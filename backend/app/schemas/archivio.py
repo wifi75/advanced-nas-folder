@@ -114,3 +114,30 @@ class VHostAnteprima(BaseModel):
 
 class WebServerDisponibili(BaseModel):
     installati: list[WebServer]
+
+
+class CreaCartella(BaseModel):
+    #: Cartella in cui creare. Vuoto = radice della pubblicazione.
+    percorso: str = Field(default="", max_length=1024)
+    nome: str = Field(min_length=1, max_length=255)
+
+
+class Rinomina(BaseModel):
+    percorso: str = Field(min_length=1, max_length=1024)
+    nome: str = Field(min_length=1, max_length=255)
+
+
+class Trasferisci(BaseModel):
+    """Spostamento o copia di un elemento in un'altra cartella."""
+
+    percorso: str = Field(min_length=1, max_length=1024)
+    #: Cartella di destinazione. Vuoto = radice della pubblicazione.
+    destinazione: str = Field(default="", max_length=1024)
+    #: Solo per la copia: nome diverso, se serve.
+    nome: str | None = Field(default=None, min_length=1, max_length=255)
+
+
+class Elimina(BaseModel):
+    percorso: str = Field(min_length=1, max_length=1024)
+    #: Necessario per eliminare una cartella che contiene qualcosa.
+    ricorsivo: bool = False

@@ -8,7 +8,7 @@ chiunque, altrimenti quella visibilita' non significherebbe nulla.
 from __future__ import annotations
 
 from dataclasses import asdict
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 import anyio
 from fastapi import APIRouter, HTTPException, Query, Response, status
@@ -22,8 +22,17 @@ from app.core.security import (
 )
 from app.models import Share, User
 from app.models.enums import Visibilita
-from app.schemas.archivio import ContenutoOut, GettoneOut, RichiestaGettone, VoceOut
-from app.services import acl, archivio, consegna
+from app.schemas.archivio import (
+    ContenutoOut,
+    CreaCartella,
+    Elimina,
+    GettoneOut,
+    RichiestaGettone,
+    Rinomina,
+    Trasferisci,
+    VoceOut,
+)
+from app.services import acl, archivio, consegna, operazioni
 from app.services.percorsi import PercorsoNonValido, normalizza_relativo, risolvi
 
 router = APIRouter(prefix="/archivio", tags=["archivio"])
@@ -190,3 +199,127 @@ async def scarica(
             headers=preparata.intestazioni,
         )
     return Response(status_code=status.HTTP_200_OK, headers=preparata.intestazioni)
+
+
+# --- modifiche --------------------------------------------------------------
+
+
+async def _con_scrittura(
+    sessione: Sessione, share: Share, percorso: str, utente: User | None
+) -> Path:
+    """Autorizza in scrittura un percorso e restituisce il percorso reale.
+
+    La scrittura non e' solo «accesso consentito»: serve un permesso di
+    livello scrittura, oppure essere amministratori. Chi puo' leggere una
+    cartella non deve poterne cambiare il contenuto.
+    """
+    decisione = await _autorizza(sessione, share, percorso, utente)
+    if not decisione.scrittura:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, "Non hai il permesso di modificare questa cartella."
+        )
+    return await _reale(sessione, share, percorso)
+
+
+async def _prepara(
+    sessione: Sessione, slug: str, percorso: str, utente: User | None
+) -> tuple[Share, str, Path]:
+    share = await _pubblicazione(sessione, slug)
+    normalizzato = _normalizza(percorso)
+    return share, normalizzato, await _con_scrittura(sessione, share, normalizzato, utente)
+
+
+def _rifiuto(exc: operazioni.OperazioneRifiutata) -> HTTPException:
+    # 409 e non 400: la richiesta e' ben formata, e' lo stato della cartella
+    # che non permette l'operazione — un nome gia' occupato, una cartella non
+    # vuota. All'utente serve sapere questo, non «richiesta non valida».
+    return HTTPException(status.HTTP_409_CONFLICT, str(exc))
+
+
+@router.post("/{slug}/cartella", status_code=status.HTTP_201_CREATED)
+async def crea_cartella(
+    slug: str, dati: CreaCartella, sessione: Sessione, utente: UtenteFacoltativo
+) -> dict[str, str]:
+    _, percorso, reale = await _prepara(sessione, slug, dati.percorso, utente)
+    try:
+        await operazioni.crea_cartella(reale, dati.nome)
+    except operazioni.OperazioneRifiutata as exc:
+        raise _rifiuto(exc) from exc
+    return {"percorso": str(PurePosixPath(percorso) / dati.nome.strip())}
+
+
+@router.post("/{slug}/rinomina")
+async def rinomina(
+    slug: str, dati: Rinomina, sessione: Sessione, utente: UtenteFacoltativo
+) -> dict[str, str]:
+    _, percorso, reale = await _prepara(sessione, slug, dati.percorso, utente)
+    try:
+        await operazioni.rinomina(reale, dati.nome)
+    except operazioni.OperazioneRifiutata as exc:
+        raise _rifiuto(exc) from exc
+    return {"percorso": str(PurePosixPath(percorso).parent / dati.nome.strip())}
+
+
+@router.post("/{slug}/sposta")
+async def sposta(
+    slug: str, dati: Trasferisci, sessione: Sessione, utente: UtenteFacoltativo
+) -> dict[str, str]:
+    """Sposta un elemento in un'altra cartella.
+
+    Servono i permessi di scrittura su **entrambe**: spostare significa
+    togliere di la' e mettere di qua, e chiederli solo sulla destinazione
+    permetterebbe di svuotare una cartella su cui non si ha alcun diritto.
+    """
+    share, origine, reale_origine = await _prepara(sessione, slug, dati.percorso, utente)
+    destinazione = _normalizza(dati.destinazione)
+    reale_destinazione = await _con_scrittura(sessione, share, destinazione, utente)
+
+    try:
+        await operazioni.sposta(reale_origine, reale_destinazione)
+    except operazioni.OperazioneRifiutata as exc:
+        raise _rifiuto(exc) from exc
+    return {"percorso": str(PurePosixPath(destinazione) / PurePosixPath(origine).name)}
+
+
+@router.post("/{slug}/copia")
+async def copia(
+    slug: str, dati: Trasferisci, sessione: Sessione, utente: UtenteFacoltativo
+) -> dict[str, str]:
+    """Copia un elemento in un'altra cartella.
+
+    Qui basta poter leggere l'origine — copiarla non la cambia — ma serve
+    scrivere nella destinazione.
+    """
+    share = await _pubblicazione(sessione, slug)
+    origine = _normalizza(dati.percorso)
+    await _autorizza(sessione, share, origine, utente)
+    reale_origine = await _reale(sessione, share, origine)
+
+    destinazione = _normalizza(dati.destinazione)
+    reale_destinazione = await _con_scrittura(sessione, share, destinazione, utente)
+
+    try:
+        await operazioni.copia(reale_origine, reale_destinazione, dati.nome)
+    except operazioni.OperazioneRifiutata as exc:
+        raise _rifiuto(exc) from exc
+    nome = dati.nome.strip() if dati.nome else PurePosixPath(origine).name
+    return {"percorso": str(PurePosixPath(destinazione) / nome)}
+
+
+@router.post("/{slug}/elimina", status_code=status.HTTP_204_NO_CONTENT)
+async def elimina(slug: str, dati: Elimina, sessione: Sessione, utente: UtenteFacoltativo) -> None:
+    """Elimina un file o una cartella.
+
+    E' una POST e non una DELETE perche' serve un corpo: la conferma per una
+    cartella non vuota non puo' viaggiare come parametro, dove finirebbe nei
+    log del web server accanto al percorso di cio' che si sta cancellando.
+    """
+    _, percorso, reale = await _prepara(sessione, slug, dati.percorso, utente)
+    if not percorso:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST, "Non si puo eliminare la radice della pubblicazione."
+        )
+    try:
+        await operazioni.elimina(reale, ricorsivo=dati.ricorsivo)
+    except operazioni.OperazioneRifiutata as exc:
+        raise _rifiuto(exc) from exc
