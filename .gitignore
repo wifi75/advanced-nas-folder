@@ -28,10 +28,16 @@ frontend/dist/
 *.sqlite
 *.sqlite3
 *.db
+# WAL e shared-memory di SQLite: accompagnano il file del database
+*.sqlite3-wal
+*.sqlite3-shm
+*.sqlite-wal
+*.sqlite-shm
 dumps/
 
 # --- Log e temporanei ---
 *.log
+*.err
 logs/
 tmp/
 .DS_Store
