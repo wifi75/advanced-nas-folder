@@ -54,27 +54,27 @@ def valida_nome(nome: str) -> str:
     if not nome or nome in (".", ".."):
         raise OperazioneRifiutata("Indica un nome.")
     if len(nome) > 255:
-        raise OperazioneRifiutata("Il nome e' troppo lungo.")
+        raise OperazioneRifiutata("Il nome è troppo lungo.")
     if any(c in _VIETATI_NEL_NOME for c in nome):
         raise OperazioneRifiutata(
-            'Il nome non puo contenere / \\ : * ? " < > | ne caratteri di controllo.'
+            'Il nome non può contenere / \\ : * ? " < > | né caratteri di controllo.'
         )
     if nome.startswith("."):
         # I file che iniziano con un punto sono nascosti, e il pannello non li
         # mostra: crearne uno significherebbe farlo sparire subito dopo.
-        raise OperazioneRifiutata("Il nome non puo iniziare con un punto.")
+        raise OperazioneRifiutata("Il nome non può iniziare con un punto.")
     if nome.endswith((" ", ".")):
         # Windows li tronca in silenzio: il file creato avrebbe un altro nome.
-        raise OperazioneRifiutata("Il nome non puo finire con uno spazio o un punto.")
+        raise OperazioneRifiutata("Il nome non può finire con uno spazio o un punto.")
     if nome.split(".")[0].lower() in _RISERVATI:
-        raise OperazioneRifiutata(f"{nome!r} e un nome riservato dal sistema.")
+        raise OperazioneRifiutata(f"{nome!r} è un nome riservato dal sistema.")
 
     return nome
 
 
 def _libero(destinazione: Path) -> None:
     if destinazione.exists():
-        raise OperazioneRifiutata(f"{destinazione.name!r} esiste gia in questa cartella.")
+        raise OperazioneRifiutata(f"{destinazione.name!r} esiste già in questa cartella.")
 
 
 def _crea_cartella(destinazione: Path) -> None:
@@ -84,27 +84,27 @@ def _crea_cartella(destinazione: Path) -> None:
 
 def _rinomina(origine: Path, destinazione: Path) -> None:
     if not origine.exists():
-        raise OperazioneRifiutata("L'elemento da rinominare non esiste piu.")
+        raise OperazioneRifiutata("L'elemento da rinominare non esiste più.")
     _libero(destinazione)
     origine.rename(destinazione)
 
 
 def _sposta(origine: Path, destinazione: Path) -> None:
     if not origine.exists():
-        raise OperazioneRifiutata("L'elemento da spostare non esiste piu.")
+        raise OperazioneRifiutata("L'elemento da spostare non esiste più.")
     if origine == destinazione or destinazione.is_relative_to(origine):
         # Spostare una cartella dentro se stessa creerebbe un ciclo, e a
         # seconda del filesystem la si perde.
-        raise OperazioneRifiutata("Non si puo spostare una cartella dentro se stessa.")
+        raise OperazioneRifiutata("Non si può spostare una cartella dentro sé stessa.")
     _libero(destinazione)
     shutil.move(str(origine), str(destinazione))
 
 
 def _copia(origine: Path, destinazione: Path) -> None:
     if not origine.exists():
-        raise OperazioneRifiutata("L'elemento da copiare non esiste piu.")
+        raise OperazioneRifiutata("L'elemento da copiare non esiste più.")
     if destinazione.is_relative_to(origine):
-        raise OperazioneRifiutata("Non si puo copiare una cartella dentro se stessa.")
+        raise OperazioneRifiutata("Non si può copiare una cartella dentro sé stessa.")
     _libero(destinazione)
     if origine.is_dir():
         shutil.copytree(origine, destinazione, symlinks=True)
@@ -114,7 +114,7 @@ def _copia(origine: Path, destinazione: Path) -> None:
 
 def _elimina(bersaglio: Path, *, ricorsivo: bool) -> None:
     if not bersaglio.exists():
-        raise OperazioneRifiutata("L'elemento non esiste piu.")
+        raise OperazioneRifiutata("L'elemento non esiste più.")
 
     if bersaglio.is_dir():
         # Una cartella piena si cancella solo se e stato chiesto in modo
@@ -122,7 +122,7 @@ def _elimina(bersaglio: Path, *, ricorsivo: bool) -> None:
         # vuota e ne perde il contenuto e troppo facile da produrre.
         if not ricorsivo and any(bersaglio.iterdir()):
             raise OperazioneRifiutata(
-                "La cartella non e vuota: conferma di volerla eliminare con tutto il contenuto."
+                "La cartella non è vuota: conferma di volerla eliminare con tutto il contenuto."
             )
         shutil.rmtree(bersaglio)
     else:
@@ -142,7 +142,7 @@ def _scrivibile(cartella: Path) -> None:
         prova.unlink()
     except OSError as exc:
         raise OperazioneRifiutata(
-            "La cartella e in sola lettura: il NAS non consente di scrivere qui."
+            "La cartella è in sola lettura: il NAS non consente di scrivere qui."
         ) from exc
 
 

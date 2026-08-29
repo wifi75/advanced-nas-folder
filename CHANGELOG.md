@@ -53,7 +53,21 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
   ricordate a mano — `XSendFilePath` su Apache, una `location` marcata `internal` su
   Nginx. Se mancano, i download rispondono vuoti; se sono scritte male, i file del NAS
   diventano raggiungibili saltando i permessi.
-- 82 test nuovi. Suite complessiva a **261 test**.
+- **Operazioni sui file**: nuova cartella, rinomina, sposta, copia ed elimina, dal
+  pannello. I pulsanti compaiono solo dove si ha il permesso di scrittura, e il
+  controllo vero lo rifà comunque il server a ogni chiamata.
+- Non si sovrascrive mai per sbaglio: se la destinazione esiste l'operazione fallisce e
+  lo dice. Una cartella con dentro qualcosa si elimina solo con una conferma esplicita:
+  chi crede di cancellarne una vuota non deve perderne il contenuto.
+- Spostare richiede la scrittura su origine **e** destinazione — chiederla solo sulla
+  destinazione permetterebbe di svuotare una cartella su cui non si ha alcun diritto.
+  Copiare richiede solo di poter leggere l'origine, perché non la cambia.
+- I nomi vengono controllati contro quelli che il NAS accetterebbe ma che poi risultano
+  inapribili da SMB o da Windows: barre, due punti, nomi di dispositivo, nomi che
+  finiscono con uno spazio.
+- La scrittura viene verificata provandoci, non fidandosi di ciò che il pannello ha
+  chiesto: se la regola NFS sul NAS è in sola lettura, il mount lo è.
+- 102 test nuovi. Suite complessiva a **281 test**.
 
 ### Modificato
 - In sviluppo la consegna passa da sola a `stream`: senza un web server davanti,

@@ -83,6 +83,81 @@ async function scarica(voce: Voce): Promise<void> {
   }
 }
 
+// --- modifiche ---
+// Compaiono solo quando il server dice che questa cartella è scrivibile: il
+// controllo vero lo rifà lui a ogni chiamata, ma mostrare pulsanti che
+// falliranno di sicuro è solo un modo di far perdere tempo.
+const puoScrivere = computed(() => contenuto.value?.scrittura === true)
+
+const nuovaCartella = ref('')
+const inRinomina = ref<Voce | null>(null)
+const nomeNuovo = ref('')
+const daEliminare = ref<Voce | null>(null)
+const daSpostare = ref<Voce | null>(null)
+const destinazione = ref('')
+const operazione = ref(false)
+
+async function conEsito(azione: () => Promise<unknown>): Promise<void> {
+  operazione.value = true
+  errore.value = null
+  try {
+    await azione()
+    await carica()
+  } catch (e) {
+    errore.value = e instanceof Error ? e.message : t('errori.generico')
+  } finally {
+    operazione.value = false
+  }
+}
+
+async function creaCartella(): Promise<void> {
+  const nome = nuovaCartella.value.trim()
+  if (!nome) return
+  await conEsito(async () => {
+    await archivioApi.creaCartella(slug.value, percorso.value, nome)
+    nuovaCartella.value = ''
+  })
+}
+
+function apriRinomina(voce: Voce): void {
+  inRinomina.value = voce
+  nomeNuovo.value = voce.nome
+}
+
+async function confermaRinomina(): Promise<void> {
+  const voce = inRinomina.value
+  if (voce === null || nomeNuovo.value.trim() === '') return
+  await conEsito(async () => {
+    await archivioApi.rinomina(slug.value, voce.percorso, nomeNuovo.value.trim())
+    inRinomina.value = null
+  })
+}
+
+function apriSposta(voce: Voce): void {
+  daSpostare.value = voce
+  destinazione.value = percorso.value
+}
+
+async function confermaSposta(copiando: boolean): Promise<void> {
+  const voce = daSpostare.value
+  if (voce === null) return
+  await conEsito(async () => {
+    const dove = destinazione.value.trim()
+    if (copiando) await archivioApi.copia(slug.value, voce.percorso, dove)
+    else await archivioApi.sposta(slug.value, voce.percorso, dove)
+    daSpostare.value = null
+  })
+}
+
+async function confermaElimina(ricorsivo: boolean): Promise<void> {
+  const voce = daEliminare.value
+  if (voce === null) return
+  await conEsito(async () => {
+    await archivioApi.elimina(slug.value, voce.percorso, ricorsivo)
+    daEliminare.value = null
+  })
+}
+
 const UNITA = ['B', 'kB', 'MB', 'GB', 'TB'] as const
 
 function dimensione(byte: number | null): string {
@@ -145,6 +220,26 @@ function quando(iso: string | null): string {
         </template>
       </nav>
     </header>
+
+    <form
+      v-if="puoScrivere"
+      class="riga-form"
+      @submit.prevent="creaCartella"
+    >
+      <input
+        v-model="nuovaCartella"
+        type="text"
+        class="campo"
+        :placeholder="t('operazioni.nuovaCartella')"
+      >
+      <button
+        type="submit"
+        class="bottone bottone--tenue"
+        :disabled="operazione || nuovaCartella.trim() === ''"
+      >
+        {{ t('operazioni.crea') }}
+      </button>
+    </form>
 
     <form
       v-if="chiedePassword"
@@ -237,17 +332,160 @@ function quando(iso: string | null): string {
         <span class="voce__dimensione">{{ dimensione(voce.dimensione) }}</span>
         <span class="voce__data">{{ quando(voce.modificato) }}</span>
 
-        <button
-          v-if="!voce.cartella"
-          type="button"
-          class="bottone bottone--tenue"
-          :disabled="inPreparazione === voce.percorso"
-          @click="scarica(voce)"
-        >
-          {{ inPreparazione === voce.percorso ? t('comune.carico') : t('archivio.scarica') }}
-        </button>
+        <div class="voce__azioni">
+          <button
+            v-if="!voce.cartella"
+            type="button"
+            class="bottone bottone--tenue"
+            :disabled="inPreparazione === voce.percorso"
+            @click="scarica(voce)"
+          >
+            {{ inPreparazione === voce.percorso ? t('comune.carico') : t('archivio.scarica') }}
+          </button>
+          <template v-if="puoScrivere">
+            <button
+              type="button"
+              class="bottone bottone--tenue"
+              @click="apriRinomina(voce)"
+            >
+              {{ t('operazioni.rinomina') }}
+            </button>
+            <button
+              type="button"
+              class="bottone bottone--tenue"
+              @click="apriSposta(voce)"
+            >
+              {{ t('operazioni.sposta') }}
+            </button>
+            <button
+              type="button"
+              class="bottone bottone--pericolo"
+              @click="daEliminare = voce"
+            >
+              {{ t('comune.elimina') }}
+            </button>
+          </template>
+        </div>
       </li>
     </ul>
+
+    <div
+      v-if="inRinomina"
+      class="velo"
+      @click.self="inRinomina = null"
+    >
+      <form
+        class="pannello"
+        @submit.prevent="confermaRinomina"
+      >
+        <h2>{{ t('operazioni.rinomina') }}</h2>
+        <input
+          v-model="nomeNuovo"
+          type="text"
+          class="campo"
+        >
+        <div class="pannello__azioni">
+          <button
+            type="button"
+            class="bottone bottone--tenue"
+            @click="inRinomina = null"
+          >
+            {{ t('comune.annulla') }}
+          </button>
+          <button
+            type="submit"
+            class="bottone"
+            :disabled="operazione"
+          >
+            {{ t('comune.salva') }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div
+      v-if="daSpostare"
+      class="velo"
+      @click.self="daSpostare = null"
+    >
+      <div
+        class="pannello"
+        role="dialog"
+      >
+        <h2>{{ t('operazioni.spostaTitolo', { nome: daSpostare.nome }) }}</h2>
+        <label
+          class="pannello__etichetta"
+          for="anf-destinazione"
+        >{{ t('operazioni.destinazione') }}</label>
+        <input
+          id="anf-destinazione"
+          v-model="destinazione"
+          type="text"
+          class="campo"
+          :placeholder="t('archivio.radice')"
+        >
+        <div class="pannello__azioni">
+          <button
+            type="button"
+            class="bottone bottone--tenue"
+            @click="daSpostare = null"
+          >
+            {{ t('comune.annulla') }}
+          </button>
+          <button
+            type="button"
+            class="bottone bottone--tenue"
+            :disabled="operazione"
+            @click="confermaSposta(true)"
+          >
+            {{ t('operazioni.copia') }}
+          </button>
+          <button
+            type="button"
+            class="bottone"
+            :disabled="operazione"
+            @click="confermaSposta(false)"
+          >
+            {{ t('operazioni.sposta') }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div
+      v-if="daEliminare"
+      class="velo"
+      @click.self="daEliminare = null"
+    >
+      <div
+        class="pannello"
+        role="dialog"
+      >
+        <h2>{{ t('operazioni.eliminaTitolo', { nome: daEliminare.nome }) }}</h2>
+        <p class="pannello__testo">
+          {{
+            daEliminare.cartella ? t('operazioni.eliminaCartella') : t('operazioni.eliminaFile')
+          }}
+        </p>
+        <div class="pannello__azioni">
+          <button
+            type="button"
+            class="bottone bottone--tenue"
+            @click="daEliminare = null"
+          >
+            {{ t('comune.annulla') }}
+          </button>
+          <button
+            type="button"
+            class="bottone bottone--pericolo"
+            :disabled="operazione"
+            @click="confermaElimina(daEliminare.cartella)"
+          >
+            {{ t('comune.elimina') }}
+          </button>
+        </div>
+      </div>
+    </div>
   </section>
 </template>
 
@@ -416,6 +654,62 @@ function quando(iso: string | null): string {
 .bottone:disabled {
   cursor: default;
   opacity: 0.55;
+}
+
+.voce__azioni {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.bottone--pericolo {
+  border: 1px solid var(--errore);
+  background: transparent;
+  color: var(--errore);
+}
+
+.riga-form {
+  display: flex;
+  gap: 0.5rem;
+  max-width: 26rem;
+}
+
+.velo {
+  position: fixed;
+  display: grid;
+  padding: 1rem;
+  background: rgb(0 0 0 / 45%);
+  inset: 0;
+  place-items: center;
+}
+
+.pannello {
+  display: flex;
+  flex-direction: column;
+  width: min(26rem, 100%);
+  gap: 0.7rem;
+  padding: 1.25rem;
+  border-radius: var(--raggio);
+  background: var(--superficie);
+}
+
+.pannello h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.pannello__testo,
+.pannello__etichetta {
+  margin: 0;
+  color: var(--testo-tenue);
+  font-size: 0.9rem;
+}
+
+.pannello__azioni {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
 }
 
 .password {

@@ -73,7 +73,9 @@ nessuna dipende da quelle successive.
 
 - [ ] Navigazione, viste elenco / griglia / galleria, icone per tipo
 - [ ] Menu contestuale, selezione multipla
-- [ ] Crea, rinomina, sposta, copia, elimina, nuova cartella
+- [x] **Crea, rinomina, sposta, copia, elimina, nuova cartella**, con conferma
+      esplicita per le cartelle non vuote e permesso di scrittura richiesto su
+      origine e destinazione
 - [ ] Upload drag&drop con avanzamento, upload di cartelle
 - [ ] Upload a blocchi riprendibile
 - [ ] Download multiplo e cartella come archivio

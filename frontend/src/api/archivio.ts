@@ -47,6 +47,39 @@ export const archivioApi = {
       percorso,
       password: password ?? null,
     }),
+
+  creaCartella: (slug: string, percorso: string, nome: string) =>
+    api.post<{ percorso: string }>(`/archivio/${encodeURIComponent(slug)}/cartella`, {
+      percorso,
+      nome,
+    }),
+
+  rinomina: (slug: string, percorso: string, nome: string) =>
+    api.post<{ percorso: string }>(`/archivio/${encodeURIComponent(slug)}/rinomina`, {
+      percorso,
+      nome,
+    }),
+
+  sposta: (slug: string, percorso: string, destinazione: string) =>
+    api.post<{ percorso: string }>(`/archivio/${encodeURIComponent(slug)}/sposta`, {
+      percorso,
+      destinazione,
+    }),
+
+  copia: (slug: string, percorso: string, destinazione: string, nome?: string) =>
+    api.post<{ percorso: string }>(`/archivio/${encodeURIComponent(slug)}/copia`, {
+      percorso,
+      destinazione,
+      nome: nome ?? null,
+    }),
+
+  /**
+   * Una POST e non una DELETE perché serve un corpo: la conferma per una
+   * cartella non vuota non può viaggiare come parametro, dove finirebbe nei
+   * log del web server accanto al percorso di ciò che si sta cancellando.
+   */
+  elimina: (slug: string, percorso: string, ricorsivo = false) =>
+    api.post<void>(`/archivio/${encodeURIComponent(slug)}/elimina`, { percorso, ricorsivo }),
 }
 
 /**

@@ -317,7 +317,7 @@ async def elimina(slug: str, dati: Elimina, sessione: Sessione, utente: UtenteFa
     _, percorso, reale = await _prepara(sessione, slug, dati.percorso, utente)
     if not percorso:
         raise HTTPException(
-            status.HTTP_400_BAD_REQUEST, "Non si puo eliminare la radice della pubblicazione."
+            status.HTTP_400_BAD_REQUEST, "Non si può eliminare la radice della pubblicazione."
         )
     try:
         await operazioni.elimina(reale, ricorsivo=dati.ricorsivo)

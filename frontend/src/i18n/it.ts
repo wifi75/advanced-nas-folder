@@ -239,6 +239,20 @@ export default {
     passwordRichiesta: 'Questo collegamento è protetto da una password.',
   },
 
+  operazioni: {
+    nuovaCartella: 'Nome della nuova cartella',
+    crea: 'Crea cartella',
+    rinomina: 'Rinomina',
+    sposta: 'Sposta',
+    copia: 'Copia',
+    spostaTitolo: 'Sposta o copia «{nome}»',
+    destinazione: 'Cartella di destinazione (vuoto = inizio)',
+    eliminaTitolo: 'Eliminare «{nome}»?',
+    eliminaFile: 'Il file viene eliminato dal NAS. L’operazione non si può annullare.',
+    eliminaCartella:
+      'La cartella viene eliminata con tutto il suo contenuto. L’operazione non si può annullare.',
+  },
+
   archivio: {
     titolo: 'Archivio',
     apri: 'Sfoglia',

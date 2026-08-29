@@ -236,6 +236,19 @@ export default {
     passwordRichiesta: 'This link is protected by a password.',
   },
 
+  operazioni: {
+    nuovaCartella: 'Name of the new folder',
+    crea: 'Create folder',
+    rinomina: 'Rename',
+    sposta: 'Move',
+    copia: 'Copy',
+    spostaTitolo: 'Move or copy “{nome}”',
+    destinazione: 'Destination folder (empty = top)',
+    eliminaTitolo: 'Delete “{nome}”?',
+    eliminaFile: 'The file is deleted from the NAS. This cannot be undone.',
+    eliminaCartella: 'The folder is deleted with everything in it. This cannot be undone.',
+  },
+
   archivio: {
     titolo: 'Files',
     apri: 'Browse',
