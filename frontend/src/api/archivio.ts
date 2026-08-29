@@ -56,6 +56,12 @@ export const archivioApi = {
       password: password ?? null,
     }),
 
+  checksum: (slug: string, percorso: string) =>
+    api.post<{ percorso: string; algoritmo: string; valore: string; dimensione: number }>(
+      `/archivio/${encodeURIComponent(slug)}/checksum`,
+      { percorso },
+    ),
+
   cerca: (slug: string, percorso: string, q: string) => {
     const query = new URLSearchParams({ percorso, q })
     return api.get<RisultatiRicerca>(`/archivio/${encodeURIComponent(slug)}/cerca?${query}`)
@@ -108,9 +114,11 @@ export async function indirizzoDownload(
   slug: string,
   percorso: string,
   password?: string,
+  mostra = false,
 ): Promise<string> {
   const { gettone } = await archivioApi.gettone(slug, percorso, password)
   const q = new URLSearchParams({ percorso, g: gettone })
+  if (mostra) q.set('mostra', 'true')
   return `${BASE}/archivio/${encodeURIComponent(slug)}/file?${q}`
 }
 

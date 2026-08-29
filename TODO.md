@@ -93,8 +93,8 @@ nessuna dipende da quelle successive.
 - [ ] Dashboard download live via WebSocket: file, IP, percentuale, velocità
 - [ ] Avanzamento lato visitatore con pausa e ripresa
 - [ ] Editor di testo e codice con evidenziazione sintassi
-- [ ] Anteprime: immagini, video, audio, PDF, epub
-- [ ] Checksum SHA-256 calcolato e mostrato
+- [x] **Anteprime**: immagini, video, audio, PDF e testo semplice
+- [x] **Checksum SHA-256** calcolato su richiesta e mostrato nell'anteprima
 
 ## Fase 5 — Rifinitura
 

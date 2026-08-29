@@ -23,6 +23,18 @@ from urllib.parse import quote
 
 from app.core.config import get_settings
 
+#: Tipi che il pannello può mostrare al posto di far scaricare. Solo questi:
+#: aprire «in linea» un tipo qualunque significherebbe farlo interpretare dal
+#: browser, che è il modo in cui un file caricato da altri diventa codice
+#: eseguito nel contesto del pannello.
+TIPI_MOSTRABILI = (
+    "image/",
+    "video/",
+    "audio/",
+    "application/pdf",
+    "text/plain",
+)
+
 #: Tipi che il browser non deve interpretare ma scaricare. Servire HTML o SVG
 #: caricati da altri con il loro tipo reale significa eseguirli nel contesto
 #: del pannello: è cross-site scripting con un altro nome.
@@ -66,6 +78,12 @@ def _disposizione(nome: str, *, allegato: bool) -> str:
     tipo = "attachment" if allegato else "inline"
     ripiego = nome.encode("ascii", "replace").decode("ascii").replace('"', "_")
     return f"{tipo}; filename=\"{ripiego}\"; filename*=UTF-8''{quote(nome)}"
+
+
+def si_puo_mostrare(nome: str) -> bool:
+    """Vero se il file si puo' aprire nel pannello invece che scaricarlo."""
+    tipo = tipo_contenuto(nome)
+    return any(tipo.startswith(prefisso) for prefisso in TIPI_MOSTRABILI)
 
 
 def intestazioni_allegato(nome: str) -> dict[str, str]:

@@ -174,3 +174,14 @@ class SelezioneZip(BaseModel):
     percorsi: list[str] = Field(min_length=1, max_length=500)
     #: Nome proposto per il file scaricato.
     nome: str = Field(default="selezione", max_length=128)
+
+
+class RichiestaChecksum(BaseModel):
+    percorso: str = Field(min_length=1, max_length=1024)
+
+
+class Checksum(BaseModel):
+    percorso: str
+    algoritmo: str = "sha256"
+    valore: str
+    dimensione: int

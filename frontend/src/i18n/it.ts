@@ -268,6 +268,13 @@ export default {
     passwordRichiesta: 'Questo collegamento è protetto da una password.',
   },
 
+  anteprima: {
+    nonMostrabile: 'Questo tipo di file non si può mostrare qui: scaricalo per aprirlo.',
+    impronta: 'Calcola impronta SHA-256',
+    improntaNota:
+      'Confrontala con quella del file di partenza per essere certo che sia arrivato identico.',
+  },
+
   selezione: {
     scegli: 'Seleziona {nome}',
     scelti: 'nessun elemento | 1 elemento scelto | {n} elementi scelti',

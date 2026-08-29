@@ -121,7 +121,16 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 - **La CI esegue i controlli a ogni push**: `ruff`, `mypy`, `pytest`, ESLint, `vue-tsc` e
   build. Prima girava solo la build della release, e un errore di tipo o un test rotto si
   scopriva al momento di rilasciare, cioè nel momento peggiore.
-- 146 test nuovi. Suite complessiva a **325 test**.
+- **Anteprime**: immagini, video, audio, PDF e testo semplice si aprono nel pannello
+  invece di essere scaricati. Il server concede l'apertura in linea **solo a questi
+  tipi**: farlo per un tipo qualunque significherebbe farlo interpretare dal browser, e
+  un file caricato da altri diventerebbe codice eseguito nel contesto del pannello.
+  HTML e SVG restano allegati anche se l'anteprima li chiede.
+- **Checksum SHA-256** calcolato su richiesta. Risponde a una domanda precisa: il file
+  arrivato è identico a quello che c'era? Confrontare le dimensioni non basta — due file
+  diversi possono pesare uguale. Viene letto a blocchi, perché caricarlo in memoria lo
+  renderebbe impossibile proprio sui file per cui serve di più.
+- 156 test nuovi. Suite complessiva a **335 test**.
 
 ### Modificato
 - In sviluppo la consegna passa da sola a `stream`: senza un web server davanti,

@@ -19,6 +19,7 @@ import {
   type Voce,
 } from '@/api/archivio'
 import { ApiError, tokenCorrente } from '@/api/client'
+import Anteprima from '@/components/Anteprima.vue'
 import Caricamenti from '@/components/Caricamenti.vue'
 
 const route = useRoute()
@@ -90,6 +91,9 @@ async function scarica(voce: Voce): Promise<void> {
     inPreparazione.value = null
   }
 }
+
+// --- anteprima ---
+const inAnteprima = ref<Voce | null>(null)
 
 // --- selezione ---
 // Un insieme di percorsi, non di indici: cambiando cartella o cercando,
@@ -522,9 +526,11 @@ function quando(iso: string | null): string {
           <span class="voce__nome">{{ risultati ? voce.percorso : voce.nome }}</span>
         </button>
 
-        <div
+        <button
           v-else
-          class="voce__apri voce__apri--file"
+          type="button"
+          class="voce__apri"
+          @click="inAnteprima = voce"
         >
           <svg
             class="voce__icona"
@@ -535,7 +541,7 @@ function quando(iso: string | null): string {
             <path :d="TRACCIATI[famiglia(voce)]" />
           </svg>
           <span class="voce__nome">{{ risultati ? voce.percorso : voce.nome }}</span>
-        </div>
+        </button>
 
         <span class="voce__dimensione">{{ dimensione(voce.dimensione) }}</span>
         <span class="voce__data">{{ quando(voce.modificato) }}</span>
@@ -576,6 +582,13 @@ function quando(iso: string | null): string {
         </div>
       </li>
     </ul>
+
+    <Anteprima
+      v-if="inAnteprima"
+      :slug="slug"
+      :voce="inAnteprima"
+      @chiudi="inAnteprima = null"
+    />
 
     <div
       v-if="inRinomina"
@@ -814,11 +827,11 @@ function quando(iso: string | null): string {
   text-align: left;
 }
 
-.voce__apri:not(.voce__apri--file) {
+.voce__apri {
   cursor: pointer;
 }
 
-.voce__apri:not(.voce__apri--file):hover .voce__nome {
+.voce__apri:hover .voce__nome {
   text-decoration: underline;
 }
 

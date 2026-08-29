@@ -7,6 +7,7 @@ chiunque, altrimenti quella visibilita' non significherebbe nulla.
 
 from __future__ import annotations
 
+import hashlib
 from collections.abc import Callable
 from dataclasses import asdict
 from pathlib import Path, PurePosixPath
@@ -24,11 +25,13 @@ from app.core.security import (
 from app.models import Share, User
 from app.models.enums import Visibilita
 from app.schemas.archivio import (
+    Checksum,
     CompletaCaricamento,
     ContenutoOut,
     CreaCartella,
     Elimina,
     GettoneOut,
+    RichiestaChecksum,
     RichiestaGettone,
     Rinomina,
     RisultatiRicerca,
@@ -175,6 +178,7 @@ async def scarica(
     utente: UtenteFacoltativo,
     percorso: str = Query(max_length=1024),
     g: str | None = Query(default=None, description="Gettone rilasciato da /gettone"),
+    mostra: bool = Query(default=False, description="Apri nel browser invece di scaricare"),
 ) -> Response:
     """Consegna un file.
 
@@ -196,7 +200,12 @@ async def scarica(
     if not await anyio.to_thread.run_sync(reale.is_file):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "File non trovato.")
 
-    preparata = consegna.prepara(reale, reale.name)
+    # «In linea» solo per i tipi che il pannello sa mostrare: concederlo a un
+    # tipo qualunque significherebbe farlo interpretare dal browser, e un file
+    # caricato da altri diventerebbe codice eseguito nel contesto del pannello.
+    in_linea = mostra and consegna.si_puo_mostrare(reale.name)
+
+    preparata = consegna.prepara(reale, reale.name, allegato=not in_linea)
     if preparata.invia_direttamente is not None:
         return FileResponse(
             preparata.invia_direttamente,
@@ -527,3 +536,43 @@ async def scarica_selezione(
     return StreamingResponse(
         flusso, media_type="application/zip", headers=consegna.intestazioni_allegato(nome)
     )
+
+
+@router.post("/{slug}/checksum", response_model=Checksum)
+async def checksum(
+    slug: str, dati: RichiestaChecksum, sessione: Sessione, utente: UtenteFacoltativo
+) -> Checksum:
+    """Calcola l'impronta SHA-256 di un file.
+
+    Serve a rispondere a una domanda precisa: il file arrivato è identico a
+    quello che c'era? Confrontare le dimensioni non basta — due file diversi
+    possono pesare uguale, e un trasferimento troncato a metà blocco no.
+
+    Il file viene letto a pezzi: caricarlo in memoria per calcolarne l'impronta
+    renderebbe impossibile farlo proprio sui file per cui serve di più.
+    """
+    share = await _pubblicazione(sessione, slug)
+    percorso = _normalizza(dati.percorso)
+    await _autorizza(sessione, share, percorso, utente)
+
+    reale = await _reale(sessione, share, percorso)
+    if not await anyio.to_thread.run_sync(reale.is_file):
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "File non trovato.")
+
+    def calcola() -> tuple[str, int]:
+        impronta = hashlib.sha256()
+        letti = 0
+        with reale.open("rb") as f:
+            while blocco := f.read(1024 * 1024):
+                impronta.update(blocco)
+                letti += len(blocco)
+        return impronta.hexdigest(), letti
+
+    try:
+        valore, dimensione = await anyio.to_thread.run_sync(calcola)
+    except OSError as exc:
+        raise HTTPException(
+            status.HTTP_503_SERVICE_UNAVAILABLE, f"File non leggibile: {exc.strerror}"
+        ) from exc
+
+    return Checksum(percorso=percorso, valore=valore, dimensione=dimensione)

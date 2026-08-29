@@ -265,6 +265,12 @@ export default {
     passwordRichiesta: 'This link is protected by a password.',
   },
 
+  anteprima: {
+    nonMostrabile: 'This file type cannot be shown here: download it to open it.',
+    impronta: 'Compute SHA-256 checksum',
+    improntaNota: 'Compare it with the original file to be sure it arrived identical.',
+  },
+
   selezione: {
     scegli: 'Select {nome}',
     scelti: 'no items | 1 item selected | {n} items selected',
