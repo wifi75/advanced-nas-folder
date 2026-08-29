@@ -8,6 +8,12 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ## [Non rilasciato]
 
 ### Aggiunto
+- **Agent privilegiato `anf-agent`**: socket Unix `0660`, protocollo JSON con
+  insieme chiuso di verbi, validatori con whitelist, generazione di unit systemd,
+  scoperta delle condivisioni NFS e lettura dello stato reale dei montaggi.
+  Nessuna dipendenza esterna: usa solo la libreria standard.
+- Autenticazione: Argon2id, token JWT, guardia sulle rotte, utente `admin` creato
+  al primo avvio con avviso sulla password iniziale.
 - Configurazione applicativa (`app/core/config.py`) letta da ambiente e `.env`,
   con validazione dei percorsi assoluti.
 - Motore e sessioni SQLite (`app/core/database.py`) con i PRAGMA riapplicati a ogni

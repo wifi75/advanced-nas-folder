@@ -23,14 +23,17 @@ nessuna dipende da quelle successive.
 - [ ] `install.sh` funzionante end-to-end
 - [x] Workflow CI: build di `dist/` e allegato alla release
 
-## Fase 1 — Mount NFS dal pannello
+## Fase 1 — Mount NFS dal pannello `in corso`
 
-- [ ] Autenticazione: login, token JWT, hash Argon2, sessioni
-- [ ] `anf-agent`: protocollo tipizzato su socket Unix, senza dipendenze esterne
-- [ ] Validatori: mountpoint confinati, whitelist delle opzioni
-- [ ] Generazione unit `.mount` / `.automount` da template
-- [ ] Scoperta delle condivisioni esportate dal NAS
-- [ ] Montaggio, smontaggio, stato *richiesto* vs *effettivo*
+- [x] Autenticazione: login, token JWT, hash Argon2, sessioni
+- [x] `anf-agent`: protocollo tipizzato su socket Unix, senza dipendenze esterne
+- [x] Validatori: mountpoint confinati, whitelist delle opzioni
+- [x] Generazione unit `.mount` / `.automount` da template
+- [x] Scoperta delle condivisioni esportate dal NAS
+- [x] Montaggio, smontaggio, stato *richiesto* vs *effettivo*, con prova di
+      scrittura sul campo
+- [ ] API: endpoint dei mount collegati all'agent
+- [ ] Interfaccia: elenco mount, scoperta, creazione, avvio e arresto
 - [ ] Interruttore scrittura, disattivato di default, con avviso di rischio
 - [ ] Migrazione dei mount preesistenti da `/etc/fstab`
 
