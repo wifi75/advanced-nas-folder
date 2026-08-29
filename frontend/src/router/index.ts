@@ -32,6 +32,12 @@ const routes: RouteRecordRaw[] = [
     meta: { titolo: 'archivio.titolo', pubblica: true },
   },
   {
+    path: '/webserver',
+    name: 'webserver',
+    component: () => import('@/views/WebServerView.vue'),
+    meta: { titolo: 'menu.webserver' },
+  },
+  {
     // Indirizzo corto di proposito: e' quello che si incolla in un messaggio.
     path: '/l/:token/:percorso(.*)*',
     name: 'link',

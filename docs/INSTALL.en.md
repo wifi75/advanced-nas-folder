@@ -159,6 +159,22 @@ curl -fsS http://127.0.0.1:8100/api/v1/health
 
 ---
 
+## Extra host names, from the panel
+
+The installer sets up the first vhost (`anf.conf`). To publish the panel on
+another host name you don't need to go back to the server: the **Web server**
+menu entry takes the name, shows a preview of the configuration and applies
+it.
+
+The generated file is named `anf-<hostname>.conf` and leaves the installer's
+own file alone. Before being applied, the configuration is checked with
+`apache2ctl configtest` or `nginx -t`: **if the check fails, the previous one
+is put back** and the panel shows the error reported by the web server.
+
+Deliberately out of scope: DNS, certificates and HTTPS listening. They live
+upstream, typically on a reverse proxy, and generating configuration that
+pretends to manage them would produce files that don't match the real setup.
+
 ## Upgrading
 
 Run the installer again: it is idempotent and **touches neither `.env` nor the

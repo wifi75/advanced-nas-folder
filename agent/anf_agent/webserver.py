@@ -99,7 +99,9 @@ server {{
     listen 80;
     server_name {hostname};
 
-    # Un file del NAS puo essere grande: nessun limite sul tempo di invio.
+    # Nessun limite alla dimensione di cio che si carica: il valore
+    # predefinito di Nginx e 1 MB, e farebbe fallire qualunque caricamento
+    # verso il NAS con un errore che non nomina la causa.
     client_max_body_size 0;
 
     location = {prefisso} {{

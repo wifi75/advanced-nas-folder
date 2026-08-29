@@ -30,6 +30,7 @@ export default {
     utenti: 'Users',
     link: 'Share links',
     stato: 'Status',
+    webserver: 'Web server',
     trasferimenti: 'Transfers',
     impostazioni: 'Settings',
     apri: 'Open the menu',
@@ -190,6 +191,26 @@ export default {
     aggiornamento: 'A new version of the panel is available.',
     ricarica: 'Update',
     prontoOffline: 'The panel now works offline too.',
+  },
+
+  webserver: {
+    titolo: 'Web server',
+    descrizione:
+      'Publish the panel on Apache or Nginx. The configuration is tested before it is applied, and if the test fails the previous one is put back.',
+    nonGestiamo:
+      'DNS, certificates and HTTPS stay where they are: this only writes the web server’s local configuration.',
+    pubblica: 'Publish on a host name',
+    hostname: 'Host name (e.g. files.example.com)',
+    prefisso: 'Prefix (/)',
+    anteprima: 'Preview',
+    applica: 'Apply',
+    vediConfigurazione: 'View configuration',
+    nessuno: 'The panel is not published on any host name yet.',
+    agentAssente:
+      'Cannot reach the system service: the list of installed web servers is unavailable.',
+    confermaTitolo: 'Remove the publication?',
+    confermaTesto:
+      'The configuration for {host} will be removed from the web server. Folders and permissions are left untouched.',
   },
 
   link: {

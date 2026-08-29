@@ -41,7 +41,19 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
   revocato è esattamente ciò che si vuole sapere dopo averlo revocato.
 - Pagina dedicata a chi riceve un link — spoglia di proposito, senza menu né accesso al
   pannello, perché mostra soltanto il ramo che il collegamento concede.
-- 33 test nuovi. Suite complessiva a **212 test**.
+- **Pubblicazione sul web server dal pannello**: si indica un nome host, si guarda
+  l'anteprima della configurazione e la si applica. Il file generato non tocca quello
+  scritto dall'installer.
+- La configurazione viene **provata prima di essere applicata** con `apache2ctl
+  configtest` o `nginx -t`, e **se il test non passa quella precedente torna al suo
+  posto**. Un pannello che può lasciare il web server incapace di ripartire prima o poi
+  lo mette fuori uso. L'esito del test compare nel messaggio d'errore: è l'unica cosa
+  che spiega cosa correggere.
+- La configurazione generata contiene le direttive delicate che finora andavano
+  ricordate a mano — `XSendFilePath` su Apache, una `location` marcata `internal` su
+  Nginx. Se mancano, i download rispondono vuoti; se sono scritte male, i file del NAS
+  diventano raggiungibili saltando i permessi.
+- 82 test nuovi. Suite complessiva a **261 test**.
 
 ### Modificato
 - In sviluppo la consegna passa da sola a `stream`: senza un web server davanti,

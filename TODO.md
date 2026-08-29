@@ -65,7 +65,8 @@ nessuna dipende da quelle successive.
       `X-Sendfile` o `X-Accel-Redirect`
 - [x] Verifica del resume (Range, `If-Range`, ETag, 206)
 - [ ] Barra di avanzamento del download lato utente
-- [ ] Gestione vhost dal pannello, con `configtest` e ripristino automatico
+- [x] **Gestione vhost dal pannello**, con anteprima, `configtest` e ripristino
+      automatico della configurazione precedente
 - [ ] Rimozione dell'alias pubblico preesistente
 
 ## Fase 3 — Gestione file completa

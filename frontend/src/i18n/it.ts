@@ -30,6 +30,7 @@ export default {
     utenti: 'Utenti',
     link: 'Link di condivisione',
     stato: 'Stato',
+    webserver: 'Web server',
     trasferimenti: 'Trasferimenti',
     impostazioni: 'Impostazioni',
     apri: 'Apri il menu',
@@ -193,6 +194,26 @@ export default {
     aggiornamento: 'È disponibile una versione aggiornata del pannello.',
     ricarica: 'Aggiorna',
     prontoOffline: 'Il pannello ora funziona anche senza rete.',
+  },
+
+  webserver: {
+    titolo: 'Web server',
+    descrizione:
+      'Pubblica il pannello su Apache o Nginx. La configurazione viene provata prima di essere applicata, e se il test non passa quella precedente torna al suo posto.',
+    nonGestiamo:
+      'DNS, certificati e HTTPS restano dove sono: qui si scrive solo la configurazione locale del web server.',
+    pubblica: 'Pubblica su un nome host',
+    hostname: 'Nome host (es. archivio.esempio.it)',
+    prefisso: 'Prefisso (/)',
+    anteprima: 'Anteprima',
+    applica: 'Applica',
+    vediConfigurazione: 'Vedi configurazione',
+    nessuno: 'Il pannello non è ancora pubblicato su nessun nome host.',
+    agentAssente:
+      'Non riesco a parlare con il servizio di sistema: l’elenco dei web server installati non è disponibile.',
+    confermaTitolo: 'Togliere la pubblicazione?',
+    confermaTesto:
+      'La configurazione di {host} verrà rimossa dal web server. Le cartelle e i permessi non vengono toccati.',
   },
 
   link: {

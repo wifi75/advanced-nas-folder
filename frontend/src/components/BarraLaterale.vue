@@ -87,6 +87,12 @@ const categorie = computed<Categoria[]>(() => [
     voci: [
       { etichetta: t('menu.stato'), a: '/', tinta: 'var(--tinta-stato)', icona: ICONE.battito },
       {
+        etichetta: t('menu.webserver'),
+        a: '/webserver',
+        tinta: 'var(--tinta-webserver)',
+        icona: ICONE.globo,
+      },
+      {
         etichetta: t('menu.trasferimenti'),
         tinta: 'var(--tinta-trasferimenti)',
         icona: ICONE.frecce,

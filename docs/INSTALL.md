@@ -158,6 +158,24 @@ curl -fsS http://127.0.0.1:8100/api/v1/health
 
 ---
 
+## Altri nomi host, dal pannello
+
+L'installer configura il primo vhost (`anf.conf`). Per pubblicare il pannello
+anche su un altro nome host non serve tornare sul server: dalla voce **Web
+server** del menu si indica il nome, si guarda l'anteprima della
+configurazione e la si applica.
+
+Il file generato si chiama `anf-<nomehost>.conf` e non tocca quello
+dell'installer. Prima di applicarla, la configurazione viene provata con
+`apache2ctl configtest` o `nginx -t`: **se il test non passa, quella
+precedente torna al suo posto** e il pannello mostra l'errore riportato dal
+web server.
+
+Restano fuori dal pannello, di proposito: DNS, certificati e ascolto in
+HTTPS. Vivono a monte, tipicamente su un reverse proxy, e generare
+configurazioni che fingono di gestirli produrrebbe file che non
+corrispondono all'impianto reale.
+
 ## Aggiornare
 
 Riesegui l'installer: è idempotente e **non tocca `.env` né il database**.
