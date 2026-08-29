@@ -61,3 +61,34 @@ def decodifica_token(token: str) -> dict[str, Any] | None:
         )
     except jwt.PyJWTError:
         return None
+
+
+def crea_gettone_percorso(share_id: int, percorso: str, *, minuti: int = 5) -> str:
+    """Autorizzazione a vita breve per scaricare un percorso preciso.
+
+    Serve perche' un download e' una navigazione del browser, non una chiamata
+    fatta dal codice: non puo' portare intestazioni, e quindi non puo' portare
+    il token di sessione. L'alternativa sarebbe mettere la password nella query
+    string, dove finirebbe nei log del web server e nella cronologia.
+
+    Il gettone vale per *quel* percorso di *quella* pubblicazione e per pochi
+    minuti: se anche venisse intercettato non aprirebbe nient'altro.
+    """
+    settings = get_settings()
+    adesso = datetime.now(UTC)
+    payload: dict[str, Any] = {
+        "sub": f"archivio:{share_id}",
+        "pth": percorso,
+        "iat": adesso,
+        "exp": adesso + timedelta(minutes=minuti),
+        "typ": "archivio",
+    }
+    return jwt.encode(payload, settings.secret_key, algorithm=ALGORITMO)
+
+
+def verifica_gettone_percorso(gettone: str, share_id: int, percorso: str) -> bool:
+    """Vero se il gettone autorizza proprio questo percorso di questa pubblicazione."""
+    contenuto = decodifica_token(gettone)
+    if contenuto is None or contenuto.get("typ") != "archivio":
+        return False
+    return contenuto.get("sub") == f"archivio:{share_id}" and contenuto.get("pth") == percorso

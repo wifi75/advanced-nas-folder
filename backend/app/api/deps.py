@@ -47,6 +47,25 @@ async def utente_corrente(credenziali: Credenziali, sessione: Sessione) -> User:
 UtenteCorrente = Annotated[User, Depends(utente_corrente)]
 
 
+async def utente_facoltativo(credenziali: Credenziali, sessione: Sessione) -> User | None:
+    """L'utente, se ha effettuato l'accesso; `None` altrimenti.
+
+    Serve agli endpoint che devono funzionare anche per chi non ha un account:
+    una cartella pubblicata come pubblica si scarica senza accedere, e
+    pretendere un token la renderebbe pubblica solo di nome.
+
+    Un token presente ma non valido resta un errore: chi lo invia crede di
+    essere autenticato, e trattarlo come anonimo gli mostrerebbe in silenzio
+    meno di quanto gli spetta.
+    """
+    if credenziali is None:
+        return None
+    return await utente_corrente(credenziali, sessione)
+
+
+UtenteFacoltativo = Annotated[User | None, Depends(utente_facoltativo)]
+
+
 async def amministratore(utente: UtenteCorrente) -> User:
     if not utente.is_admin:
         raise HTTPException(

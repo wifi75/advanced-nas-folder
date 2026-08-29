@@ -5,6 +5,11 @@
 line-length = 100
 target-version = "py314"
 
+# Le migrazioni le scrive alembic, non noi: riformattarle le farebbe divergere
+# da cio che il comando rigenera, e il confronto con una nuova migrazione
+# diventerebbe illeggibile.
+extend-exclude = ["backend/alembic"]
+
 [lint]
 select = ["E", "F", "I", "N", "UP", "B", "S", "C4", "SIM"]
 
