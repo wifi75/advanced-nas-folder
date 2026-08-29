@@ -20,8 +20,11 @@ nessuna dipende da quelle successive.
       risalita e `alembic check` senza differenze residue
 - [x] Scheletro frontend Vue 3 + TypeScript + Vite — build, typecheck ed eslint
       puliti, pagine verificate nel browser in tema chiaro e scuro
+- [x] Suite di test: 84 test su validatori dell'agent, sicurezza e accesso
+- [x] Configurazione ruff unica in `ruff.toml`, valida anche per `agent/` e `tests/`
 - [ ] `install.sh` funzionante end-to-end
 - [x] Workflow CI: build di `dist/` e allegato alla release
+- [ ] CI: eseguire anche `ruff`, `mypy` e `pytest` a ogni push, non solo il build
 
 ## Fase 1 — Mount NFS dal pannello `in corso`
 
@@ -79,6 +82,16 @@ nessuna dipende da quelle successive.
 - [ ] *(opzionale)* Integrazione API HAProxy per creare i sottodomini end-to-end
 
 ---
+
+## Emerso durante i rilasci
+
+- [ ] **Test end-to-end dell'agent su Linux.** I test attuali sono unitari e coprono
+      i validatori; il ciclo completo (creazione, montaggio, stato, rimozione) è stato
+      provato a mano contro un NAS reale, ma non è automatizzato. Serve un ambiente di
+      prova con systemd.
+- [ ] **Decisione in sospeso:** i commit precedenti al 29 agosto 2026 contengono un
+      riferimento a uno strumento di terze parti nel piè di firma. Toglierlo richiede
+      di riscrivere la cronologia e un force-push, che non è stato ancora autorizzato.
 
 ## Non in programma, per scelta
 

@@ -8,6 +8,7 @@ l'API puo parlargli, e nessuno da fuori la macchina.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import grp
 import logging
 import os
@@ -147,12 +148,10 @@ class Agent:
         senza questo passaggio lo stato risulterebbe sempre "non montato", che
         e vero ma inutile, perche basta guardarci dentro per montarlo.
         """
-        try:
+        # NAS irraggiungibile o percorso assente: lo stato letto subito dopo
+        # dira com'e andata, qui non serve interrompere.
+        with contextlib.suppress(OSError):
             next(iter(os.scandir(str(mountpoint))), None)
-        except OSError:
-            # NAS irraggiungibile o percorso assente: lo stato letto dopo dira
-            # com'e andata, qui non serve interrompere.
-            pass
 
     def _leggi_stato(self, mountpoint: PurePosixPath) -> dict[str, Any]:
         self._innesca(mountpoint)
@@ -196,9 +195,7 @@ async def _servi_client(
                 risposta = Risposta.fallimento(exc.codice, exc.messaggio)
             except Exception:
                 logger.exception("Errore non previsto nella gestione della richiesta")
-                risposta = Risposta.fallimento(
-                    CodiceErrore.INTERNO, "Errore interno dell'agent."
-                )
+                risposta = Risposta.fallimento(CodiceErrore.INTERNO, "Errore interno dell'agent.")
 
             scrittore.write(risposta.a_json())
             await scrittore.drain()
@@ -219,7 +216,7 @@ async def avvia_server(percorso_socket: Path, gruppo: str, radice_mount: PurePos
     # del gruppo dell'applicazione.
     try:
         os.chown(percorso_socket, 0, grp.getgrnam(gruppo).gr_gid)
-    except (KeyError, PermissionError):
+    except KeyError, PermissionError:
         logger.warning("Gruppo %r non trovato: il socket resta di root", gruppo)
     percorso_socket.chmod(0o660)
 

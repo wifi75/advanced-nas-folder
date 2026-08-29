@@ -1,0 +1,23 @@
+# Configurazione unica per i tre alberi Python del progetto:
+# backend/, agent/ e tests/. Tenerla nella radice evita che l'agent, che e il
+# componente piu delicato, sfugga ai controlli perche vive fuori da backend/.
+
+line-length = 100
+target-version = "py314"
+
+[lint]
+select = ["E", "F", "I", "N", "UP", "B", "S", "C4", "SIM"]
+
+ignore = [
+    # I nomi del progetto sono in italiano: "ErroreAgent" e corretto qui, e
+    # rinominarlo in "AgentError" renderebbe il codice incoerente con tutto
+    # il resto.
+    "N818",
+]
+
+[lint.per-file-ignores]
+# pytest usa `assert`: e il suo meccanismo, non una svista.
+"tests/**" = ["S101"]
+
+[format]
+docstring-code-format = true

@@ -7,6 +7,14 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non rilasciato]
 
+### Da fare
+Vedere [TODO.md](TODO.md).
+
+## [0.2.0] - 2026-08-29
+
+Fase 1 — autenticazione e agent privilegiato, entrambi verificati eseguendoli:
+l'agent contro un NAS Synology reale, l'accesso dall'API e dal browser.
+
 ### Aggiunto
 - **Agent privilegiato `anf-agent`**: socket Unix `0660`, protocollo JSON con
   insieme chiuso di verbi, validatori con whitelist, generazione di unit systemd,
@@ -22,6 +30,13 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
   `Transfer`, `VHost`, `Setting`.
 - Endpoint `/api/v1/health` e `/api/v1/health/ready`, quest'ultimo verifica davvero
   la raggiungibilità del database.
+- **Suite di test: 84 test.** La parte più consistente copre i validatori
+  dell'agent, cioè la barriera su cui poggia la sicurezza dell'intero progetto:
+  slug con `..`, comandi iniettati nell'indirizzo del server, opzioni fuori
+  whitelist, percorsi con risalita, verbi inventati. Più hash delle password,
+  token manomessi, scaduti o firmati con un'altra chiave, e il flusso di accesso.
+- Configurazione ruff unica in `ruff.toml` nella radice, così anche `agent/` e
+  `tests/` rientrano negli stessi controlli del backend.
 - Prima migrazione Alembic con supporto asincrono e `render_as_batch`, necessario
   perché SQLite non sa modificare una colonna con `ALTER`.
 - Scheletro frontend: Vue 3, TypeScript, Vite, Pinia, Vue Router. Client HTTP con
@@ -46,9 +61,15 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
   ha solo build alpha. Rimosso `baseUrl`, deprecato nella 6 e rimosso nella 7.
 - Client HTTP: con `exactOptionalPropertyTypes` attivo, `body: undefined` non equivale
   a omettere la proprietà. La richiesta viene ora costruita in modo condizionale.
+- `setuptools` non riusciva a determinare i pacchetti da installare con `alembic/` e
+  `.venv/` accanto ad `app/`: ora sono dichiarati esplicitamente.
+- Lo stato di un mount non innescava l'automount e riportava sempre "non montato";
+  e `findmnt` filtrato sul tipo `nfs` nascondeva i percorsi sotto automount, che
+  compaiono prima come `autofs`. Entrambi trovati eseguendo, non leggendo.
 
-### Da fare
-Vedere [TODO.md](TODO.md) per il piano completo delle fasi.
+### Nota
+Il codice usa la sintassi PEP 758 (`except A, B:` senza parentesi), valida solo da
+**Python 3.14**, coerentemente con `requires-python`.
 
 ## [0.1.0] - 2026-08-29
 

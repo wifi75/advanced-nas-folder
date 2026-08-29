@@ -60,9 +60,7 @@ class Richiesta:
         try:
             grezzo = json.loads(riga)
         except (json.JSONDecodeError, UnicodeDecodeError) as exc:
-            raise ErroreAgent(
-                CodiceErrore.RICHIESTA_MALFORMATA, f"JSON non valido: {exc}"
-            ) from exc
+            raise ErroreAgent(CodiceErrore.RICHIESTA_MALFORMATA, f"JSON non valido: {exc}") from exc
 
         if not isinstance(grezzo, dict):
             raise ErroreAgent(

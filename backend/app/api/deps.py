@@ -33,7 +33,7 @@ async def utente_corrente(credenziali: Credenziali, sessione: Sessione) -> User:
 
     try:
         user_id = int(contenuto["sub"])
-    except (KeyError, TypeError, ValueError):
+    except KeyError, TypeError, ValueError:
         raise _NON_AUTENTICATO from None
 
     utente = await sessione.get(User, user_id)

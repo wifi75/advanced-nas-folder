@@ -23,7 +23,7 @@ def hash_password(password: str) -> str:
 def verifica_password(password: str, hash_memorizzato: str) -> bool:
     try:
         _hasher.verify(hash_memorizzato, password)
-    except (VerifyMismatchError, InvalidHashError):
+    except VerifyMismatchError, InvalidHashError:
         return False
     return True
 

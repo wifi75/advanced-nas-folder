@@ -12,7 +12,26 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.1.0 (fase 0)
+- Versione corrente: 0.2.0
+
+## Stato al 29 agosto 2026
+
+**Fatto e verificato eseguendo, non solo leggendo:**
+
+- Backend FastAPI su Python 3.14 con configurazione, SQLite in WAL, otto modelli e
+  prima migrazione Alembic (`upgrade`, `downgrade`, risalita, nessuna differenza
+  residua).
+- Autenticazione: Argon2id, JWT, guardia sulle rotte, utente `admin` creato al primo
+  avvio con avviso sulla password iniziale.
+- Frontend Vue 3 + TypeScript: accesso, tema chiaro/scuro, piede di pagina che legge
+  versione e autore dall'API. Build, typecheck ed ESLint puliti.
+- **Agent privilegiato completo**, provato contro un NAS Synology reale: scoperta
+  condivisioni, creazione, montaggio, stato con prova di scrittura sul campo,
+  smontaggio, rimozione. Tentativi di violazione (slug con `..`, opzioni fuori
+  whitelist, comandi iniettati nell'indirizzo) tutti respinti.
+
+**Da fare subito dopo:** endpoint API dei mount collegati all'agent, interfaccia dei
+mount, poi `install.sh`. Vedere [TODO.md](TODO.md).
 
 ## Decisioni architetturali fissate
 

@@ -84,7 +84,7 @@ def stato_montaggio(mountpoint: PurePosixPath) -> dict[str, object]:
 
     try:
         voci = json.loads(esito.stdout)["filesystems"]
-    except (json.JSONDecodeError, KeyError):
+    except json.JSONDecodeError, KeyError:
         logger.warning("Uscita di findmnt non interpretabile per %s", mountpoint)
         return {"montato": False, "opzioni": None, "sorgente": None, "scrittura": None}
 

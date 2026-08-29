@@ -29,7 +29,7 @@ class UserOut(BaseModel):
 
 class TokenResponse(BaseModel):
     access_token: str
-    token_type: str = "bearer"
+    token_type: str = "bearer"  # noqa: S105 - schema OAuth2, non una password
     expires_in: int
     user: UserOut
     #: Vero se l'utente sta ancora usando la password iniziale. Il pannello
