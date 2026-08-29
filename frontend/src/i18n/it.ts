@@ -189,6 +189,12 @@ export default {
     decisoDaPredefinita: 'deciso dalla scelta predefinita della pubblicazione',
   },
 
+  pwa: {
+    aggiornamento: 'È disponibile una versione aggiornata del pannello.',
+    ricarica: 'Aggiorna',
+    prontoOffline: 'Il pannello ora funziona anche senza rete.',
+  },
+
   errori: {
     serverNonRaggiungibile: 'Server non raggiungibile. Controlla la connessione.',
     sessioneScaduta: 'Sessione scaduta. Accedi di nuovo.',

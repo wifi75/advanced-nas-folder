@@ -26,7 +26,22 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
   stessa pagina**, che dice se una cartella è raggiungibile e quale regola lo decide.
   La voce «Pubblicazioni» del menu non è più in attesa.
 
+- **Applicazione installabile (PWA)**: manifest, icone generate a partire dalla
+  pastiglia delle condivisioni NFS — compresa la variante ritagliabile che i sistemi
+  richiedono per l'icona in schermata home — e service worker con precache dei file
+  del pannello.
+  - Le chiamate all'API sono **sempre escluse dalla cache**: mostrare uno stato del
+    sistema non più reale, su un pannello che monta filesystem, è peggio di un errore
+    di rete.
+  - L'aggiornamento **non si applica da solo**: compare un avviso e decide chi sta
+    lavorando. Ricaricare il codice mentre qualcuno configura un mount è peggio che
+    restare una versione indietro per qualche minuto.
+  - Colore della barra del browser diverso per tema chiaro e scuro.
+
 ### Corretto
+- **Il pannello è servito sotto `/pannello/`, ma il frontend era compilato come se
+  stesse alla radice del sito**: in produzione i file non sarebbero stati trovati.
+  Impostata la base e allineato il router.
 - Un percorso con risalita passato alla verifica dell'accesso produceva un errore
   interno invece di una risposta comprensibile.
 - Nella verifica, lasciare vuoto il campo utente per provare l'accesso **anonimo**

@@ -79,13 +79,13 @@ else {
 Write-Host ''
 Write-Host 'Advanced NAS Folder - ambiente di sviluppo' -ForegroundColor Cyan
 Write-Host ''
-Write-Host ("  Pannello   http://localhost:{0}" -f $PortaWeb)
+Write-Host ("  Pannello   http://localhost:{0}/pannello/" -f $PortaWeb)
 Write-Host ("  API        http://localhost:{0}/docs" -f $PortaApi)
 
 if (-not $SoloLocale -and $ip) {
     Write-Host ''
     Write-Host '  Dalla rete locale:' -ForegroundColor Cyan
-    Write-Host ("  Pannello   http://{0}:{1}" -f $ip, $PortaWeb)
+    Write-Host ("  Pannello   http://{0}:{1}/pannello/" -f $ip, $PortaWeb)
     Write-Host ("  API        http://{0}:{1}/docs" -f $ip, $PortaApi)
     Write-Host ''
     Write-Host '  ATTENZIONE: il pannello e raggiungibile da chiunque sia nella tua' -ForegroundColor Yellow

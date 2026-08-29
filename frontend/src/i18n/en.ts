@@ -186,6 +186,12 @@ export default {
     decisoDaPredefinita: 'decided by the publication default',
   },
 
+  pwa: {
+    aggiornamento: 'A new version of the panel is available.',
+    ricarica: 'Update',
+    prontoOffline: 'The panel now works offline too.',
+  },
+
   errori: {
     serverNonRaggiungibile: 'Server unreachable. Check your connection.',
     sessioneScaduta: 'Session expired. Please sign in again.',

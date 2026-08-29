@@ -2,8 +2,22 @@
 <html lang="it">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="color-scheme" content="light dark" />
+
+    <!--
+      Due colori, uno per tema: la barra del browser sul telefono segue questo
+      valore, e un colore solo stonerebbe con metà degli utenti.
+    -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#e9edf3" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#131d28" />
+
+    <link rel="icon" type="image/png" sizes="192x192" href="/icona-192.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="NAS Folder" />
+
     <title>Advanced NAS Folder</title>
   </head>
   <body>

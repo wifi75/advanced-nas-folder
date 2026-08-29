@@ -158,7 +158,11 @@ cd frontend && npm run dev -- --host
 
 Con `--host` (e con `avvia-dev.ps1` senza argomenti) i servizi ascoltano su tutte le
 interfacce: il pannello si raggiunge da telefono o tablet all'indirizzo della macchina
-in rete, per esempio `http://192.168.1.50:5195`.
+in rete, per esempio `http://192.168.1.50:5195/pannello/`.
+
+Il pannello vive sotto `/pannello/` anche in sviluppo, perché è lì che il web server
+lo serve in produzione: tenerlo alla radice in sviluppo farebbe funzionare in locale
+percorsi che poi non funzionano installati.
 
 > **Attenzione:** così il pannello è raggiungibile da chiunque sia nella stessa rete,
 > e in sviluppo le credenziali iniziali sono `admin`/`admin`. Usa `-SoloLocale`

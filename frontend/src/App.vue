@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 
 import AppFooter from '@/components/AppFooter.vue'
+import AvvisoAggiornamento from '@/components/AvvisoAggiornamento.vue'
 import BarraLaterale from '@/components/BarraLaterale.vue'
 import { aggiornaTitolo } from '@/router'
 import { useAuthStore } from '@/stores/auth'
@@ -71,6 +72,8 @@ async function esci(): Promise<void> {
       </main>
       <AppFooter />
     </div>
+
+    <AvvisoAggiornamento />
   </div>
 
   <template v-else>
@@ -78,6 +81,7 @@ async function esci(): Promise<void> {
       <RouterView />
     </main>
     <AppFooter />
+    <AvvisoAggiornamento />
   </template>
 </template>
 

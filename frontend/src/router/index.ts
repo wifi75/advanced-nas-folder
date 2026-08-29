@@ -37,7 +37,10 @@ const routes: RouteRecordRaw[] = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  // Il pannello è servito sotto un prefisso (`/pannello/`), non alla radice
+  // del sito: senza passarlo qui, ogni indirizzo interno punterebbe fuori
+  // dall'applicazione e il web server risponderebbe con un 404.
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 })
 

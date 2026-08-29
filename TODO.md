@@ -107,7 +107,13 @@ Richieste del 2026-08-29 rimaste aperte alla chiusura della v0.3.0:
 - [ ] **Documenti interni ancora solo in italiano**: `docs/PIANO.md`,
       `docs/VERSIONI.md` e `agent/README.md`. Sono documenti di sviluppo, non
       di installazione: tradurli ha meno urgenza ma resta da fare.
-- [ ] **PWA**: pannello installabile sul telefono, icona in schermata home.
+- [x] **PWA**: manifest, icone (comprese quelle ritagliabili), service worker con
+      precache e API sempre escluse dalla cache, avviso di aggiornamento.
+- [ ] **Da confermare su un browser vero**: la registrazione del service worker non
+      è verificabile nel browser incorporato dello strumento di sviluppo, che la
+      blocca — verificato che fallisca anche con un service worker di una riga.
+      Tutto il resto (manifest, icone, contenuto della precache, esclusione
+      dell'API, colori della barra) è stato controllato sul build.
 - [ ] **Pubblicazione sul server, alla fine dello sviluppo.** Sul server non è
       ancora stato pubblicato nulla. Dalla v0.4.0 il comando documentato nel
       README funziona davvero: verificato scaricando `install.sh` e il pacchetto

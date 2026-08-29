@@ -150,7 +150,12 @@ cd frontend && npm run dev -- --host
 ```
 
 With `--host` the services listen on every interface, so you can try the panel from a
-phone or tablet at the machine's network address.
+phone or tablet at the machine's network address, for example
+`http://192.168.1.50:5195/pannello/`.
+
+The panel lives under `/pannello/` in development too, because that is where the web
+server puts it in production: keeping it at the site root during development would
+make paths work locally that break once installed.
 
 > **Careful:** that makes the panel reachable by anyone on the same network, and in
 > development the initial credentials are `admin`/`admin`.
