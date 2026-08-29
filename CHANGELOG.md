@@ -7,6 +7,16 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non rilasciato]
 
+### Aggiunto
+- **Endpoint dei mount**: elenco, scoperta delle condivisioni di un NAS, creazione,
+  modifica, avvio, arresto ed eliminazione. Tutti riservati agli amministratori.
+- Client verso l'agent (`app/services/agent_client.py`), unico punto di contatto fra
+  l'API e il processo privilegiato.
+- 25 test sugli endpoint, con un agent simulato: verificano che la scrittura resti
+  disattivata se non richiesta, che il percorso di montaggio non sia mai scelto
+  dall'utente, che le opzioni di resilienza siano sempre presenti, e che un mount non
+  venga cancellato dal database se l'agent non ha potuto ripulire il sistema.
+
 ### Da fare
 Vedere [TODO.md](TODO.md).
 

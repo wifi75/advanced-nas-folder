@@ -36,3 +36,14 @@ async def client() -> AsyncGenerator:
         app.router.lifespan_context(app),
     ):
         yield c
+
+
+@pytest.fixture
+async def admin(client):  # noqa: ANN001, ANN201 - tipo fornito dalla fixture client
+    """Client gia autenticato come amministratore."""
+    risposta = await client.post(
+        "/api/v1/auth/login", json={"username": "admin", "password": "admin"}
+    )
+    token = risposta.json()["access_token"]
+    client.headers["Authorization"] = f"Bearer {token}"
+    return client

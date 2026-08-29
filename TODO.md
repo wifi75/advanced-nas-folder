@@ -35,9 +35,10 @@ nessuna dipende da quelle successive.
 - [x] Scoperta delle condivisioni esportate dal NAS
 - [x] Montaggio, smontaggio, stato *richiesto* vs *effettivo*, con prova di
       scrittura sul campo
-- [ ] API: endpoint dei mount collegati all'agent
+- [x] API: endpoint dei mount collegati all'agent — elenco, scoperta, creazione,
+      modifica, avvio, arresto, eliminazione
+- [x] Interruttore scrittura, disattivato di default, con avviso quando il NAS la nega
 - [ ] Interfaccia: elenco mount, scoperta, creazione, avvio e arresto
-- [ ] Interruttore scrittura, disattivato di default, con avviso di rischio
 - [ ] Migrazione dei mount preesistenti da `/etc/fstab`
 
 ## Fase 2 — Pubblicazione e permessi
