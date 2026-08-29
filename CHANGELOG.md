@@ -153,7 +153,17 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
   della rotazione: senza, dopo la prima rotazione notturna il monitoraggio smetterebbe di
   aggiornarsi in silenzio. Finché quei byte non arrivano restano vuoti — un numero
   inventato sarebbe peggio di uno assente.
-- 178 test nuovi. Suite complessiva a **357 test**.
+- **Impostazioni del pannello**: nome, sottotitolo e logo personalizzabili, e la scelta
+  se elencare anche i file nascosti. Titolo e logo si leggono anche senza accedere,
+  perché disegnano la pagina di accesso.
+- **Spazio sui dischi**, comprese le condivisioni montate. Quello del disco del pannello
+  sta accanto agli altri di proposito: è quello che ci si dimentica, e se si riempie il
+  pannello smette di funzionare anche con il NAS mezzo vuoto.
+- **Editor di testo** nell'anteprima, dove si ha il permesso di scrivere. Il salvataggio
+  scrive un file accanto e poi lo rinomina al posto dell'originale: se la scrittura si
+  interrompe a metà, il file di partenza è ancora quello di prima.
+- **Caricamento di cartelle intere**, ricostruendo l'albero dall'altra parte.
+- 199 test nuovi. Suite complessiva a **378 test**.
 
 ### Modificato
 - In sviluppo la consegna passa da sola a `stream`: senza un web server davanti,

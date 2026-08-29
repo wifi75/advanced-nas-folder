@@ -313,6 +313,9 @@ export default {
 
   anteprima: {
     nonMostrabile: 'Questo tipo di file non si può mostrare qui: scaricalo per aprirlo.',
+    modifica: 'Modifica il testo',
+    salvato: 'Salvato',
+    troncato: 'Il file è troppo grande: ne vedi solo l’inizio, e salvare perderebbe il resto.',
     impronta: 'Calcola impronta SHA-256',
     improntaNota:
       'Confrontala con quella del file di partenza per essere certo che sia arrivato identico.',
@@ -336,6 +339,7 @@ export default {
   caricamento: {
     trascina: 'Trascina qui i file da caricare',
     scegli: 'Scegli dal dispositivo',
+    scegliCartella: 'Scegli una cartella',
     fatto: 'Caricato',
     annullato: 'Annullato',
     riprova: 'Riprova',

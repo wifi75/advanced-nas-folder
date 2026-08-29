@@ -587,7 +587,9 @@ function quando(iso: string | null): string {
       v-if="inAnteprima"
       :slug="slug"
       :voce="inAnteprima"
+      :modificabile="puoScrivere"
       @chiudi="inAnteprima = null"
+      @salvato="carica"
     />
 
     <div

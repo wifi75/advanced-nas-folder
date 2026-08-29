@@ -14,6 +14,7 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { archivioApi } from '@/api/archivio'
 import { BLOCCO, caricamentoApi, inviaBlocco } from '@/api/caricamento'
 import { tokenCorrente } from '@/api/client'
 
@@ -26,6 +27,8 @@ type Stato = 'attesa' | 'invio' | 'fatto' | 'errore' | 'annullato'
 
 interface InCorso {
   file: File
+  /** Percorso relativo dentro la cartella trascinata, se ce n'è uno. */
+  dentro: string
   inviati: number
   stato: Stato
   errore: string | null
@@ -46,9 +49,27 @@ function percento(c: InCorso): number {
 function aggiungi(files: FileList | null): void {
   if (!files) return
   for (const file of Array.from(files)) {
-    coda.value.push({ file, inviati: 0, stato: 'attesa', errore: null })
+    // Scegliendo una cartella il browser riempie `webkitRelativePath` con il
+    // percorso interno: è così che si ricostruisce l'albero dall'altra parte.
+    const relativo = (file as File & { webkitRelativePath?: string }).webkitRelativePath ?? ''
+    const dentro = relativo.includes('/') ? relativo.slice(0, relativo.lastIndexOf('/')) : ''
+    coda.value.push({ file, dentro, inviati: 0, stato: 'attesa', errore: null })
   }
   void lavora()
+}
+
+/** Crea le cartelle mancanti lungo il percorso, ignorando quelle che ci sono già. */
+async function preparaCartelle(dentro: string): Promise<string> {
+  let corrente = props.percorso
+  for (const pezzo of dentro.split('/').filter(Boolean)) {
+    try {
+      await archivioApi.creaCartella(props.slug, corrente, pezzo)
+    } catch {
+      // Esiste già: è il caso normale dal secondo file in poi.
+    }
+    corrente = corrente ? `${corrente}/${pezzo}` : pezzo
+  }
+  return corrente
 }
 
 function suRilascio(evento: DragEvent): void {
@@ -85,9 +106,11 @@ async function invia(voce: InCorso): Promise<void> {
   voce.errore = null
 
   try {
+    const dove = voce.dentro ? await preparaCartelle(voce.dentro) : props.percorso
+
     // Da dove riprendere lo sa il server: un caricamento interrotto ieri
     // riparte oggi senza che questa pagina se lo sia ricordato.
-    const stato = await caricamentoApi.stato(props.slug, props.percorso, voce.file.name)
+    const stato = await caricamentoApi.stato(props.slug, dove, voce.file.name)
     if (stato.gia_presente) {
       voce.stato = 'errore'
       voce.errore = t('caricamento.esiste')
@@ -103,7 +126,7 @@ async function invia(voce: InCorso): Promise<void> {
       const fine = Math.min(voce.inviati + BLOCCO, voce.file.size)
       voce.inviati = await inviaBlocco(
         props.slug,
-        props.percorso,
+        dove,
         voce.file.name,
         voce.file.slice(voce.inviati, fine),
         voce.inviati,
@@ -111,7 +134,7 @@ async function invia(voce: InCorso): Promise<void> {
       )
     }
 
-    await caricamentoApi.completa(props.slug, props.percorso, voce.file.name, voce.file.size)
+    await caricamentoApi.completa(props.slug, dove, voce.file.name, voce.file.size)
     voce.stato = 'fatto'
     emit('caricato')
   } catch (e) {
@@ -165,6 +188,15 @@ function pulisci(): void {
           @change="suScelta"
         >
       </label>
+      <label class="zona__scegli">
+        {{ t('caricamento.scegliCartella') }}
+        <input
+          type="file"
+          webkitdirectory
+          class="zona__campo"
+          @change="suScelta"
+        >
+      </label>
     </div>
 
     <ul
@@ -177,7 +209,7 @@ function pulisci(): void {
         class="voce"
       >
         <div class="voce__testa">
-          <span class="voce__nome">{{ c.file.name }}</span>
+          <span class="voce__nome">{{ c.dentro ? `${c.dentro}/${c.file.name}` : c.file.name }}</span>
           <span class="voce__stato">
             <template v-if="c.stato === 'fatto'">{{ t('caricamento.fatto') }}</template>
             <template v-else-if="c.stato === 'annullato'">

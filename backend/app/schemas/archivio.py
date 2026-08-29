@@ -235,3 +235,15 @@ class SpazioDisco(BaseModel):
     #: sembrare pieno un disco che semplicemente non risponde.
     totale: int | None
     libero: int | None
+
+
+class TestoOut(BaseModel):
+    percorso: str
+    contenuto: str
+    #: Vero se il file è stato troncato perché troppo grande per l'editor.
+    troncato: bool = False
+
+
+class SalvaTesto(BaseModel):
+    percorso: str = Field(min_length=1, max_length=1024)
+    contenuto: str = Field(max_length=2_000_000)

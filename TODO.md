@@ -80,7 +80,7 @@ nessuna dipende da quelle successive.
       esplicita per le cartelle non vuote e permesso di scrittura richiesto su
       origine e destinazione
 - [x] **Caricamento con trascinamento e avanzamento**, a blocchi e riprendibile
-- [ ] Caricamento di cartelle intere
+- [x] **Caricamento di cartelle intere**, ricostruendo l'albero
 - [x] **Cartella come archivio ZIP**, prodotto mentre lo si invia
 
 - [x] **Ricerca** nei nomi, ricorsiva e filtrata dai permessi
@@ -93,7 +93,8 @@ nessuna dipende da quelle successive.
 - [x] **IP reali dietro il reverse proxy** (`X-Forwarded-For` dai soli proxy fidati)
 - [x] **Cruscotto dei trasferimenti dal vivo** via SSE: file, indirizzo, byte, esito
 - [ ] Avanzamento lato visitatore con pausa e ripresa *(vedi nota sui limiti)*
-- [ ] Editor di testo e codice con evidenziazione sintassi
+- [x] **Editor di testo**, con scrittura atomica
+- [ ] Evidenziazione della sintassi nell'editor
 - [x] **Anteprime**: immagini, video, audio, PDF e testo semplice
 - [x] **Checksum SHA-256** calcolato su richiesta e mostrato nell'anteprima
 
@@ -101,8 +102,8 @@ nessuna dipende da quelle successive.
 
 - [x] Tema chiaro, scuro o automatico *(anticipato su richiesta)*
 - [x] Multilingua italiano e inglese *(anticipato su richiesta)*
-- [ ] Branding, titolo e logo personalizzabili
-- [ ] Spazio disco nella barra laterale, nascondere i file nascosti
+- [x] **Marchio**: titolo, sottotitolo e logo personalizzabili
+- [x] **Spazio sui dischi** e scelta se mostrare i file nascosti
 - [ ] `update.sh` e `uninstall.sh`
 - [ ] Documentazione utente completa
 - [ ] *(opzionale)* Integrazione API HAProxy per creare i sottodomini end-to-end

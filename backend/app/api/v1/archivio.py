@@ -35,8 +35,10 @@ from app.schemas.archivio import (
     RichiestaGettone,
     Rinomina,
     RisultatiRicerca,
+    SalvaTesto,
     SelezioneZip,
     StatoCaricamento,
+    TestoOut,
     Trasferisci,
     VoceOut,
 )
@@ -621,3 +623,77 @@ async def checksum(
         ) from exc
 
     return Checksum(percorso=percorso, valore=valore, dimensione=dimensione)
+
+
+# --- modifica di un file di testo -------------------------------------------
+
+#: Oltre questa dimensione un file non si apre nell'editor. Non è un limite
+#: tecnico ma di buon senso: un file da dieci megabyte di testo non si
+#: modifica in una casella di testo del browser, si scarica.
+_TESTO_MASSIMO = 1_000_000
+
+
+@router.get("/{slug}/testo", response_model=TestoOut)
+async def leggi_testo(
+    slug: str,
+    sessione: Sessione,
+    utente: UtenteFacoltativo,
+    percorso: str = Query(min_length=1, max_length=1024),
+) -> TestoOut:
+    """Contenuto di un file di testo, per l'editor."""
+    share = await _pubblicazione(sessione, slug)
+    percorso = _normalizza(percorso)
+    await _autorizza(sessione, share, percorso, utente)
+
+    reale = await _reale(sessione, share, percorso)
+    if not await anyio.to_thread.run_sync(reale.is_file):
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "File non trovato.")
+
+    def leggi() -> tuple[str, bool]:
+        with reale.open("r", encoding="utf-8", errors="replace") as f:
+            testo = f.read(_TESTO_MASSIMO + 1)
+        if len(testo) > _TESTO_MASSIMO:
+            return testo[:_TESTO_MASSIMO], True
+        return testo, False
+
+    try:
+        contenuto, troncato = await anyio.to_thread.run_sync(leggi)
+    except OSError as exc:
+        raise HTTPException(
+            status.HTTP_503_SERVICE_UNAVAILABLE, f"File non leggibile: {exc.strerror}"
+        ) from exc
+
+    return TestoOut(percorso=percorso, contenuto=contenuto, troncato=troncato)
+
+
+@router.post("/{slug}/testo", response_model=TestoOut)
+async def salva_testo(
+    slug: str, dati: SalvaTesto, sessione: Sessione, utente: UtenteFacoltativo
+) -> TestoOut:
+    """Sovrascrive un file di testo.
+
+    Scrive prima un file accanto e poi lo rinomina al posto dell'originale:
+    se la scrittura si interrompe a metà — spazio finito, rete caduta — il
+    file di partenza è ancora quello di prima. Scrivere direttamente sopra
+    significherebbe poterlo troncare senza averne una copia.
+    """
+    _, percorso, reale = await _prepara(sessione, slug, dati.percorso, utente)
+
+    def scrivi() -> None:
+        if reale.is_dir():
+            raise operazioni.OperazioneRifiutata("Non è un file di testo.")
+        temporaneo = reale.with_name(f".{reale.name}.anf-scrittura")
+        temporaneo.write_text(dati.contenuto, encoding="utf-8", newline="")
+        temporaneo.replace(reale)
+
+    try:
+        await anyio.to_thread.run_sync(scrivi)
+    except operazioni.OperazioneRifiutata as exc:
+        raise _rifiuto(exc) from exc
+    except OSError as exc:
+        motivo = exc.strerror or str(exc)
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, f"Il sistema ha rifiutato la scrittura: {motivo}"
+        ) from exc
+
+    return TestoOut(percorso=percorso, contenuto=dati.contenuto)

@@ -13,8 +13,8 @@ import { useI18n } from 'vue-i18n'
 
 import { archivioApi, indirizzoDownload, type Voce } from '@/api/archivio'
 
-const props = defineProps<{ slug: string; voce: Voce }>()
-const emit = defineEmits<{ chiudi: [] }>()
+const props = defineProps<{ slug: string; voce: Voce; modificabile?: boolean }>()
+const emit = defineEmits<{ chiudi: []; salvato: [] }>()
 
 const { t } = useI18n()
 
@@ -37,6 +37,8 @@ async function prepara(): Promise<void> {
   indirizzo.value = null
   errore.value = null
   impronta.value = null
+  testo.value = null
+  salvato.value = false
   if (genere.value === 'nessuno') return
 
   try {
@@ -47,6 +49,41 @@ async function prepara(): Promise<void> {
 }
 
 watch(() => props.voce.percorso, prepara, { immediate: true })
+
+// --- modifica del testo ---
+// Solo per i file di testo e solo dove si può scrivere: aprire un editor su
+// un file che poi non si riesce a salvare è un modo di far perdere tempo.
+const testo = ref<string | null>(null)
+const troncato = ref(false)
+const salvando = ref(false)
+const salvato = ref(false)
+
+async function apriEditor(): Promise<void> {
+  errore.value = null
+  salvato.value = false
+  try {
+    const letto = await archivioApi.leggiTesto(props.slug, props.voce.percorso)
+    testo.value = letto.contenuto
+    troncato.value = letto.troncato
+  } catch (e) {
+    errore.value = e instanceof Error ? e.message : t('errori.generico')
+  }
+}
+
+async function salvaTesto(): Promise<void> {
+  if (testo.value === null) return
+  salvando.value = true
+  errore.value = null
+  try {
+    await archivioApi.salvaTesto(props.slug, props.voce.percorso, testo.value)
+    salvato.value = true
+    emit('salvato')
+  } catch (e) {
+    errore.value = e instanceof Error ? e.message : t('errori.generico')
+  } finally {
+    salvando.value = false
+  }
+}
 
 async function calcolaImpronta(): Promise<void> {
   calcolando.value = true
@@ -99,6 +136,15 @@ async function calcolaImpronta(): Promise<void> {
           {{ t('anteprima.nonMostrabile') }}
         </p>
 
+        <template v-if="testo !== null">
+          <textarea
+            v-model="testo"
+            class="editor"
+            spellcheck="false"
+            :aria-label="voce.nome"
+          />
+        </template>
+
         <template v-else-if="indirizzo">
           <img
             v-if="genere === 'immagine'"
@@ -135,6 +181,33 @@ async function calcolaImpronta(): Promise<void> {
       </div>
 
       <footer class="piede">
+        <button
+          v-if="modificabile && genere === 'testo' && testo === null"
+          type="button"
+          class="bottone"
+          @click="apriEditor"
+        >
+          {{ t('anteprima.modifica') }}
+        </button>
+        <template v-if="testo !== null">
+          <button
+            type="button"
+            class="bottone"
+            :disabled="salvando"
+            @click="salvaTesto"
+          >
+            {{ salvando ? t('comune.carico') : t('comune.salva') }}
+          </button>
+          <span
+            v-if="salvato"
+            class="fatto"
+            role="status"
+          >{{ t('anteprima.salvato') }}</span>
+          <span
+            v-if="troncato"
+            class="nota"
+          >{{ t('anteprima.troncato') }}</span>
+        </template>
         <button
           type="button"
           class="bottone"
@@ -243,6 +316,25 @@ async function calcolaImpronta(): Promise<void> {
   gap: 0.5rem;
   padding-top: 0.5rem;
   border-top: 1px solid var(--bordo);
+}
+
+.editor {
+  width: 100%;
+  min-height: 20rem;
+  padding: 0.6rem;
+  border: 1px solid var(--bordo);
+  border-radius: var(--raggio);
+  background: var(--sfondo);
+  color: var(--testo);
+  font-family: ui-monospace, monospace;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.fatto {
+  color: var(--ok);
+  font-size: 0.85rem;
 }
 
 .impronta {

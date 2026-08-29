@@ -165,3 +165,57 @@ async def test_checksum_rispetta_i_permessi(admin: AsyncClient, share_id: int) -
         "/api/v1/archivio/documenti/checksum", json={"percorso": "nota.txt"}
     )
     assert risposta.status_code == 403
+
+
+# --- editor di testo -------------------------------------------------------
+
+
+async def test_legge_un_file_di_testo(admin: AsyncClient, share_id: int) -> None:
+    risposta = await admin.get("/api/v1/archivio/documenti/testo", params={"percorso": "nota.txt"})
+    assert risposta.status_code == 200
+    assert risposta.json()["contenuto"] == "una nota"
+    assert risposta.json()["troncato"] is False
+
+
+async def test_salva_un_file_di_testo(admin: AsyncClient, share_id: int, cartella: Path) -> None:
+    risposta = await admin.post(
+        "/api/v1/archivio/documenti/testo",
+        json={"percorso": "nota.txt", "contenuto": "riscritta\nsu due righe"},
+    )
+    assert risposta.status_code == 200
+    assert (cartella / "nota.txt").read_text(encoding="utf-8") == "riscritta\nsu due righe"
+
+
+async def test_una_scrittura_non_lascia_file_di_appoggio(
+    admin: AsyncClient, share_id: int, cartella: Path
+) -> None:
+    """Il file temporaneo serve a non troncare l'originale, non a restare lì."""
+    await admin.post(
+        "/api/v1/archivio/documenti/testo",
+        json={"percorso": "nota.txt", "contenuto": "nuova"},
+    )
+    assert not list(cartella.glob("*.anf-scrittura"))
+
+
+async def test_chi_puo_leggere_non_puo_riscrivere(
+    admin: AsyncClient, share_id: int, cartella: Path
+) -> None:
+    admin.headers.pop("Authorization", None)
+
+    risposta = await admin.post(
+        "/api/v1/archivio/documenti/testo",
+        json={"percorso": "nota.txt", "contenuto": "abusiva"},
+    )
+    assert risposta.status_code == 403
+    assert (cartella / "nota.txt").read_text(encoding="utf-8") == "una nota"
+
+
+async def test_una_cartella_non_si_riscrive_come_testo(
+    admin: AsyncClient, share_id: int, cartella: Path
+) -> None:
+    (cartella / "sottocartella").mkdir()
+    risposta = await admin.post(
+        "/api/v1/archivio/documenti/testo",
+        json={"percorso": "sottocartella", "contenuto": "x"},
+    )
+    assert risposta.status_code == 409

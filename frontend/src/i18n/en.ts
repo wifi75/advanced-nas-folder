@@ -310,6 +310,9 @@ export default {
 
   anteprima: {
     nonMostrabile: 'This file type cannot be shown here: download it to open it.',
+    modifica: 'Edit text',
+    salvato: 'Saved',
+    troncato: 'The file is too large: you are seeing only its beginning, and saving would lose the rest.',
     impronta: 'Compute SHA-256 checksum',
     improntaNota: 'Compare it with the original file to be sure it arrived identical.',
   },
@@ -332,6 +335,7 @@ export default {
   caricamento: {
     trascina: 'Drop files here to upload',
     scegli: 'Choose from device',
+    scegliCartella: 'Choose a folder',
     fatto: 'Uploaded',
     annullato: 'Cancelled',
     riprova: 'Try again',

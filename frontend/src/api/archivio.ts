@@ -56,6 +56,19 @@ export const archivioApi = {
       password: password ?? null,
     }),
 
+  leggiTesto: (slug: string, percorso: string) => {
+    const q = new URLSearchParams({ percorso })
+    return api.get<{ percorso: string; contenuto: string; troncato: boolean }>(
+      `/archivio/${encodeURIComponent(slug)}/testo?${q}`,
+    )
+  },
+
+  salvaTesto: (slug: string, percorso: string, contenuto: string) =>
+    api.post<{ percorso: string; contenuto: string }>(
+      `/archivio/${encodeURIComponent(slug)}/testo`,
+      { percorso, contenuto },
+    ),
+
   checksum: (slug: string, percorso: string) =>
     api.post<{ percorso: string; algoritmo: string; valore: string; dimensione: number }>(
       `/archivio/${encodeURIComponent(slug)}/checksum`,
