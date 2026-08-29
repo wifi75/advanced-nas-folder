@@ -227,3 +227,13 @@ async def test_la_revoca_chiude_il_link_ma_ne_conserva_il_conteggio(
 async def test_un_token_inesistente_non_dice_nulla(admin: AsyncClient, share_id: int) -> None:
     risposta = await _anonimo(admin).get("/api/v1/link/token-inventato")
     assert risposta.status_code == 404
+
+
+async def test_aprire_il_link_porta_sulla_sua_cartella(admin: AsyncClient, share_id: int) -> None:
+    """Il collegamento *è* quella cartella: senza percorso ci si atterra sopra."""
+    creato = await _crea(admin, share_id, percorso="foto")
+
+    risposta = await _anonimo(admin).get(f"/api/v1/link/{creato['token']}")
+    assert risposta.status_code == 200
+    assert risposta.json()["percorso"] == "foto"
+    assert [v["nome"] for v in risposta.json()["voci"]] == ["mare.txt"]

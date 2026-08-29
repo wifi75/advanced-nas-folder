@@ -56,6 +56,12 @@ async def _apri(
     except PercorsoNonValido as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, str(exc)) from exc
 
+    # Senza percorso si atterra sul ramo del link, non sulla radice della
+    # pubblicazione: il collegamento *e'* quella cartella, e chi lo apre si
+    # aspetta di vedersela davanti, non un errore.
+    if not richiesto:
+        richiesto = collegamento.path
+
     # Fuori dal ramo del link il percorso non esiste, per chi ha quel token.
     if not servizio_link.dentro_ramo(collegamento, richiesto):
         raise _NON_VALIDO

@@ -58,7 +58,8 @@ nessuna dipende da quelle successive.
       raggiungibile e *quale regola l'ha deciso*, anche in forma anonima
 - [x] **Interfaccia delle pubblicazioni e dei permessi**: elenco, creazione, regole
       per cartella, permessi per utente e verifica dell'accesso nella stessa pagina
-- [ ] Link di condivisione con scadenza, limite di download e revoca
+- [x] **Link di condivisione** con scadenza, limite di download e revoca, gestiti
+      dentro la pubblicazione a cui appartengono
 - [x] **Consegna dei file**: elenco della cartella filtrato voce per voce dal
       controllo degli accessi, e download delegato al web server con
       `X-Sendfile` o `X-Accel-Redirect`

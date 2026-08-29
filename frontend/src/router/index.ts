@@ -32,6 +32,13 @@ const routes: RouteRecordRaw[] = [
     meta: { titolo: 'archivio.titolo', pubblica: true },
   },
   {
+    // Indirizzo corto di proposito: e' quello che si incolla in un messaggio.
+    path: '/l/:token/:percorso(.*)*',
+    name: 'link',
+    component: () => import('@/views/LinkView.vue'),
+    meta: { titolo: 'link.titolo', pubblica: true },
+  },
+  {
     path: '/accedi',
     name: 'login',
     component: () => import('@/views/LoginView.vue'),

@@ -6,11 +6,17 @@
  * configura permessi a prefissi deve poter controllare l'esito senza uscire
  * dalla pagina, altrimenti gli errori li scoprono gli utenti.
  */
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { ApiError } from '@/api/client'
-import { sharesApi, type EsitoAccesso, type Livello, type Visibilita } from '@/api/shares'
+import {
+  sharesApi,
+  type EsitoAccesso,
+  type LinkCondivisione,
+  type Livello,
+  type Visibilita,
+} from '@/api/shares'
 import { useSharesStore } from '@/stores/shares'
 
 const props = defineProps<{ id: number }>()
@@ -56,6 +62,89 @@ async function assegnaPermesso(): Promise<void> {
   )
   if (fatto) permessoPercorso.value = ''
 }
+
+// --- link di condivisione ---
+const link = ref<LinkCondivisione[]>([])
+const linkPercorso = ref('')
+const linkEtichetta = ref('')
+const linkPassword = ref('')
+const linkGiorni = ref<number | string>('')
+const linkMaxDownload = ref<number | string>('')
+const erroreLink = ref('')
+/**
+ * Il token appena creato.
+ *
+ * Resta a schermo finché non lo si chiude di proposito: nel database c'è solo
+ * la sua impronta, quindi questa è l'unica occasione per copiarlo.
+ */
+const tokenNuovo = ref<string | null>(null)
+const copiato = ref(false)
+
+async function caricaLink(): Promise<void> {
+  try {
+    link.value = await sharesApi.elencaLink(props.id)
+  } catch (e) {
+    erroreLink.value = e instanceof Error ? e.message : ''
+  }
+}
+
+/** Un campo numerico svuotato vale stringa vuota, non `null`: qui diventa «nessun limite». */
+function limite(valore: number | string): number | null {
+  return typeof valore === 'number' && valore > 0 ? valore : null
+}
+
+async function creaLink(): Promise<void> {
+  erroreLink.value = ''
+  try {
+    const creato = await sharesApi.creaLink(props.id, {
+      percorso: linkPercorso.value,
+      etichetta: linkEtichetta.value || null,
+      password: linkPassword.value || null,
+      giorni: limite(linkGiorni.value),
+      max_download: limite(linkMaxDownload.value),
+    })
+    tokenNuovo.value = creato.token
+    copiato.value = false
+    linkPercorso.value = ''
+    linkEtichetta.value = ''
+    linkPassword.value = ''
+    await caricaLink()
+  } catch (e) {
+    erroreLink.value = e instanceof Error ? e.message : ''
+  }
+}
+
+async function revocaLink(linkId: number): Promise<void> {
+  erroreLink.value = ''
+  try {
+    await sharesApi.revocaLink(props.id, linkId)
+    await caricaLink()
+  } catch (e) {
+    erroreLink.value = e instanceof Error ? e.message : ''
+  }
+}
+
+/** Indirizzo completo da consegnare a chi deve ricevere i file. */
+function indirizzoLink(token: string): string {
+  return `${globalThis.location.origin}${import.meta.env.BASE_URL}l/${token}`
+}
+
+async function copia(token: string): Promise<void> {
+  try {
+    await globalThis.navigator.clipboard.writeText(indirizzoLink(token))
+    copiato.value = true
+  } catch {
+    // Senza permesso per gli appunti resta la selezione manuale: il testo è
+    // visibile a schermo apposta.
+    copiato.value = false
+  }
+}
+
+function quando(iso: string | null): string {
+  return iso ? new Date(iso).toLocaleDateString() : ''
+}
+
+onMounted(caricaLink)
 
 // --- verifica ---
 const provaPercorso = ref('')
@@ -253,6 +342,123 @@ const chiHaDeciso = computed(() => {
       </div>
     </section>
 
+    <!-- link di condivisione -->
+    <section class="blocco">
+      <h3>{{ t('link.titolo') }}</h3>
+      <p class="spiega">
+        {{ t('link.descrizione') }}
+      </p>
+
+      <div
+        v-if="tokenNuovo"
+        class="token"
+        role="status"
+      >
+        <p class="token__avviso">
+          {{ t('link.copiaOra') }}
+        </p>
+        <code class="token__valore">{{ indirizzoLink(tokenNuovo) }}</code>
+        <div class="token__azioni">
+          <button
+            type="button"
+            @click="copia(tokenNuovo)"
+          >
+            {{ copiato ? t('link.copiato') : t('link.copia') }}
+          </button>
+          <button
+            type="button"
+            class="secondario"
+            @click="tokenNuovo = null"
+          >
+            {{ t('comune.chiudi') }}
+          </button>
+        </div>
+      </div>
+
+      <ul
+        v-if="link.length"
+        class="elenco"
+      >
+        <li
+          v-for="c in link"
+          :key="c.id"
+        >
+          <span class="percorso">{{ c.label || c.path || t('regole.radice') }}</span>
+          <span
+            class="etichetta"
+            :class="{ 'etichetta--negato': c.esaurito }"
+          >
+            {{ c.esaurito ? t('link.chiuso') : t('link.attivo') }}
+          </span>
+          <span class="nota">
+            {{ t('link.usato', { n: c.download_count }) }}
+            <template v-if="c.max_downloads">/ {{ c.max_downloads }}</template>
+            <template v-if="c.expires_at"> · {{ quando(c.expires_at) }}</template>
+            <template v-if="c.protetto_da_password"> · {{ t('regole.protetta') }}</template>
+          </span>
+          <button
+            v-if="!c.is_revoked"
+            type="button"
+            class="togli"
+            :title="t('link.revoca')"
+            @click="revocaLink(c.id)"
+          >
+            ×
+          </button>
+        </li>
+      </ul>
+      <p
+        v-else
+        class="vuoto"
+      >
+        {{ t('link.nessuno') }}
+      </p>
+
+      <div class="riga-form">
+        <input
+          v-model="linkPercorso"
+          type="text"
+          :placeholder="t('link.cartella')"
+        >
+        <input
+          v-model="linkEtichetta"
+          type="text"
+          :placeholder="t('link.etichetta')"
+        >
+        <input
+          v-model.number="linkGiorni"
+          type="number"
+          min="1"
+          :placeholder="t('link.giorni')"
+        >
+        <input
+          v-model.number="linkMaxDownload"
+          type="number"
+          min="1"
+          :placeholder="t('link.maxDownload')"
+        >
+        <input
+          v-model="linkPassword"
+          type="password"
+          :placeholder="t('link.password')"
+        >
+        <button
+          type="button"
+          @click="creaLink"
+        >
+          {{ t('link.crea') }}
+        </button>
+      </div>
+
+      <p
+        v-if="erroreLink"
+        class="errore-prova"
+        role="alert"
+      >
+        {{ erroreLink }}
+      </p>
+    </section>
+
     <!-- verifica -->
     <section class="blocco blocco--prova">
       <h3>{{ t('prova.titolo') }}</h3>
@@ -309,6 +515,34 @@ const chiHaDeciso = computed(() => {
 </template>
 
 <style scoped>
+.token {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--accento);
+  border-radius: var(--raggio);
+  background: var(--superficie-alt);
+}
+
+.token__avviso {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.token__valore {
+  overflow-wrap: anywhere;
+  font-size: 0.8rem;
+  user-select: all;
+}
+
+.token__azioni {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .dettaglio {
   display: flex;
   flex-direction: column;

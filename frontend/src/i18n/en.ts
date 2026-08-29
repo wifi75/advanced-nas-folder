@@ -192,6 +192,29 @@ export default {
     prontoOffline: 'The panel now works offline too.',
   },
 
+  link: {
+    titolo: 'Share links',
+    descrizione:
+      'A way to get a folder to someone without an account. The link only covers the folder you pick, and can be limited by time and by number of downloads.',
+    cartella: 'Folder (empty = all)',
+    etichetta: 'Name (optional)',
+    giorni: 'Days',
+    maxDownload: 'Max downloads',
+    password: 'Password (optional)',
+    crea: 'Create link',
+    copia: 'Copy',
+    copiato: 'Copied',
+    copiaOra:
+      'Copy it now: only its fingerprint is stored, so it cannot be shown again.',
+    nessuno: 'No links created.',
+    attivo: 'Active',
+    chiuso: 'No longer valid',
+    revoca: 'Revoke',
+    usato: 'used {n} times',
+    scaduto: 'This link is no longer valid.',
+    passwordRichiesta: 'This link is protected by a password.',
+  },
+
   archivio: {
     titolo: 'Files',
     apri: 'Browse',

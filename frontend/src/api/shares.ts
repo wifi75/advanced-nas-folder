@@ -56,6 +56,37 @@ export interface EsitoAccesso {
   permesso: string | null
 }
 
+export interface LinkCondivisione {
+  id: number
+  path: string
+  label: string | null
+  expires_at: string | null
+  max_downloads: number | null
+  download_count: number
+  is_revoked: boolean
+  protetto_da_password: boolean
+  /** Vero se il link non apre più nulla: scaduto, revocato o esaurito. */
+  esaurito: boolean
+}
+
+/**
+ * Il link appena creato, con il token in chiaro.
+ *
+ * È l'unico momento in cui il token esiste fuori dal database, che ne conserva
+ * solo l'impronta: dopo non è più recuperabile, e va copiato adesso.
+ */
+export interface LinkCreato extends LinkCondivisione {
+  token: string
+}
+
+export interface NuovoLink {
+  percorso: string
+  etichetta?: string | null
+  password?: string | null
+  giorni?: number | null
+  max_download?: number | null
+}
+
 export const sharesApi = {
   elenca: () => api.get<Share[]>('/shares'),
   dettaglio: (id: number) => api.get<ShareDettaglio>(`/shares/${id}`),
@@ -79,4 +110,9 @@ export const sharesApi = {
 
   provaAccesso: (id: number, dati: { percorso: string; user_id: number | null }) =>
     api.post<EsitoAccesso>(`/shares/${id}/prova-accesso`, dati),
+
+  elencaLink: (id: number) => api.get<LinkCondivisione[]>(`/shares/${id}/link`),
+  creaLink: (id: number, dati: NuovoLink) => api.post<LinkCreato>(`/shares/${id}/link`, dati),
+  revocaLink: (id: number, linkId: number) =>
+    api.delete<LinkCondivisione>(`/shares/${id}/link/${linkId}`),
 }

@@ -195,6 +195,29 @@ export default {
     prontoOffline: 'Il pannello ora funziona anche senza rete.',
   },
 
+  link: {
+    titolo: 'Link di condivisione',
+    descrizione:
+      'Un modo per far arrivare una cartella a chi non ha un account. Il collegamento vale solo per la cartella indicata, e si può limitare nel tempo e nel numero di scaricamenti.',
+    cartella: 'Cartella (vuoto = tutta)',
+    etichetta: 'Nome (facoltativo)',
+    giorni: 'Giorni',
+    maxDownload: 'Max download',
+    password: 'Password (facoltativa)',
+    crea: 'Crea link',
+    copia: 'Copia',
+    copiato: 'Copiato',
+    copiaOra:
+      'Copialo adesso: nel database resta solo la sua impronta, e non potrà essere mostrato di nuovo.',
+    nessuno: 'Nessun link creato.',
+    attivo: 'Attivo',
+    chiuso: 'Non più valido',
+    revoca: 'Revoca',
+    usato: 'usato {n} volte',
+    scaduto: 'Questo collegamento non è più valido.',
+    passwordRichiesta: 'Questo collegamento è protetto da una password.',
+  },
+
   archivio: {
     titolo: 'Archivio',
     apri: 'Sfoglia',

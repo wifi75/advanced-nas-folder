@@ -67,3 +67,32 @@ export async function indirizzoDownload(
   const q = new URLSearchParams({ percorso, g: gettone })
   return `${BASE}/archivio/${encodeURIComponent(slug)}/file?${q}`
 }
+
+/**
+ * Cartella aperta da un link di condivisione.
+ *
+ * Il token è l'autorizzazione: non serve alcun accesso al pannello.
+ */
+export const linkApi = {
+  contenuto: (token: string, percorso = '', password?: string) => {
+    const q = new URLSearchParams({ percorso })
+    if (password) q.set('password', password)
+    return api.get<Contenuto>(`/link/${encodeURIComponent(token)}?${q}`)
+  },
+}
+
+/**
+ * Indirizzo da cui scaricare un file passando dal link.
+ *
+ * Qui non serve un gettone separato: il token nell'indirizzo è già
+ * l'autorizzazione, e vive nella pagina che l'utente sta guardando.
+ */
+export function indirizzoDownloadLink(
+  token: string,
+  percorso: string,
+  password?: string,
+): string {
+  const q = new URLSearchParams({ percorso })
+  if (password) q.set('password', password)
+  return `${BASE}/link/${encodeURIComponent(token)}/file?${q}`
+}

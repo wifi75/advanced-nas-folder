@@ -27,7 +27,21 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
   cartella è pubblica, con percorso navigabile, dimensioni, date e richiesta della
   password dove serve. Dall'elenco delle pubblicazioni un pulsante «Sfoglia» apre la
   cartella corrispondente.
-- 22 test nuovi. Suite complessiva a **201 test**.
+- **Link di condivisione**: un modo per far arrivare una cartella a chi non ha un
+  account e non lo avrà. Il token stesso è l'autorizzazione, limitata a un ramo, a una
+  scadenza e a un numero di scaricamenti, e revocabile in qualunque momento.
+  Facoltativamente protetto da una password.
+- Due limiti il token non li supera, perché non sarebbero eccezioni ma buchi: non
+  porta mai fuori dal ramo per cui è stato creato, e non apre un percorso marcato
+  *negato*. Se un link superasse un divieto esplicito, crearne uno sarebbe il modo per
+  aggirarlo.
+- Nel database resta solo l'impronta SHA-256 del token, che perciò viene mostrato una
+  volta sola, subito dopo la creazione.
+- La revoca non cancella la riga: quante volte è stato usato un collegamento poi
+  revocato è esattamente ciò che si vuole sapere dopo averlo revocato.
+- Pagina dedicata a chi riceve un link — spoglia di proposito, senza menu né accesso al
+  pannello, perché mostra soltanto il ramo che il collegamento concede.
+- 33 test nuovi. Suite complessiva a **212 test**.
 
 ### Modificato
 - In sviluppo la consegna passa da sola a `stream`: senza un web server davanti,
