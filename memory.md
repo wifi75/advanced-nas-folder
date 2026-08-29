@@ -12,9 +12,9 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.4.0
+- Versione corrente: 0.5.0
 
-## Stato alla v0.4.0 — 29 agosto 2026
+## Stato alla v0.5.0 — 29 agosto 2026
 
 **Fatto e verificato eseguendo, non solo leggendo:**
 
@@ -44,8 +44,14 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 **Sul server non è ancora stato pubblicato nulla.** L'installazione vera si fa alla
 fine dello sviluppo.
 
-**Da fare subito dopo:** endpoint e interfaccia per assegnare i permessi, PWA.
-Vedere [TODO.md](TODO.md).
+- **Pubblicazioni complete**: endpoint e interfaccia per cartelle pubblicate, regole
+  di visibilità per prefisso e permessi per singolo utente, con una verifica
+  dell'accesso che dice quale regola ha deciso.
+- **Applicazione installabile (PWA)**: manifest, icone, service worker con l'API
+  sempre esclusa dalla cache e aggiornamento non automatico.
+
+**Da fare subito dopo:** consegna dei download (`X-Sendfile` / `X-Accel-Redirect`),
+che è il pezzo che rende la fase 2 usabile davvero. Vedere [TODO.md](TODO.md).
 
 ## Ambiente di sviluppo
 
@@ -73,6 +79,12 @@ collegamento all'altra versione. I documenti interni di sviluppo (`PIANO.md`,
   ma disattivate, con la fase indicata.
 - `npm run typecheck` usa `vue-tsc --build`: la variante `--noEmit` non controllava i
   progetti referenziati e lasciava passare errori che il build trovava.
+- **Il pannello vive sotto `/pannello/`**, in sviluppo come in produzione: la `base`
+  di Vite e il router lo dichiarano. Tenerlo alla radice in sviluppo farebbe
+  funzionare in locale percorsi che poi si rompono installati.
+- Il service worker è spento in sviluppo di proposito, e la sua registrazione **non è
+  verificabile nel browser incorporato**, che la blocca anche per un service worker
+  di una riga: va confermata su un browser vero.
 
 ## Decisioni architetturali fissate
 

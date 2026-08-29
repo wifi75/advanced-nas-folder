@@ -7,6 +7,14 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non rilasciato]
 
+### Da fare
+Vedere [TODO.md](TODO.md).
+
+## [0.5.0] - 2026-08-29
+
+Le cartelle si pubblicano e si proteggono dall'interfaccia, e il pannello si
+installa sul telefono.
+
 ### Aggiunto
 - **Endpoint delle pubblicazioni**: elenco, creazione, modifica ed eliminazione delle
   cartelle pubblicate, con regole di visibilità per prefisso di percorso e permessi

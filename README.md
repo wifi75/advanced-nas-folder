@@ -9,6 +9,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![Vite](https://img.shields.io/badge/Build-Vite%208.2-646CFF?logo=vite&logoColor=white)](https://vite.dev)
 [![Lingue](https://img.shields.io/badge/Interfaccia-italiano%20%7C%20english-C8467C)](frontend/src/i18n)
+[![PWA](https://img.shields.io/badge/App-installabile%20(PWA)-5A0FC8?logo=pwa&logoColor=white)](https://web.dev/explore/progressive-web-apps)
 [![Database](https://img.shields.io/badge/DB-SQLite%20(WAL)-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/wal.html)
 [![Storage](https://img.shields.io/badge/Storage-NFS%20v3%20%7C%20v4-EE0000?logo=redhat&logoColor=white)](https://linux-nfs.org)
 [![Web server](https://img.shields.io/badge/Web%20server-Apache%20%7C%20Nginx-D22128?logo=apache&logoColor=white)](https://httpd.apache.org)
@@ -19,10 +20,10 @@ Pannello self-hosted che **monta condivisioni NFS**, **pubblica cartelle con per
 per sottocartella** e sostituisce integralmente FileBrowser — senza che tu debba mai
 modificare a mano un file di configurazione del server.
 
-> **Stato: fase 1 completata, fase 2 in corso.** Il pannello monta condivisioni NFS
-> dall'interfaccia, in italiano e in inglese, con tema chiaro, scuro o automatico, e
-> l'installer per Linux è pronto. Manca la pubblicazione delle cartelle: il modello
-> dei permessi c'è, l'interfaccia per assegnarli no. Vedere [TODO.md](TODO.md).
+> **Stato: fasi 1 e 2 quasi complete.** Il pannello monta condivisioni NFS, pubblica
+> cartelle con permessi fino al singolo utente, è installabile sul telefono e parla
+> italiano e inglese. Manca la consegna dei file, cioè il download vero e proprio.
+> Vedere [TODO.md](TODO.md).
 
 ---
 

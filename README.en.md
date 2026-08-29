@@ -9,6 +9,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![Vite](https://img.shields.io/badge/Build-Vite%208.2-646CFF?logo=vite&logoColor=white)](https://vite.dev)
 [![Languages](https://img.shields.io/badge/Interface-italiano%20%7C%20english-C8467C)](frontend/src/i18n)
+[![PWA](https://img.shields.io/badge/App-installable%20(PWA)-5A0FC8?logo=pwa&logoColor=white)](https://web.dev/explore/progressive-web-apps)
 [![Database](https://img.shields.io/badge/DB-SQLite%20(WAL)-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/wal.html)
 [![Storage](https://img.shields.io/badge/Storage-NFS%20v3%20%7C%20v4-EE0000?logo=redhat&logoColor=white)](https://linux-nfs.org)
 [![Web server](https://img.shields.io/badge/Web%20server-Apache%20%7C%20Nginx-D22128?logo=apache&logoColor=white)](https://httpd.apache.org)
@@ -19,10 +20,10 @@ Self-hosted panel that **mounts NFS shares**, **publishes folders with per-subfo
 permissions** and fully replaces FileBrowser — without ever editing a server
 configuration file by hand.
 
-> **Status: phase 1 complete, phase 2 in progress.** The panel mounts NFS shares from
-> the interface, in Italian and English, with a light, dark or automatic theme, and the
-> Linux installer is ready. Folder publishing is still missing: the permission model is
-> there, the interface to assign permissions is not. See [TODO.md](TODO.md).
+> **Status: phases 1 and 2 nearly complete.** The panel mounts NFS shares, publishes
+> folders with per-user permissions, installs on your phone and speaks Italian and
+> English. File delivery — the actual download — is still missing. See
+> [TODO.md](TODO.md).
 
 ---
 
