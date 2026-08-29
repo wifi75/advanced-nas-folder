@@ -209,3 +209,29 @@ class TrasferimentoOut(BaseModel):
     is_resumed: bool
     started_at: datetime
     finished_at: datetime | None
+
+
+class ImpostazioniOut(BaseModel):
+    titolo: str
+    sottotitolo: str | None = None
+    logo_url: str | None = None
+    mostra_nascosti: bool = False
+
+
+class ImpostazioniUpdate(BaseModel):
+    titolo: str | None = Field(default=None, max_length=128)
+    sottotitolo: str | None = Field(default=None, max_length=256)
+    logo_url: str | None = Field(default=None, max_length=512)
+    mostra_nascosti: bool | None = None
+
+
+class SpazioDisco(BaseModel):
+    """Spazio di una condivisione montata, o del disco del pannello."""
+
+    mount_id: int | None
+    label: str
+    mountpoint: str
+    #: Vuoti se il percorso non è raggiungibile: mostrare zero farebbe
+    #: sembrare pieno un disco che semplicemente non risponde.
+    totale: int | None
+    libero: int | None

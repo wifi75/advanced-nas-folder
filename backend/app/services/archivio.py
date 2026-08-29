@@ -65,7 +65,7 @@ async def permessi_di(
     return list(risultato.scalars().all())
 
 
-def _leggi_cartella(reale: Path, base: PurePosixPath) -> list[Voce]:
+def _leggi_cartella(reale: Path, base: PurePosixPath, nascosti: bool) -> list[Voce]:
     """Legge le voci dal disco. Sincrona: la chiama un thread separato.
 
     Una `stat` su NFS puo' fermarsi per secondi se il NAS non risponde, e
@@ -74,7 +74,11 @@ def _leggi_cartella(reale: Path, base: PurePosixPath) -> list[Voce]:
     voci: list[Voce] = []
     with os.scandir(reale) as elenco:
         for elemento in elenco:
-            if elemento.name.startswith("."):
+            if elemento.name.startswith(".") and not nascosti:
+                continue
+            # I file parziali di un caricamento in corso non sono file: non si
+            # mostrano nemmeno quando i nascosti sono visibili.
+            if elemento.name.endswith(".anf-parziale"):
                 continue
             try:
                 info = elemento.stat()
@@ -100,6 +104,8 @@ async def elenca(
     reale: Path,
     percorso: str,
     consentito: Callable[[str], bool],
+    *,
+    nascosti: bool = False,
 ) -> list[Voce]:
     """Voci della cartella che chi guarda puo' vedere, cartelle prima.
 
@@ -114,7 +120,7 @@ async def elenca(
 
     base = normalizza_relativo(percorso)
     try:
-        voci = await anyio.to_thread.run_sync(_leggi_cartella, reale, base)
+        voci = await anyio.to_thread.run_sync(_leggi_cartella, reale, base, nascosti)
     except OSError as exc:
         raise ArchivioNonDisponibile("La cartella non e' leggibile.") from exc
 

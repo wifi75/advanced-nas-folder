@@ -32,6 +32,12 @@ const routes: RouteRecordRaw[] = [
     meta: { titolo: 'archivio.titolo', pubblica: true },
   },
   {
+    path: '/impostazioni',
+    name: 'impostazioni',
+    component: () => import('@/views/ImpostazioniView.vue'),
+    meta: { titolo: 'menu.impostazioni' },
+  },
+  {
     path: '/trasferimenti',
     name: 'trasferimenti',
     component: () => import('@/views/TrasferimentiView.vue'),

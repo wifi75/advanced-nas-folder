@@ -17,6 +17,7 @@ import { RouterLink } from 'vue-router'
 import SelettoreLingua from '@/components/SelettoreLingua.vue'
 import SelettoreTema from '@/components/SelettoreTema.vue'
 import { useAppStore } from '@/stores/app'
+import { useImpostazioniStore } from '@/stores/impostazioni'
 import { useAuthStore } from '@/stores/auth'
 
 interface Voce {
@@ -37,6 +38,7 @@ defineProps<{ aperta?: boolean }>()
 const emit = defineEmits<{ naviga: []; esci: [] }>()
 
 const app = useAppStore()
+const impostazioni = useImpostazioniStore()
 const auth = useAuthStore()
 const { t } = useI18n()
 
@@ -105,9 +107,9 @@ const categorie = computed<Categoria[]>(() => [
       },
       {
         etichetta: t('menu.impostazioni'),
+        a: '/impostazioni',
         tinta: 'var(--tinta-impostazioni)',
         icona: ICONE.ingranaggio,
-        fase: 5,
       },
     ],
   },
@@ -120,7 +122,20 @@ const categorie = computed<Categoria[]>(() => [
     :class="{ 'barra--aperta': aperta }"
   >
     <div class="marchio">
-      <span class="marchio__nome">{{ app.name }}</span>
+      <img
+        v-if="impostazioni.valori.logo_url"
+        :src="impostazioni.valori.logo_url"
+        :alt="impostazioni.valori.titolo"
+        class="marchio__logo"
+      >
+      <span
+        v-else
+        class="marchio__nome"
+      >{{ impostazioni.valori.titolo }}</span>
+      <span
+        v-if="impostazioni.valori.sottotitolo"
+        class="marchio__sottotitolo"
+      >{{ impostazioni.valori.sottotitolo }}</span>
       <span class="marchio__versione">v{{ app.version }}</span>
     </div>
 
@@ -217,6 +232,17 @@ const categorie = computed<Categoria[]>(() => [
 </template>
 
 <style scoped>
+.marchio__logo {
+  max-width: 100%;
+  max-height: 2.2rem;
+  object-fit: contain;
+}
+
+.marchio__sottotitolo {
+  color: var(--testo-tenue);
+  font-size: 0.72rem;
+}
+
 .barra {
   flex: none;
   inline-size: 264px;

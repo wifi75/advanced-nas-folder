@@ -193,6 +193,24 @@ export default {
     prontoOffline: 'The panel now works offline too.',
   },
 
+  impostazioni: {
+    titolo: 'Settings',
+    descrizione: 'Panel appearance and disk space.',
+    marchio: 'Branding',
+    nome: 'Panel name',
+    sottotitolo: 'Subtitle (optional)',
+    logo: 'Logo (image address)',
+    logoNota: 'If set, it replaces the name in the sidebar.',
+    nascosti: 'Also show files starting with a dot',
+    nascostiNota:
+      'Half-finished uploads stay hidden anyway: they are not files, and showing them would make them look downloadable.',
+    salvato: 'Saved',
+    spazio: 'Disk space',
+    discoPannello: 'Panel disk',
+    liberi: '{libero} free',
+    nonRaggiungibile: 'unreachable',
+  },
+
   trasferimenti: {
     titolo: 'Transfers',
     descrizione: 'What was downloaded and uploaded, by whom and from where.',

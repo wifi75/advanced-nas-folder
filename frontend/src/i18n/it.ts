@@ -196,6 +196,24 @@ export default {
     prontoOffline: 'Il pannello ora funziona anche senza rete.',
   },
 
+  impostazioni: {
+    titolo: 'Impostazioni',
+    descrizione: 'Aspetto del pannello e spazio sui dischi.',
+    marchio: 'Marchio',
+    nome: 'Nome del pannello',
+    sottotitolo: 'Sottotitolo (facoltativo)',
+    logo: 'Logo (indirizzo di un’immagine)',
+    logoNota: 'Se indicato sostituisce il nome nella barra laterale.',
+    nascosti: 'Mostra anche i file che iniziano con un punto',
+    nascostiNota:
+      'I caricamenti a metà restano comunque invisibili: non sono file, e mostrarli li farebbe sembrare scaricabili.',
+    salvato: 'Salvato',
+    spazio: 'Spazio sui dischi',
+    discoPannello: 'Disco del pannello',
+    liberi: '{libero} liberi',
+    nonRaggiungibile: 'non raggiungibile',
+  },
+
   trasferimenti: {
     titolo: 'Trasferimenti',
     descrizione: 'Cosa è stato scaricato e caricato, da chi e da dove.',

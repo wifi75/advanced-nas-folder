@@ -12,6 +12,7 @@ from app.api.v1 import (
     archivio,
     auth,
     health,
+    impostazioni,
     link,
     mounts,
     shares,
@@ -87,3 +88,4 @@ app.include_router(link.router, prefix="/api/v1")
 app.include_router(vhosts.router, prefix="/api/v1")
 app.include_router(utenti.router, prefix="/api/v1")
 app.include_router(trasferimenti.router, prefix="/api/v1")
+app.include_router(impostazioni.router, prefix="/api/v1")

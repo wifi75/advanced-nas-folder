@@ -117,6 +117,14 @@ async def _reale(sessione: Sessione, share: Share, percorso: str) -> Path:
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, str(exc)) from exc
 
 
+async def _mostra_nascosti(sessione: Sessione) -> bool:
+    """Se l'amministratore ha chiesto di elencare anche i file nascosti."""
+    from app.models import Setting
+
+    impostazione = await sessione.get(Setting, "mostra_nascosti")
+    return impostazione is not None and impostazione.value == "si"
+
+
 # --- consultazione ---------------------------------------------------------
 
 
@@ -142,7 +150,9 @@ async def contenuto(
         )
 
     try:
-        voci = await archivio.elenca(reale, percorso, consentito)
+        voci = await archivio.elenca(
+            reale, percorso, consentito, nascosti=await _mostra_nascosti(sessione)
+        )
     except archivio.ArchivioNonDisponibile as exc:
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, str(exc)) from exc
 
