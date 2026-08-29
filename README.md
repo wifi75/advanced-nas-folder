@@ -70,7 +70,8 @@ Due scelte deliberate:
 
 - Linux con systemd (sviluppato e testato su Ubuntu 24.04 LTS)
 - Apache con `mod_xsendfile`, **oppure** Nginx
-- Python 3.12 o superiore
+- Python 3.14 o superiore — su Ubuntu si installa dal PPA `deadsnakes`, **affiancato**
+  all'interprete di sistema, che non viene toccato. Se ne occupa `install.sh`.
 - Nessun server di database: i dati stanno in un file SQLite
 - `nfs-common` per i mount NFS
 

@@ -68,7 +68,7 @@ Per i pacchetti con scope, codificare i caratteri speciali:
 
 | | Versione | Nota |
 |---|---|---|
-| Python | 3.14.7 è l'ultima | il progetto richiede almeno la 3.12 |
+| Python | **3.14** richiesta | upstream è alla 3.14.7; il PPA `deadsnakes` per Ubuntu 24.04 fornisce la 3.14.6 |
 | Node.js | 24.18.1 LTS | serve solo alla CI, mai sul server |
 | SQLite | libreria standard di Python | modalità WAL |
 
@@ -88,6 +88,22 @@ ma il primo build va guardato:
 - **pytest 9** ha rimosso funzionalità deprecate nella serie 8.
 
 ---
+
+## Python: si installa affiancato, mai al posto
+
+Ubuntu 24.04 distribuisce Python 3.12, e il sistema stesso ne dipende. Il progetto usa
+la 3.14 dal PPA `deadsnakes`, che la installa **accanto** all'interprete di sistema:
+
+```bash
+add-apt-repository -y ppa:deadsnakes/ppa
+apt-get install -y python3.14 python3.14-venv python3.14-dev
+python3.14 -m venv /var/www/advanced-nas-folder/venv
+```
+
+`python3` continua a puntare alla 3.12. **Non spostare mai quel collegamento** con
+`update-alternatives`: ci girano sopra il sistema operativo e le altre applicazioni
+presenti sulla macchina. Il venv del progetto va creato esplicitamente con
+`python3.14`.
 
 ## Quando aggiornare
 

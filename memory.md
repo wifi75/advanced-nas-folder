@@ -55,6 +55,16 @@ su un pannello esposto a Internet.
   di ripiego ma un requisito verificato con `rpcinfo`.
 - Il frontend non si compila sul server: `dist/` arriva già pronto dalla CI.
 
+## Versioni
+
+Regola: sempre le ultime stabili, verificate **interrogando i registri** PyPI e npm —
+non da ricerca web, che è stata smentita di versioni maggiori. Vedere
+[docs/VERSIONI.md](docs/VERSIONI.md).
+
+Python **3.14** dal PPA `deadsnakes`, installato accanto alla 3.12 di sistema. Il
+collegamento `python3` non va mai spostato: ci dipendono il sistema e le altre
+applicazioni della macchina.
+
 ## Standard applicati
 
 - Backend FastAPI, frontend Vue 3 + TypeScript + Vite

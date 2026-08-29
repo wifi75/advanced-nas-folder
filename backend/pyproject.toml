@@ -5,7 +5,7 @@ description = "Pannello self-hosted per mount NFS, pubblicazione e gestione file
 authors = [{ name = "Tiziano Cassone" }]
 license = { text = "MIT" }
 readme = "../README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.14"
 
 # Versioni interrogate direttamente su PyPI il 2026-08-29.
 # NON aggiornarle a memoria e NON fidarsi delle ricerche web: interrogare il
@@ -34,13 +34,13 @@ dev = [
 
 [tool.ruff]
 line-length = 100
-target-version = "py312"
+target-version = "py314"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "UP", "B", "S", "C4", "SIM"]
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.14"
 strict = true
 
 [tool.pytest.ini_options]
