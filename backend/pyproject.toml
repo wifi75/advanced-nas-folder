@@ -4,7 +4,8 @@ version = "0.1.0"
 description = "Pannello self-hosted per mount NFS, pubblicazione e gestione file"
 authors = [{ name = "Tiziano Cassone" }]
 license = { text = "MIT" }
-readme = "../README.md"
+# Nessun campo `readme`: setuptools rifiuta i percorsi fuori da questa cartella,
+# e il README del progetto sta nella radice del repository.
 requires-python = ">=3.14"
 
 # Versioni interrogate direttamente su PyPI il 2026-08-29.

@@ -11,16 +11,15 @@ nessuna dipende da quelle successive.
 - [x] Licenza MIT
 - [x] README, piano tecnico, wiki NFS Synology
 - [x] `.env.example` e `.gitignore`
-- [ ] **Verificare le versioni provvisorie** in `backend/pyproject.toml` e
-      `frontend/package.json`. Sono confermate con ricerca: FastAPI 0.141.1,
-      Vue 3.5.33, Vite 8.0.9, PostgreSQL 18.6, Node 24.18.1. Le altre dipendenze
-      sono state fissate senza verifica e vanno controllate prima della prima
-      installazione reale.
-- [ ] Scheletro backend FastAPI con `core/version.py` e endpoint di health
+- [x] Versioni verificate interrogando PyPI e npm — vedere [docs/VERSIONI.md](docs/VERSIONI.md)
+- [x] Python 3.14 come requisito, installato accanto all'interprete di sistema
+- [x] Scheletro backend FastAPI: configurazione, database, endpoint di health
+- [x] Modelli del database: User, Mount, Share, AccessRule, ShareLink, Transfer,
+      VHost, Setting — verificati creando davvero le tabelle su Python 3.14
+- [ ] Prima migrazione Alembic
 - [ ] Scheletro frontend Vue 3 + TypeScript + Vite
-- [ ] Modelli e prima migrazione Alembic
 - [ ] `install.sh` funzionante end-to-end
-- [ ] Workflow CI: build di `dist/` e allegato alla release
+- [x] Workflow CI: build di `dist/` e allegato alla release
 
 ## Fase 1 — Mount NFS dal pannello
 
