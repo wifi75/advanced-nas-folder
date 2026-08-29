@@ -45,8 +45,9 @@ I mount NFS si gestiscono dall'interfaccia, in due lingue.
   solo alla navigazione, e cambiare lingua non cambia rotta.
 - Il comando `typecheck` non intercettava errori che il `build` trovava, dando falsa
   sicurezza. Ora usa lo stesso controllo.
-- La cartella `.claude/` era finita nel repository: rimossa, con la regola di ignore
-  in `.git/info/exclude` e non in `.gitignore`, che viene pubblicato.
+- La cartella di configurazione locale dell'editor era finita nel repository: rimossa,
+  con la regola di ignore in `.git/info/exclude` e non in `.gitignore`, che viene
+  pubblicato e conterrebbe a sua volta il nome della cartella.
 
 ## [0.2.0] - 2026-08-29
 
