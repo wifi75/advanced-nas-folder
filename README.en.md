@@ -20,8 +20,9 @@ permissions** and fully replaces FileBrowser — without ever editing a server
 configuration file by hand.
 
 > **Status: phase 1 complete, phase 2 in progress.** The panel mounts NFS shares from
-> the interface, in Italian and English, with a light, dark or automatic theme.
-> Folder publishing is still missing. See [TODO.md](TODO.md).
+> the interface, in Italian and English, with a light, dark or automatic theme, and the
+> Linux installer is ready. Folder publishing is still missing: the permission model is
+> there, the interface to assign permissions is not. See [TODO.md](TODO.md).
 
 ---
 

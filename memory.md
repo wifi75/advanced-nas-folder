@@ -12,9 +12,9 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.3.0
+- Versione corrente: 0.4.0
 
-## Stato al 29 agosto 2026
+## Stato alla v0.4.0 — 29 agosto 2026
 
 **Fatto e verificato eseguendo, non solo leggendo:**
 
@@ -46,6 +46,13 @@ fine dello sviluppo.
 
 **Da fare subito dopo:** endpoint e interfaccia per assegnare i permessi, PWA.
 Vedere [TODO.md](TODO.md).
+
+## Ambiente di sviluppo
+
+`avvia-dev.ps1` avvia backend e frontend e stampa gli indirizzi. Senza argomenti
+ascoltano su **tutte le interfacce**, per provare il pannello da telefono o tablet;
+con `-SoloLocale` solo su `127.0.0.1`. Vite richiede `allowedHosts` per accettare
+richieste che arrivano da un indirizzo IP: senza, risponde «host non consentito».
 
 ## Convenzioni della documentazione
 

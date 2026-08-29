@@ -7,6 +7,14 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non rilasciato]
 
+### Da fare
+Vedere [TODO.md](TODO.md).
+
+## [0.4.0] - 2026-08-29
+
+Il progetto diventa installabile su un server, e i permessi arrivano al singolo
+utente.
+
 ### Aggiunto
 - **`deploy/install.sh`**: installazione su server Linux, con messaggi in italiano e
   in inglese. Idempotente, con `--dry-run` per vedere cosa farebbe e `--uninstall`
@@ -29,9 +37,16 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 - `docs/INSTALL.md`: prerequisiti, verifica del NAS prima di installare, cosa fa
   l'installer passo per passo, aggiornamento, disinstallazione e risoluzione dei
   problemi più frequenti.
+- **`avvia-dev.ps1`**: avvia backend e frontend in sviluppo come schede della stessa
+  finestra di Windows Terminal, con ripiego a finestre separate, e stampa gli
+  indirizzi. Controlla prima che ambiente Python, dipendenze e `.env` esistano.
 
-### Da fare
-Vedere [TODO.md](TODO.md).
+### Cambiato
+- In sviluppo i servizi ascoltano su **tutte le interfacce**, così il pannello si può
+  provare da telefono o tablet. Aggiunto `allowedHosts` perché Vite rifiuta gli Host
+  che non conosce, come difesa dal rebinding DNS. Opzione `-SoloLocale` per tornare
+  ad ascoltare solo su `127.0.0.1`.
+- Il README non dichiara più che l'installer manca: ora esiste.
 
 ## [0.3.0] - 2026-08-29
 

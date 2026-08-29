@@ -20,8 +20,9 @@ per sottocartella** e sostituisce integralmente FileBrowser — senza che tu deb
 modificare a mano un file di configurazione del server.
 
 > **Stato: fase 1 completata, fase 2 in corso.** Il pannello monta condivisioni NFS
-> dall'interfaccia, in italiano e in inglese, con tema chiaro, scuro o automatico.
-> Mancano la pubblicazione delle cartelle e l'installer. Vedere [TODO.md](TODO.md).
+> dall'interfaccia, in italiano e in inglese, con tema chiaro, scuro o automatico, e
+> l'installer per Linux è pronto. Manca la pubblicazione delle cartelle: il modello
+> dei permessi c'è, l'interfaccia per assegnarli no. Vedere [TODO.md](TODO.md).
 
 ---
 
