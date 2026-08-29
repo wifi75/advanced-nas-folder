@@ -1,0 +1,45 @@
+[project]
+name = "advanced-nas-folder"
+version = "0.1.0"
+description = "Pannello self-hosted per mount NFS, pubblicazione e gestione file"
+authors = [{ name = "Tiziano Cassone" }]
+license = { text = "MIT" }
+readme = "../README.md"
+requires-python = ">=3.12"
+
+# Versioni stabili verificate il 2026-08-29.
+dependencies = [
+    "fastapi==0.141.1",
+    "uvicorn[standard]==0.38.0",
+    "pydantic==2.12.3",
+    "pydantic-settings==2.11.0",
+    "sqlalchemy==2.0.44",
+    "alembic==1.16.5",
+    "psycopg[binary]==3.2.10",
+    "argon2-cffi==25.1.0",
+    "pyjwt==2.10.1",
+    "python-multipart==0.0.20",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==8.4.2",
+    "pytest-asyncio==1.2.0",
+    "httpx==0.28.1",
+    "ruff==0.14.0",
+    "mypy==1.18.2",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "S", "C4", "SIM"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

@@ -1,0 +1,34 @@
+[Unit]
+Description=Advanced NAS Folder - API
+Documentation=https://github.com/wifi75/advanced-nas-folder
+After=network.target postgresql.service anf-agent.service
+Wants=postgresql.service
+Requires=anf-agent.service
+
+[Service]
+Type=exec
+# Utente non privilegiato: questa applicazione non deve poter toccare il sistema.
+User=anf
+Group=anf
+WorkingDirectory=/var/www/advanced-nas-folder/backend
+EnvironmentFile=/var/www/advanced-nas-folder/.env
+ExecStart=/var/www/advanced-nas-folder/venv/bin/uvicorn app.main:app \
+    --host ${ANF_HOST} --port ${ANF_PORT} --proxy-headers
+Restart=on-failure
+RestartSec=5
+
+# Isolamento
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+RestrictRealtime=yes
+LockPersonality=yes
+ReadWritePaths=/var/www/advanced-nas-folder /srv/nas
+
+[Install]
+WantedBy=multi-user.target

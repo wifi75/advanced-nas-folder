@@ -1,0 +1,43 @@
+# --- Segreti e configurazione locale: MAI nel repository ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# --- Node / frontend ---
+node_modules/
+frontend/dist/
+.vite/
+*.tsbuildinfo
+
+# --- Database e dati locali ---
+*.sqlite
+*.sqlite3
+*.db
+dumps/
+
+# --- Log e temporanei ---
+*.log
+logs/
+tmp/
+.DS_Store
+Thumbs.db
+
+# --- Editor ---
+.vscode/
+.idea/
+*.swp

@@ -1,0 +1,53 @@
+name: Release
+
+# Compila il frontend qui e allega il pacchetto alla release, cosi il server di
+# destinazione non ha mai bisogno di Node ne di node_modules.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Prepara Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Installa le dipendenze del frontend
+        working-directory: frontend
+        run: npm ci
+
+      - name: Compila il frontend
+        working-directory: frontend
+        run: npm run build
+
+      - name: Prepara il pacchetto
+        run: |
+          mkdir -p pacchetto
+          cp -r backend agent deploy docs pacchetto/
+          cp README.md CHANGELOG.md LICENSE .env.example pacchetto/
+          mkdir -p pacchetto/frontend
+          cp -r frontend/dist pacchetto/frontend/dist
+          tar -czf advanced-nas-folder.tar.gz -C pacchetto .
+          sha256sum advanced-nas-folder.tar.gz > advanced-nas-folder.tar.gz.sha256
+          cp deploy/install.sh . 2>/dev/null || true
+
+      - name: Pubblica la release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            advanced-nas-folder.tar.gz
+            advanced-nas-folder.tar.gz.sha256
+            install.sh
+          generate_release_notes: true
