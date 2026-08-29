@@ -105,9 +105,10 @@ Richieste del 2026-08-29 rimaste aperte alla chiusura della v0.3.0:
       di installazione: tradurli ha meno urgenza ma resta da fare.
 - [ ] **PWA**: pannello installabile sul telefono, icona in schermata home.
 - [ ] **Pubblicazione sul server, alla fine dello sviluppo.** Sul server non è
-      ancora stato pubblicato nulla: `install.sh` è pronto e verificato a vuoto,
-      ma l'installazione vera si fa quando il progetto è completo. Da eseguire
-      con `--dry-run` prima, poi per davvero.
+      ancora stato pubblicato nulla. Dalla v0.4.0 il comando documentato nel
+      README funziona davvero: verificato scaricando `install.sh` e il pacchetto
+      dalla release, checksum confermato e `dist/` compilato dalla CI presente.
+      Da eseguire con `--dry-run` prima, poi per davvero.
 
 ## Emerso durante i rilasci
 
