@@ -17,6 +17,12 @@ const routes: RouteRecordRaw[] = [
     meta: { titolo: 'menu.condivisioni' },
   },
   {
+    path: '/pubblicazioni',
+    name: 'shares',
+    component: () => import('@/views/SharesView.vue'),
+    meta: { titolo: 'menu.pubblicazioni' },
+  },
+  {
     path: '/accedi',
     name: 'login',
     component: () => import('@/views/LoginView.vue'),

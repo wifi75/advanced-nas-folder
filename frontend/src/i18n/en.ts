@@ -109,6 +109,83 @@ export default {
     creando: 'Creating…',
   },
 
+  share: {
+    titolo: 'Published folders',
+    sottotitolo: 'Decide which folders are reachable, and by whom.',
+    nuova: 'New publication',
+    vuoto: 'No folder published yet. A publication starts from an NFS share already mounted.',
+    servonoMount: 'You need at least one mounted NFS share first: a publication starts from there.',
+    condivisione: 'NFS share',
+    sottopercorso: 'Subfolder',
+    sottopercorsoAiuto: 'Leave empty to publish the root of the share',
+    nome: 'Name',
+    identificatore: 'Identifier',
+    descrizione: 'Description',
+    visibilitaPredefinita: 'Who can access',
+    attiva: 'Publication enabled',
+    disattivata: 'Disabled',
+    creando: 'Creating…',
+    confermaTitolo: 'Delete “{nome}”?',
+    confermaTesto:
+      'The publication, its rules and its permissions are removed. Files on the NAS are left untouched.',
+  },
+
+  visibilita: {
+    pubblica: 'Anyone, without signing in',
+    password: 'Anyone with the password',
+    utenti: 'Every signed-in user',
+    utenti_scelti: 'Only authorised users',
+    negata: 'Nobody',
+    breve_pubblica: 'Public',
+    breve_password: 'Password',
+    breve_utenti: 'Users',
+    breve_utenti_scelti: 'Authorised',
+    breve_negata: 'Denied',
+  },
+
+  regole: {
+    titolo: 'Rules per folder',
+    descrizione:
+      'Each rule covers one folder and everything inside it. The most specific rule always wins, so a subfolder can be stricter than the folder containing it.',
+    percorso: 'Folder',
+    radice: 'the whole publication',
+    aggiungi: 'Add rule',
+    password: 'Password',
+    protetta: 'password protected',
+    nessuna: 'No rule: the publication default applies.',
+  },
+
+  permessi: {
+    titolo: 'Per-user permissions',
+    descrizione:
+      'Decide which user reaches which folder, or all of them. An explicit denial beats the folder rule, so you can take a branch away from one person while leaving it open to everyone else.',
+    utente: 'User',
+    cartella: 'Folder',
+    livello: 'Permission',
+    negato: 'Denied',
+    lettura: 'Read',
+    scrittura: 'Read and write',
+    assegna: 'Assign',
+    nessuno: 'No permission assigned.',
+    tutte: 'all folders',
+  },
+
+  prova: {
+    titolo: 'Check an access',
+    descrizione:
+      'See whether a folder is reachable and which rule decides it, before your users find out for you.',
+    percorso: 'Folder to check',
+    come: 'As',
+    anonimo: 'Anonymous visitor',
+    verifica: 'Check',
+    consentito: 'Access allowed',
+    negato: 'Access denied',
+    conScrittura: 'with write access',
+    decisoDaRegola: 'decided by the rule on “{percorso}”',
+    decisoDaPermesso: 'decided by the permission on “{percorso}”',
+    decisoDaPredefinita: 'decided by the publication default',
+  },
+
   errori: {
     serverNonRaggiungibile: 'Server unreachable. Check your connection.',
     sessioneScaduta: 'Session expired. Please sign in again.',

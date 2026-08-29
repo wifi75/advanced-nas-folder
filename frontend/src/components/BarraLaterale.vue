@@ -66,9 +66,9 @@ const categorie = computed<Categoria[]>(() => [
       },
       {
         etichetta: t('menu.pubblicazioni'),
+        a: '/pubblicazioni',
         tinta: 'var(--tinta-pubblicazioni)',
         icona: ICONE.globo,
-        fase: 2,
       },
       { etichetta: t('menu.file'), tinta: 'var(--tinta-file)', icona: ICONE.documento, fase: 3 },
     ],

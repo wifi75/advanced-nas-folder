@@ -56,7 +56,8 @@ nessuna dipende da quelle successive.
       regole di visibilità per prefisso, permessi per utente
 - [x] **Verifica dell'accesso** (`prova-accesso`): dice se un percorso è
       raggiungibile e *quale regola l'ha deciso*, anche in forma anonima
-- [ ] Interfaccia delle pubblicazioni e dei permessi
+- [x] **Interfaccia delle pubblicazioni e dei permessi**: elenco, creazione, regole
+      per cartella, permessi per utente e verifica dell'accesso nella stessa pagina
 - [ ] Link di condivisione con scadenza, limite di download e revoca
 - [ ] Download delegato: `X-Sendfile` e `X-Accel-Redirect`
 - [ ] Verifica del resume (Range, `If-Range`, ETag, 206)

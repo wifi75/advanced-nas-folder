@@ -21,10 +21,18 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
   allo stesso utente ne cambia il livello invece di creare un secondo permesso che
   contraddirebbe il primo.
 - 20 test sugli endpoint. Suite complessiva a **179 test**.
+- **Interfaccia delle pubblicazioni**: elenco, creazione con identificatore proposto
+  dal nome, regole per cartella, permessi per utente e **verifica dell'accesso nella
+  stessa pagina**, che dice se una cartella è raggiungibile e quale regola lo decide.
+  La voce «Pubblicazioni» del menu non è più in attesa.
 
 ### Corretto
 - Un percorso con risalita passato alla verifica dell'accesso produceva un errore
   interno invece di una risposta comprensibile.
+- Nella verifica, lasciare vuoto il campo utente per provare l'accesso **anonimo**
+  inviava una stringa vuota anziché «nessun utente»: la verifica falliva, e l'errore
+  veniva pure inghiottito lasciando la pagina muta. Ora l'anonimo funziona e gli
+  errori si vedono.
 
 ### Da fare
 Vedere [TODO.md](TODO.md).

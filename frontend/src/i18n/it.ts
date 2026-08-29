@@ -110,6 +110,85 @@ export default {
     creando: 'Creo…',
   },
 
+  share: {
+    titolo: 'Pubblicazioni',
+    sottotitolo: 'Decidi quali cartelle sono raggiungibili e da chi.',
+    nuova: 'Nuova pubblicazione',
+    vuoto:
+      'Nessuna cartella pubblicata. Una pubblicazione parte da una condivisione NFS già montata.',
+    servonoMount:
+      'Prima serve almeno una condivisione NFS montata: una pubblicazione parte da lì.',
+    condivisione: 'Condivisione',
+    sottopercorso: 'Sottocartella',
+    sottopercorsoAiuto: 'Vuoto per pubblicare la radice della condivisione',
+    nome: 'Nome',
+    identificatore: 'Identificatore',
+    descrizione: 'Descrizione',
+    visibilitaPredefinita: 'Chi può accedere',
+    attiva: 'Pubblicazione attiva',
+    disattivata: 'Disattivata',
+    creando: 'Creo…',
+    confermaTitolo: 'Eliminare «{nome}»?',
+    confermaTesto:
+      'La pubblicazione, le sue regole e i permessi vengono rimossi. I file sul NAS non vengono toccati.',
+  },
+
+  visibilita: {
+    pubblica: 'Chiunque, anche senza accedere',
+    password: 'Chi conosce la password',
+    utenti: 'Tutti gli utenti autenticati',
+    utenti_scelti: 'Solo gli utenti autorizzati',
+    negata: 'Nessuno',
+    breve_pubblica: 'Pubblica',
+    breve_password: 'Password',
+    breve_utenti: 'Utenti',
+    breve_utenti_scelti: 'Autorizzati',
+    breve_negata: 'Negata',
+  },
+
+  regole: {
+    titolo: 'Regole per cartella',
+    descrizione:
+      'Ogni regola vale per una cartella e per tutto ciò che contiene. Vince sempre la regola più specifica, così una sottocartella può essere più chiusa di quella che la contiene.',
+    percorso: 'Cartella',
+    radice: 'tutta la pubblicazione',
+    aggiungi: 'Aggiungi regola',
+    password: 'Password',
+    protetta: 'protetta da password',
+    nessuna: 'Nessuna regola: vale la scelta predefinita della pubblicazione.',
+  },
+
+  permessi: {
+    titolo: 'Permessi per utente',
+    descrizione:
+      'Stabilisci quale utente raggiunge quale cartella, o tutte. Un divieto esplicito vince sulla regola della cartella, così puoi togliere un ramo a una persona lasciandolo aperto agli altri.',
+    utente: 'Utente',
+    cartella: 'Cartella',
+    livello: 'Permesso',
+    negato: 'Negato',
+    lettura: 'Lettura',
+    scrittura: 'Lettura e scrittura',
+    assegna: 'Assegna',
+    nessuno: 'Nessun permesso assegnato.',
+    tutte: 'tutte le cartelle',
+  },
+
+  prova: {
+    titolo: 'Verifica un accesso',
+    descrizione:
+      'Controlla se una cartella è raggiungibile e quale regola lo decide, prima di scoprirlo dagli utenti.',
+    percorso: 'Cartella da verificare',
+    come: 'Come',
+    anonimo: 'Visitatore anonimo',
+    verifica: 'Verifica',
+    consentito: 'Accesso consentito',
+    negato: 'Accesso negato',
+    conScrittura: 'con scrittura',
+    decisoDaRegola: 'deciso dalla regola su «{percorso}»',
+    decisoDaPermesso: 'deciso dal permesso su «{percorso}»',
+    decisoDaPredefinita: 'deciso dalla scelta predefinita della pubblicazione',
+  },
+
   errori: {
     serverNonRaggiungibile: 'Server non raggiungibile. Controlla la connessione.',
     sessioneScaduta: 'Sessione scaduta. Accedi di nuovo.',
