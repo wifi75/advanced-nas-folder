@@ -1,49 +1,80 @@
 """Permessi di accesso per sottocartella.
 
-Il modello è a prefissi: uno share ha una visibilità predefinita, e ogni regola
-la sovrascrive per un ramo dell'albero. **Vince la regola con il prefisso più
-lungo che corrisponde**, così una sottocartella può essere più restrittiva
-della cartella che la contiene — che è esattamente il requisito del progetto.
+Due livelli, che rispondono a domande diverse:
+
+* la **visibilità del percorso** dice chi in generale può vederlo — chiunque
+  senza accedere (accesso anonimo), chi ha la password, qualunque utente
+  autenticato, solo chi ha un permesso esplicito, o nessuno;
+* il **permesso del singolo utente** dice cosa può fare *quella* persona su
+  *quel* percorso, e sovrascrive la visibilità.
+
+In entrambi **vince la regola con il prefisso più lungo** che corrisponde, così
+una sottocartella può essere più restrittiva della cartella che la contiene —
+o più permissiva, se è quello che si vuole.
 """
 
 from __future__ import annotations
 
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 from pathlib import PurePosixPath
 
-from app.models import AccessRule, Share, User
-from app.models.enums import Visibilita
+from app.models import AccessRule, PermessoUtente, Share, User
+from app.models.enums import Livello, Visibilita
 from app.services.percorsi import normalizza_relativo
 
 
 @dataclass(frozen=True, slots=True)
 class Decisione:
     consentito: bool
+    #: Vero se l'utente può anche modificare, non solo leggere.
+    scrittura: bool
     visibilita: Visibilita
-    #: Regola che ha deciso, per poterlo spiegare nel pannello.
+    #: Regola di visibilità che ha deciso, se ce n'è una.
     regola: AccessRule | None
+    #: Permesso personale che ha deciso, se ce n'è uno.
+    permesso: PermessoUtente | None
     motivo: str
 
 
-def _prefisso_corrisponde(prefisso: str, percorso: PurePosixPath) -> bool:
+def _corrisponde(prefisso: str, percorso: PurePosixPath) -> bool:
     """Vero se `prefisso` è il percorso stesso o una sua cartella superiore.
 
     Il confronto è per componenti e non per stringhe: `foto` non deve
     corrispondere a `fotografie`, che con un semplice `startswith` accadrebbe.
     """
-    parti_prefisso = normalizza_relativo(prefisso).parts
-    if not parti_prefisso:
+    parti = normalizza_relativo(prefisso).parts
+    if not parti:
         return True
-    return percorso.parts[: len(parti_prefisso)] == parti_prefisso
+    return percorso.parts[: len(parti)] == parti
+
+
+def _piu_specifico[T](candidati: Iterable[T], prefisso_di: Callable[[T], str]) -> T | None:
+    """Fra i candidati, quello con il prefisso composto da più cartelle."""
+    scelti = list(candidati)
+    if not scelti:
+        return None
+    return max(scelti, key=lambda c: len(normalizza_relativo(prefisso_di(c)).parts))
 
 
 def regola_applicabile(share: Share, percorso: str | None) -> AccessRule | None:
-    """La regola più specifica che copre il percorso richiesto."""
+    """La regola di visibilità più specifica che copre il percorso richiesto."""
     richiesto = normalizza_relativo(percorso)
-    candidate = [r for r in share.rules if _prefisso_corrisponde(r.path_prefix, richiesto)]
-    if not candidate:
-        return None
-    return max(candidate, key=lambda r: len(normalizza_relativo(r.path_prefix).parts))
+    return _piu_specifico(
+        (r for r in share.rules if _corrisponde(r.path_prefix, richiesto)),
+        lambda r: r.path_prefix,
+    )
+
+
+def permesso_applicabile(
+    permessi: Sequence[PermessoUtente], percorso: str | None
+) -> PermessoUtente | None:
+    """Il permesso personale più specifico che copre il percorso richiesto."""
+    richiesto = normalizza_relativo(percorso)
+    return _piu_specifico(
+        (p for p in permessi if _corrisponde(p.path_prefix, richiesto)),
+        lambda p: p.path_prefix,
+    )
 
 
 def valuta(
@@ -51,53 +82,85 @@ def valuta(
     percorso: str | None,
     utente: User | None,
     *,
+    permessi: Sequence[PermessoUtente] = (),
     password_fornita: bool = False,
 ) -> Decisione:
     """Decide se l'accesso è consentito, e spiega perché.
 
-    `password_fornita` indica che il richiedente ha già superato la verifica
-    della password per questo percorso: la verifica vera avviene altrove, qui
-    si prende solo la decisione.
+    `permessi` sono i permessi personali dell'utente su questo share, già
+    caricati dal chiamante. `password_fornita` indica che la verifica della
+    password è già stata superata: qui si prende solo la decisione.
     """
     if not share.is_enabled:
-        return Decisione(False, Visibilita.NEGATA, None, "La pubblicazione è disattivata.")
+        return Decisione(
+            False, False, Visibilita.NEGATA, None, None, "La pubblicazione è disattivata."
+        )
 
     regola = regola_applicabile(share, percorso)
     visibilita = regola.visibility if regola is not None else share.default_visibility
 
-    # Un amministratore vede tutto, tranne ciò che è esplicitamente negato:
-    # una cartella marcata "negata" resta chiusa anche a lui, altrimenti quella
-    # visibilità non significherebbe nulla.
+    # Un percorso marcato "negato" resta chiuso a chiunque, amministratore
+    # incluso: altrimenti quella visibilità non significherebbe nulla.
     if visibilita is Visibilita.NEGATA:
-        return Decisione(False, visibilita, regola, "Accesso negato da una regola.")
+        return Decisione(
+            False, False, visibilita, regola, None, "Accesso negato da una regola del percorso."
+        )
 
     if utente is not None and utente.is_admin:
-        return Decisione(True, visibilita, regola, "Amministratore.")
+        return Decisione(True, True, visibilita, regola, None, "Amministratore.")
+
+    # Il permesso personale viene prima della visibilità: è il modo per dire
+    # "questa cartella la vede solo Mario", e anche per togliere a una persona
+    # un ramo che per gli altri resta aperto.
+    permesso = permesso_applicabile(permessi, percorso) if utente is not None else None
+    if permesso is not None:
+        if permesso.livello is Livello.NEGATO:
+            return Decisione(
+                False, False, visibilita, regola, permesso, "Accesso negato a questo utente."
+            )
+        return Decisione(
+            True,
+            permesso.livello is Livello.SCRITTURA,
+            visibilita,
+            regola,
+            permesso,
+            "Permesso assegnato all'utente.",
+        )
 
     match visibilita:
         case Visibilita.PUBBLICA:
-            return Decisione(True, visibilita, regola, "Percorso pubblico.")
+            return Decisione(True, False, visibilita, regola, None, "Percorso pubblico.")
         case Visibilita.UTENTI:
             if utente is None:
-                return Decisione(False, visibilita, regola, "Serve l'accesso al pannello.")
-            return Decisione(True, visibilita, regola, "Utente autenticato.")
+                return Decisione(
+                    False, False, visibilita, regola, None, "Serve l'accesso al pannello."
+                )
+            return Decisione(True, False, visibilita, regola, None, "Utente autenticato.")
+        case Visibilita.UTENTI_SCELTI:
+            # Nessun permesso personale corrispondente: qui l'assenza è un no.
+            return Decisione(
+                False,
+                False,
+                visibilita,
+                regola,
+                None,
+                "Riservato agli utenti autorizzati su questo percorso.",
+            )
         case Visibilita.PASSWORD:
             if password_fornita:
-                return Decisione(True, visibilita, regola, "Password corretta.")
-            return Decisione(False, visibilita, regola, "Serve la password.")
+                return Decisione(True, False, visibilita, regola, None, "Password corretta.")
+            return Decisione(False, False, visibilita, regola, None, "Serve la password.")
 
-    return Decisione(False, Visibilita.NEGATA, regola, "Visibilità non riconosciuta.")
+    return Decisione(False, False, Visibilita.NEGATA, regola, None, "Visibilità non riconosciuta.")
 
 
 def dentro_ambito(utente: User | None, percorso: str | None) -> bool:
     """Vero se il percorso rientra nell'ambito assegnato all'utente.
 
-    L'ambito limita un utente a un ramo dello share. Il confronto è per
-    componenti, non per stringhe, per lo stesso motivo dei prefissi.
+    L'ambito limita un utente a un ramo dello share, indipendentemente dai
+    permessi: è un confine, non un permesso. Il confronto è per componenti.
     """
-    if utente is None or not utente.scope:
-        return True
-    if utente.is_admin:
+    if utente is None or not utente.scope or utente.is_admin:
         return True
     ambito = normalizza_relativo(utente.scope).parts
     richiesto = normalizza_relativo(percorso).parts

@@ -7,6 +7,7 @@ caricate quando legge `Base.metadata`.
 from app.models.base import Base
 from app.models.enums import (
     AccessoNFS,
+    Livello,
     StatoMount,
     StatoTrasferimento,
     TipoTrasferimento,
@@ -14,7 +15,7 @@ from app.models.enums import (
     WebServer,
 )
 from app.models.mount import Mount
-from app.models.share import AccessRule, Share, ShareLink
+from app.models.share import AccessRule, PermessoUtente, Share, ShareLink
 from app.models.system import Setting, Transfer, VHost
 from app.models.user import User
 
@@ -22,7 +23,9 @@ __all__ = [
     "AccessRule",
     "AccessoNFS",
     "Base",
+    "Livello",
     "Mount",
+    "PermessoUtente",
     "Setting",
     "Share",
     "ShareLink",

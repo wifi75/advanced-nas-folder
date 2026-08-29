@@ -24,12 +24,33 @@ class AccessoNFS(StrEnum):
 
 
 class Visibilita(StrEnum):
-    """Chi puo accedere a un percorso pubblicato."""
+    """Chi puo accedere a un percorso pubblicato.
 
+    E la regola di base del percorso. I permessi assegnati al singolo utente
+    la sovrascrivono: vedere `PermessoUtente`.
+    """
+
+    #: Chiunque, senza accedere al pannello. E l'accesso anonimo.
     PUBBLICA = "pubblica"
     PASSWORD = "password"  # noqa: S105 - nome di una modalita, non una password
-    UTENTI = "utenti"  # solo utenti autenticati
+    #: Qualunque utente autenticato.
+    UTENTI = "utenti"
+    #: Solo gli utenti a cui e stato assegnato un permesso esplicito.
+    UTENTI_SCELTI = "utenti_scelti"
     NEGATA = "negata"
+
+
+class Livello(StrEnum):
+    """Cosa puo fare un utente su un percorso.
+
+    `NEGATO` non e l'assenza di permesso: e un divieto esplicito, e vince
+    sulla regola di base del percorso. Serve a togliere a una persona una
+    cartella dentro un ramo che per tutti gli altri resta accessibile.
+    """
+
+    NEGATO = "negato"
+    LETTURA = "lettura"
+    SCRITTURA = "scrittura"
 
 
 class TipoTrasferimento(StrEnum):

@@ -2,11 +2,11 @@
 
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, String, Text
+from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin
-from app.models.enums import Visibilita
+from app.models.enums import Livello, Visibilita
 
 
 class Share(Base, TimestampMixin):
@@ -62,6 +62,40 @@ class AccessRule(Base, TimestampMixin):
 
     def __repr__(self) -> str:
         return f"<AccessRule {self.path_prefix!r} {self.visibility}>"
+
+
+class PermessoUtente(Base, TimestampMixin):
+    """Permesso di un singolo utente su un percorso dentro uno share.
+
+    E cio che permette di dire "questa cartella la vede solo Mario", cosa che
+    la sola visibilita del percorso non sa esprimere: quella distingue fra
+    chiunque, chi ha la password e chi e autenticato, ma non fra una persona e
+    un'altra.
+
+    Come per le regole di visibilita, vince il prefisso piu lungo: si puo
+    concedere un ramo intero e togliere una sottocartella al suo interno.
+    """
+
+    __tablename__ = "permessi_utente"
+    __table_args__ = (
+        UniqueConstraint("user_id", "share_id", "path_prefix", name="uq_permesso_percorso"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    share_id: Mapped[int] = mapped_column(ForeignKey("shares.id", ondelete="CASCADE"), index=True)
+
+    #: Prefisso normalizzato, senza barra iniziale. Vuoto = tutto lo share.
+    path_prefix: Mapped[str] = mapped_column(String(1024), default="")
+    livello: Mapped[Livello] = mapped_column(
+        Enum(Livello, native_enum=False), default=Livello.LETTURA
+    )
+
+    def __repr__(self) -> str:
+        return (
+            f"<PermessoUtente u={self.user_id} s={self.share_id} "
+            f"{self.path_prefix!r} {self.livello}>"
+        )
 
 
 class ShareLink(Base, TimestampMixin):

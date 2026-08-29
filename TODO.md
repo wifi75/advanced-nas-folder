@@ -22,7 +22,9 @@ nessuna dipende da quelle successive.
       puliti, pagine verificate nel browser in tema chiaro e scuro
 - [x] Suite di test: 84 test su validatori dell'agent, sicurezza e accesso
 - [x] Configurazione ruff unica in `ruff.toml`, valida anche per `agent/` e `tests/`
-- [ ] `install.sh` funzionante end-to-end
+- [x] `install.sh` — bilingue, idempotente, con `--dry-run` e `--uninstall`.
+      Verificato con shellcheck e prova a vuoto su server reale; installazione
+      vera non ancora eseguita
 - [x] Workflow CI: build di `dist/` e allegato alla release
 - [ ] CI: eseguire anche `ruff`, `mypy` e `pytest` a ogni push, non solo il build
 
@@ -47,8 +49,12 @@ nessuna dipende da quelle successive.
 - [x] Modello `Share`: cartella pubblicata a partire da un mount
 - [x] `AccessRule` per prefisso di percorso, con risoluzione sicura dei percorsi
 - [ ] Endpoint e interfaccia degli share
-- [ ] Visibilità: pubblica / password / utenti registrati / link con scadenza
-- [ ] Link di condivisione con limite di download e revoca
+- [x] Visibilità del percorso: pubblica (anonima), password, utenti registrati,
+      solo utenti autorizzati, negata
+- [x] **Permessi per singolo utente**: quale utente accede a quale cartella, o a
+      tutte. Divieto esplicito che batte la regola del percorso
+- [ ] Endpoint e interfaccia per assegnare i permessi
+- [ ] Link di condivisione con scadenza, limite di download e revoca
 - [ ] Download delegato: `X-Sendfile` e `X-Accel-Redirect`
 - [ ] Verifica del resume (Range, `If-Range`, ETag, 206)
 - [ ] Gestione vhost dal pannello, con `configtest` e ripristino automatico
@@ -91,11 +97,11 @@ nessuna dipende da quelle successive.
 
 Richieste del 2026-08-29 rimaste aperte alla chiusura della v0.3.0:
 
-- [ ] **`install.sh`: installazione automatica su server Linux.** È anche l'ultima
-      voce aperta della fase 0 e blocca qualunque installazione reale.
 - [ ] **Documentazione bilingue**: `README.en.md` e versione inglese dei documenti
       in `docs/`. L'interfaccia è già in due lingue, la documentazione no.
 - [ ] **`docs/INSTALL.md`**: tutti i passi di installazione, nelle due lingue.
+- [ ] **PWA**: pannello installabile sul telefono, icona in schermata home.
+- [ ] Installazione reale sul server, quando decidi di procedere.
 
 ## Emerso durante i rilasci
 

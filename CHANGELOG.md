@@ -7,6 +7,23 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non rilasciato]
 
+### Aggiunto
+- **`deploy/install.sh`**: installazione su server Linux, con messaggi in italiano e
+  in inglese. Idempotente, con `--dry-run` per vedere cosa farebbe e `--uninstall`
+  che lascia intatti dati e mount. Installa Python 3.14 *accanto* all'interprete di
+  sistema, rileva Apache o Nginx, e prima di ricaricare il web server ne verifica la
+  configurazione: se non è valida ripristina la precedente, così un errore qui non
+  ferma gli altri siti ospitati sulla macchina.
+- Modelli di configurazione per Apache e Nginx, da includere in un vhost esistente
+  invece di sostituirlo.
+- **Permessi per singolo utente** (`PermessoUtente`): stabilire quale utente accede a
+  quale cartella, o a tutte. Un divieto esplicito batte la regola del percorso, così
+  si può togliere a una persona un ramo che per gli altri resta aperto.
+- Nuova visibilità `utenti_scelti`: il percorso è riservato a chi ha un permesso
+  esplicito. Restano disponibili l'accesso anonimo (`pubblica`), la password e
+  l'accesso a tutti gli utenti autenticati.
+- Livelli di permesso: negato, lettura, scrittura.
+
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
