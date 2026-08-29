@@ -7,6 +7,34 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non rilasciato]
 
+### Aggiunto
+- **Consegna dei file**: le cartelle pubblicate si sfogliano e i file si scaricano.
+  Il download lo esegue il web server, non l'applicazione: Python autorizza e passa
+  il file con `X-Sendfile` (Apache) o `X-Accel-Redirect` (Nginx). Così la ripresa di
+  un trasferimento interrotto funziona da sola — `Range`, `If-Range` ed `ETag` sono
+  già implementati là — e un file grande non tiene occupato un worker.
+- L'elenco di una cartella **filtra ogni voce con il controllo degli accessi**: una
+  sottocartella vietata sparisce dall'elenco anche quando quella che la contiene è
+  aperta a tutti. Nasconderla solo nell'interfaccia non servirebbe, visto che
+  l'elenco resta leggibile via API.
+- I collegamenti di download portano un **gettone valido pochi minuti e solo per quel
+  percorso**, invece della password: una navigazione del browser non può portare
+  intestazioni, e la query string finisce nei log del web server.
+- I file che il browser eseguirebbe (HTML, SVG, XML) vengono serviti come
+  `application/octet-stream`: con il loro tipo reale girerebbero nel contesto del
+  pannello.
+- Vista di navigazione dell'archivio, raggiungibile **anche senza accedere** quando la
+  cartella è pubblica, con percorso navigabile, dimensioni, date e richiesta della
+  password dove serve. Dall'elenco delle pubblicazioni un pulsante «Sfoglia» apre la
+  cartella corrispondente.
+- 22 test nuovi. Suite complessiva a **201 test**.
+
+### Modificato
+- In sviluppo la consegna passa da sola a `stream`: senza un web server davanti,
+  `X-Sendfile` produce risposte vuote che sembrano un difetto del codice.
+- `ruff` non analizza più le migrazioni di alembic: sono generate, e riformattarle le
+  farebbe divergere da ciò che il comando rigenera.
+
 ### Da fare
 Vedere [TODO.md](TODO.md).
 

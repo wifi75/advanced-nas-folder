@@ -7,7 +7,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -40,6 +40,8 @@ class Settings(BaseSettings):
     mount_root: Path = Path("/srv/nas")
 
     # --- Consegna dei download ---
+    #: In sviluppo diventa "stream" da solo: senza un web server davanti,
+    #: "xsendfile" produce risposte vuote che sembrano un difetto del codice.
     download_backend: Literal["xsendfile", "xaccel", "stream"] = "xsendfile"
     xaccel_prefix: str = "/__anf_internal"
 
@@ -53,6 +55,12 @@ class Settings(BaseSettings):
         if not v.is_absolute():
             raise ValueError(f"{v} deve essere un percorso assoluto")
         return v
+
+    @model_validator(mode="after")
+    def _consegna_adatta_allambiente(self) -> "Settings":
+        if self.env == "development" and "download_backend" not in self.model_fields_set:
+            object.__setattr__(self, "download_backend", "stream")
+        return self
 
     @property
     def database_url(self) -> str:

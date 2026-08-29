@@ -19,7 +19,8 @@ export class ApiError extends Error {
   }
 }
 
-const BASE = '/api/v1'
+/** Radice dell'API. Esportata per i collegamenti che il browser deve seguire da solo. */
+export const BASE = '/api/v1'
 
 let authToken: string | null = null
 

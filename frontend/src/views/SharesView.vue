@@ -157,6 +157,12 @@ function alterna(s: Share): void {
         </div>
 
         <div class="azioni">
+          <RouterLink
+            class="sfoglia"
+            :to="`/archivio/${s.slug}`"
+          >
+            {{ t('archivio.apri') }}
+          </RouterLink>
           <button
             type="button"
             class="secondario"
@@ -421,6 +427,19 @@ button {
 button:disabled {
   opacity: 0.55;
   cursor: default;
+}
+
+/* Un collegamento, non un bottone: deve poter essere aperto in una nuova
+   scheda: e' il modo naturale di consultare una cartella mentre se ne
+   configurano i permessi. */
+.sfoglia {
+  padding: 0.45rem 0.85rem;
+  border: 1px solid var(--bordo);
+  border-radius: var(--raggio);
+  color: var(--testo);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
 }
 
 button.secondario {

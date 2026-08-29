@@ -195,6 +195,17 @@ export default {
     prontoOffline: 'Il pannello ora funziona anche senza rete.',
   },
 
+  archivio: {
+    titolo: 'Archivio',
+    apri: 'Sfoglia',
+    percorso: 'Percorso',
+    radice: 'Inizio',
+    scarica: 'Scarica',
+    vuota: 'Questa cartella è vuota.',
+    passwordRichiesta: 'Questo percorso è protetto da una password.',
+    sblocca: 'Apri',
+  },
+
   errori: {
     serverNonRaggiungibile: 'Server non raggiungibile. Controlla la connessione.',
     sessioneScaduta: 'Sessione scaduta. Accedi di nuovo.',

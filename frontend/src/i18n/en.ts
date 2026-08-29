@@ -192,6 +192,17 @@ export default {
     prontoOffline: 'The panel now works offline too.',
   },
 
+  archivio: {
+    titolo: 'Files',
+    apri: 'Browse',
+    percorso: 'Path',
+    radice: 'Top',
+    scarica: 'Download',
+    vuota: 'This folder is empty.',
+    passwordRichiesta: 'This path is protected by a password.',
+    sblocca: 'Open',
+  },
+
   errori: {
     serverNonRaggiungibile: 'Server unreachable. Check your connection.',
     sessioneScaduta: 'Session expired. Please sign in again.',

@@ -59,8 +59,11 @@ nessuna dipende da quelle successive.
 - [x] **Interfaccia delle pubblicazioni e dei permessi**: elenco, creazione, regole
       per cartella, permessi per utente e verifica dell'accesso nella stessa pagina
 - [ ] Link di condivisione con scadenza, limite di download e revoca
-- [ ] Download delegato: `X-Sendfile` e `X-Accel-Redirect`
-- [ ] Verifica del resume (Range, `If-Range`, ETag, 206)
+- [x] **Consegna dei file**: elenco della cartella filtrato voce per voce dal
+      controllo degli accessi, e download delegato al web server con
+      `X-Sendfile` o `X-Accel-Redirect`
+- [x] Verifica del resume (Range, `If-Range`, ETag, 206)
+- [ ] Barra di avanzamento del download lato utente
 - [ ] Gestione vhost dal pannello, con `configtest` e ripristino automatico
 - [ ] Rimozione dell'alias pubblico preesistente
 
