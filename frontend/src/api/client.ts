@@ -46,11 +46,29 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     } catch {
       detail = await response.text().catch(() => undefined)
     }
-    throw new ApiError(response.status, messaggioPerStato(response.status), detail)
+    // Il server spiega spesso cosa è andato storto e cosa fare: buttare via
+    // quel messaggio per mostrarne uno generico sarebbe uno spreco.
+    throw new ApiError(response.status, dettaglioLeggibile(detail) ?? messaggioPerStato(response.status), detail)
   }
 
   if (response.status === 204) return undefined as T
   return (await response.json()) as T
+}
+
+/**
+ * Estrae il messaggio del server, se ne ha mandato uno leggibile.
+ *
+ * FastAPI mette l'errore in `detail`: una stringa per gli errori applicativi,
+ * un elenco di oggetti per quelli di validazione. Solo il primo caso è
+ * pensato per essere letto da una persona.
+ */
+function dettaglioLeggibile(detail: unknown): string | null {
+  if (typeof detail === 'string' && detail.trim() !== '') return detail
+  if (detail !== null && typeof detail === 'object' && 'detail' in detail) {
+    const interno = (detail as { detail: unknown }).detail
+    if (typeof interno === 'string' && interno.trim() !== '') return interno
+  }
+  return null
 }
 
 function messaggioPerStato(status: number): string {
@@ -88,5 +106,6 @@ export const api = {
   get: <T>(path: string) => request<T>(path),
   post: <T>(path: string, body?: unknown) => request<T>(path, conCorpo('POST', body)),
   put: <T>(path: string, body?: unknown) => request<T>(path, conCorpo('PUT', body)),
+  patch: <T>(path: string, body?: unknown) => request<T>(path, conCorpo('PATCH', body)),
   delete: <T>(path: string) => request<T>(path, { method: 'DELETE' }),
 }

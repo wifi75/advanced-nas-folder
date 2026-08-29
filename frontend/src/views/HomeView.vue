@@ -1,17 +1,11 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { RouterLink } from 'vue-router'
 
 import { useAppStore } from '@/stores/app'
 import { useAuthStore } from '@/stores/auth'
 
 const app = useAppStore()
 const auth = useAuthStore()
-const router = useRouter()
-
-async function esci(): Promise<void> {
-  auth.esci()
-  await router.push({ name: 'login' })
-}
 </script>
 
 <template>
@@ -24,14 +18,6 @@ async function esci(): Promise<void> {
           gestisci i file.
         </p>
       </div>
-      <button
-        v-if="auth.autenticato"
-        class="esci"
-        type="button"
-        @click="esci"
-      >
-        Esci
-      </button>
     </header>
 
     <p
@@ -63,10 +49,25 @@ async function esci(): Promise<void> {
     </section>
 
     <section class="avviso">
-      <h2>Fase 1 — in corso</h2>
+      <h2>Condivisioni NFS</h2>
       <p>
-        L'accesso funziona. La gestione dei mount NFS è il prossimo passo, la
-        pubblicazione con i permessi arriva nella fase 2.
+        Monta le cartelle del NAS dal pannello, senza toccare file di
+        configurazione: il sistema legge dal NAS l'elenco delle cartelle
+        disponibili e le monta al posto tuo.
+      </p>
+      <RouterLink
+        class="collegamento"
+        to="/condivisioni"
+      >
+        Vai alle condivisioni
+      </RouterLink>
+    </section>
+
+    <section class="avviso">
+      <h2>In arrivo</h2>
+      <p>
+        La pubblicazione delle cartelle con i permessi per sottocartella arriva
+        nella fase 2, la gestione dei file nella fase 3.
       </p>
     </section>
   </div>

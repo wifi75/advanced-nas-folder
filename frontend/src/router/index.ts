@@ -10,6 +10,12 @@ const routes: RouteRecordRaw[] = [
     meta: { titolo: 'Pannello' },
   },
   {
+    path: '/condivisioni',
+    name: 'mounts',
+    component: () => import('@/views/MountsView.vue'),
+    meta: { titolo: 'Condivisioni NFS' },
+  },
+  {
     path: '/accedi',
     name: 'login',
     component: () => import('@/views/LoginView.vue'),

@@ -38,7 +38,8 @@ nessuna dipende da quelle successive.
 - [x] API: endpoint dei mount collegati all'agent — elenco, scoperta, creazione,
       modifica, avvio, arresto, eliminazione
 - [x] Interruttore scrittura, disattivato di default, con avviso quando il NAS la nega
-- [ ] Interfaccia: elenco mount, scoperta, creazione, avvio e arresto
+- [x] Interfaccia: elenco mount, scoperta, creazione, avvio e arresto
+- [x] Verifica end-to-end su Linux: pannello → API → agent → NAS reale
 - [ ] Migrazione dei mount preesistenti da `/etc/fstab`
 
 ## Fase 2 — Pubblicazione e permessi

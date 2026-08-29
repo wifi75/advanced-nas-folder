@@ -16,6 +16,14 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
   disattivata se non richiesta, che il percorso di montaggio non sia mai scelto
   dall'utente, che le opzioni di resilienza siano sempre presenti, e che un mount non
   venga cancellato dal database se l'agent non ha potuto ripulire il sistema.
+- **Interfaccia dei mount**: elenco con stato richiesto *e* effettivo affiancati,
+  creazione con scoperta delle condivisioni dal NAS invece che percorso digitato a
+  mano, montaggio, smontaggio, rilettura dello stato ed eliminazione con conferma.
+  Barra di navigazione e disconnessione.
+
+### Corretto
+- Il client HTTP scartava il messaggio d'errore del server e ne mostrava uno
+  generico: il backend spiega cosa fare, e quella spiegazione ora arriva a schermo.
 
 ### Da fare
 Vedere [TODO.md](TODO.md).
