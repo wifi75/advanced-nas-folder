@@ -109,8 +109,14 @@ async def contenuto(
 
     reale = await _reale(sessione, share, percorso)
     permessi = await archivio.permessi_di(sessione, share.id, utente)
+
+    def consentito(p: str) -> bool:
+        return acl.valuta(share, p, utente, permessi=permessi).consentito and acl.dentro_ambito(
+            utente, p
+        )
+
     try:
-        voci = await archivio.elenca(reale, percorso, share, utente, permessi)
+        voci = await archivio.elenca(reale, percorso, consentito)
     except archivio.ArchivioNonDisponibile as exc:
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, str(exc)) from exc
 

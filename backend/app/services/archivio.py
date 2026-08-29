@@ -9,6 +9,7 @@ comunque via API, e sarebbe leggibile da chiunque sappia aprirla.
 from __future__ import annotations
 
 import os
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath
@@ -19,7 +20,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.models import Mount, PermessoUtente, Share, User
-from app.services import acl
 from app.services.percorsi import PercorsoNonValido, normalizza_relativo
 
 
@@ -99,14 +99,15 @@ def _leggi_cartella(reale: Path, base: PurePosixPath) -> list[Voce]:
 async def elenca(
     reale: Path,
     percorso: str,
-    share: Share,
-    utente: User | None,
-    permessi: list[PermessoUtente],
+    consentito: Callable[[str], bool],
 ) -> list[Voce]:
-    """Voci della cartella che l'utente puo' vedere, cartelle prima.
+    """Voci della cartella che chi guarda puo' vedere, cartelle prima.
 
-    Il controllo e' per singola voce: una sottocartella negata sparisce
-    dall'elenco anche quando quella che la contiene e' aperta a tutti.
+    Il permesso lo decide `consentito`, che riceve il percorso di ogni voce: a
+    seconda di come si e' arrivati qui e' il controllo degli accessi o la
+    validita' di un link di condivisione. Il filtro pero' e' sempre per singola
+    voce, cosi una sottocartella vietata sparisce dall'elenco anche quando
+    quella che la contiene e' aperta a tutti.
     """
     if not reale.is_dir():
         raise ArchivioNonDisponibile("La cartella non e' disponibile.")
@@ -117,12 +118,7 @@ async def elenca(
     except OSError as exc:
         raise ArchivioNonDisponibile("La cartella non e' leggibile.") from exc
 
-    visibili = [
-        v
-        for v in voci
-        if acl.valuta(share, v.percorso, utente, permessi=permessi).consentito
-        and acl.dentro_ambito(utente, v.percorso)
-    ]
+    visibili = [v for v in voci if consentito(v.percorso)]
     visibili.sort(key=lambda v: (not v.cartella, v.nome.casefold()))
     return visibili
 

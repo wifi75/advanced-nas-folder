@@ -2,14 +2,17 @@
 
 from __future__ import annotations
 
+from datetime import UTC, datetime, timedelta
+
 from fastapi import APIRouter, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from app.api.deps import Amministratore, Sessione
 from app.core.security import hash_password
-from app.models import AccessRule, Mount, PermessoUtente, Share, User
+from app.models import AccessRule, Mount, PermessoUtente, Share, ShareLink, User
 from app.models.enums import Visibilita
+from app.schemas.archivio import LinkCreate, LinkCreato, LinkOut
 from app.schemas.share import (
     EsitoAccesso,
     PermessoCreate,
@@ -23,6 +26,7 @@ from app.schemas.share import (
     ShareUpdate,
 )
 from app.services import acl
+from app.services import link as servizio_link
 from app.services.percorsi import PercorsoNonValido, normalizza_relativo
 
 router = APIRouter(prefix="/shares", tags=["pubblicazioni"])
@@ -272,3 +276,88 @@ async def prova_accesso(
         regola=decisione.regola.path_prefix if decisione.regola else None,
         permesso=decisione.permesso.path_prefix if decisione.permesso else None,
     )
+
+
+# --- link di condivisione --------------------------------------------------
+
+
+def _link_con_share(collegamento: ShareLink, share: Share) -> LinkOut:
+    """Il link come lo vede chi lo amministra.
+
+    `esaurito` non e' un campo del database ma il verdetto delle stesse regole
+    che decidono in ingresso: senza, l'elenco mostrerebbe come attivo un link
+    scaduto stanotte.
+    """
+    return LinkOut(
+        id=collegamento.id,
+        path=collegamento.path,
+        label=collegamento.label,
+        expires_at=collegamento.expires_at,
+        max_downloads=collegamento.max_downloads,
+        download_count=collegamento.download_count,
+        is_revoked=collegamento.is_revoked,
+        protetto_da_password=collegamento.password_hash is not None,
+        esaurito=not servizio_link.verifica(collegamento, share, collegamento.path).valido,
+    )
+
+
+@router.get("/{share_id}/link", response_model=list[LinkOut])
+async def elenca_link(share_id: int, sessione: Sessione, _: Amministratore) -> list[LinkOut]:
+    share = await _carica(sessione, share_id)
+    risultato = await sessione.execute(
+        select(ShareLink).where(ShareLink.share_id == share_id).order_by(ShareLink.id.desc())
+    )
+    return [_link_con_share(c, share) for c in risultato.scalars().all()]
+
+
+@router.post("/{share_id}/link", response_model=LinkCreato, status_code=status.HTTP_201_CREATED)
+async def crea_link(
+    share_id: int, dati: LinkCreate, sessione: Sessione, amministratore: Amministratore
+) -> LinkCreato:
+    """Crea un link di condivisione e ne restituisce il token **una sola volta**.
+
+    Nel database finisce solo l'impronta del token: se qualcuno legge il
+    database non ricava i link attivi, ma nemmeno noi possiamo mostrarlo di
+    nuovo dopo. Chi lo crea deve copiarlo adesso.
+    """
+    share = await _carica(sessione, share_id)
+    token = servizio_link.nuovo_token()
+
+    collegamento = ShareLink(
+        share_id=share_id,
+        created_by=amministratore.id,
+        token_hash=servizio_link.impronta(token),
+        path=_normalizza(dati.percorso),
+        label=dati.etichetta,
+        password_hash=hash_password(dati.password) if dati.password else None,
+        expires_at=(
+            datetime.now(UTC) + timedelta(days=dati.giorni) if dati.giorni is not None else None
+        ),
+        max_downloads=dati.max_download,
+    )
+    sessione.add(collegamento)
+    await sessione.commit()
+    await sessione.refresh(collegamento)
+
+    base = _link_con_share(collegamento, share)
+    return LinkCreato(**base.model_dump(), token=token)
+
+
+@router.delete("/{share_id}/link/{link_id}", response_model=LinkOut)
+async def revoca_link(
+    share_id: int, link_id: int, sessione: Sessione, _: Amministratore
+) -> LinkOut:
+    """Revoca un link senza cancellarlo.
+
+    La riga resta: quante volte e' stato usato un collegamento poi revocato e'
+    esattamente cio' che si vuole sapere dopo averlo revocato.
+    """
+    share = await _carica(sessione, share_id)
+    collegamento = await sessione.get(ShareLink, link_id)
+    if collegamento is None or collegamento.share_id != share_id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Collegamento non trovato.")
+
+    collegamento.is_revoked = True
+    await sessione.commit()
+    await sessione.refresh(collegamento)
+    return _link_con_share(collegamento, share)

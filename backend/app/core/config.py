@@ -57,7 +57,7 @@ class Settings(BaseSettings):
         return v
 
     @model_validator(mode="after")
-    def _consegna_adatta_allambiente(self) -> "Settings":
+    def _consegna_adatta_allambiente(self) -> Settings:
         if self.env == "development" and "download_backend" not in self.model_fields_set:
             object.__setattr__(self, "download_backend", "stream")
         return self
