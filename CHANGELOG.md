@@ -94,7 +94,21 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 - I permessi generali (cosa può fare una persona) restano separati dai permessi per
   cartella (dove può farlo): rispondono a domande diverse, e mescolarli renderebbe
   illeggibili entrambi.
-- 130 test nuovi. Suite complessiva a **309 test**.
+- **Ricerca** nei nomi dei file, ricorsiva a partire dalla cartella in cui ci si trova.
+  I risultati mostrano il percorso completo, così non si perde il contesto, e passano dal
+  controllo degli accessi voce per voce: una ricerca che mostrasse i nomi dentro una
+  cartella vietata sarebbe un modo di leggerne il contenuto.
+- Due tetti — ai risultati e alle cartelle visitate — non sono opzioni ma parte del
+  progetto: su NFS ogni cartella è un giro di rete, e senza limiti una ricerca su
+  centomila file terrebbe occupato un thread per minuti.
+- **Scaricare una cartella intera come archivio ZIP**. L'archivio viene prodotto mentre
+  lo si invia, non costruito prima su disco: una cartella del NAS può pesare più dello
+  spazio libero della macchina. Il prezzo è che il browser non mostra la percentuale,
+  perché la dimensione totale non è nota in anticipo.
+- I file entrano nell'archivio **senza compressione**: su un NAS domestico il contenuto è
+  quasi sempre già compresso, e comprimerlo di nuovo consuma processore per guadagnare
+  qualche per mille.
+- 143 test nuovi. Suite complessiva a **322 test**.
 
 ### Modificato
 - In sviluppo la consegna passa da sola a `stream`: senza un web server davanti,

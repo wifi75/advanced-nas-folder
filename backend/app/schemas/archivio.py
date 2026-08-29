@@ -158,3 +158,11 @@ class CompletaCaricamento(BaseModel):
     nome: str = Field(min_length=1, max_length=255)
     #: Dimensione totale attesa. Serve a non completare un file troncato.
     dimensione: int | None = Field(default=None, ge=0)
+
+
+class RisultatiRicerca(BaseModel):
+    termine: str
+    percorso: str
+    voci: list[VoceOut] = []
+    #: Vero se la ricerca si è fermata a un limite: l'elenco non è completo.
+    troncata: bool = False

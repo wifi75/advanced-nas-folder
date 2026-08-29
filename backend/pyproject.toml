@@ -22,6 +22,9 @@ dependencies = [
     "argon2-cffi==25.1.0",
     "pyjwt==2.13.0",
     "python-multipart==0.0.32",
+    # Produce lo ZIP mentre lo si invia, senza costruirlo prima su disco: una
+    # cartella del NAS puo' pesare piu' dello spazio libero della macchina.
+    "zipstream-ng==1.9.3",
 ]
 
 [project.optional-dependencies]
@@ -48,6 +51,12 @@ include = ["app*"]
 [tool.mypy]
 python_version = "3.14"
 strict = true
+
+# zipstream-ng non dichiara i propri tipi. Si spegne il controllo solo per
+# quel modulo, non in generale: `strict` resta acceso su tutto il resto.
+[[tool.mypy.overrides]]
+module = "zipstream.*"
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

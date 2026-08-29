@@ -10,7 +10,13 @@ import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 
-import { archivioApi, indirizzoDownload, type Contenuto, type Voce } from '@/api/archivio'
+import {
+  archivioApi,
+  indirizzoDownload,
+  indirizzoZip,
+  type Contenuto,
+  type Voce,
+} from '@/api/archivio'
 import { ApiError } from '@/api/client'
 import Caricamenti from '@/components/Caricamenti.vue'
 
@@ -81,6 +87,52 @@ async function scarica(voce: Voce): Promise<void> {
     errore.value = e instanceof Error ? e.message : t('errori.generico')
   } finally {
     inPreparazione.value = null
+  }
+}
+
+// --- ricerca ---
+const termine = ref('')
+const risultati = ref<Voce[] | null>(null)
+const troncata = ref(false)
+const cercando = ref(false)
+
+/** Le voci a schermo: i risultati se si sta cercando, altrimenti la cartella. */
+const voci = computed(() => risultati.value ?? contenuto.value?.voci ?? [])
+
+async function cerca(): Promise<void> {
+  const q = termine.value.trim()
+  if (q.length < 2) {
+    risultati.value = null
+    return
+  }
+  cercando.value = true
+  errore.value = null
+  try {
+    const esito = await archivioApi.cerca(slug.value, percorso.value, q)
+    risultati.value = esito.voci
+    troncata.value = esito.troncata
+  } catch (e) {
+    errore.value = e instanceof Error ? e.message : t('errori.generico')
+  } finally {
+    cercando.value = false
+  }
+}
+
+function azzeraRicerca(): void {
+  termine.value = ''
+  risultati.value = null
+  troncata.value = false
+}
+
+// Cambiando cartella la ricerca precedente non ha più senso.
+watch(percorso, azzeraRicerca)
+
+async function scaricaCartella(): Promise<void> {
+  errore.value = null
+  try {
+    window.location.href = await indirizzoZip(slug.value, percorso.value)
+  } catch (e) {
+    errore.value = e instanceof Error ? e.message : t('errori.generico')
   }
 }
 
@@ -192,6 +244,45 @@ function quando(iso: string | null): string {
         {{ contenuto.descrizione }}
       </p>
 
+      <div class="strumenti">
+        <form
+          class="cerca"
+          @submit.prevent="cerca"
+        >
+          <input
+            v-model="termine"
+            type="search"
+            class="campo"
+            :placeholder="t('ricerca.campo')"
+            @search="cerca"
+            @keyup.enter="cerca"
+          >
+          <button
+            type="submit"
+            class="bottone bottone--tenue"
+            :disabled="termine.trim().length < 2 || cercando"
+          >
+            {{ t('ricerca.cerca') }}
+          </button>
+          <button
+            v-if="risultati"
+            type="button"
+            class="bottone bottone--tenue"
+            @click="azzeraRicerca"
+          >
+            {{ t('ricerca.azzera') }}
+          </button>
+        </form>
+
+        <button
+          type="button"
+          class="bottone bottone--tenue"
+          @click="scaricaCartella"
+        >
+          {{ t('archivio.scaricaCartella') }}
+        </button>
+      </div>
+
       <nav
         class="briciole"
         :aria-label="t('archivio.percorso')"
@@ -292,18 +383,28 @@ function quando(iso: string | null): string {
     </p>
 
     <p
-      v-else-if="contenuto && contenuto.voci.length === 0"
+      v-if="risultati"
+      class="avviso"
+    >
+      {{ t('ricerca.esito', { n: risultati.length }, risultati.length) }}
+      <template v-if="troncata">
+        — {{ t('ricerca.troncata') }}
+      </template>
+    </p>
+
+    <p
+      v-else-if="contenuto && voci.length === 0"
       class="avviso"
     >
       {{ t('archivio.vuota') }}
     </p>
 
     <ul
-      v-else-if="contenuto"
+      v-if="contenuto && voci.length"
       class="voci"
     >
       <li
-        v-for="voce in contenuto.voci"
+        v-for="voce in voci"
         :key="voce.percorso"
         class="voce"
       >
@@ -320,7 +421,7 @@ function quando(iso: string | null): string {
           >
             <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" />
           </svg>
-          <span class="voce__nome">{{ voce.nome }}</span>
+          <span class="voce__nome">{{ risultati ? voce.percorso : voce.nome }}</span>
         </button>
 
         <div
@@ -334,7 +435,7 @@ function quando(iso: string | null): string {
           >
             <path d="M6 3h7l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z M13 3v5h5" />
           </svg>
-          <span class="voce__nome">{{ voce.nome }}</span>
+          <span class="voce__nome">{{ risultati ? voce.percorso : voce.nome }}</span>
         </div>
 
         <span class="voce__dimensione">{{ dimensione(voce.dimensione) }}</span>
@@ -674,6 +775,20 @@ function quando(iso: string | null): string {
   border: 1px solid var(--errore);
   background: transparent;
   color: var(--errore);
+}
+
+.strumenti {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.cerca {
+  display: flex;
+  flex: 1 1 18rem;
+  gap: 0.5rem;
 }
 
 .riga-form {

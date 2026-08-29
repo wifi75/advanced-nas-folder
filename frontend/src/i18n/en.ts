@@ -265,6 +265,14 @@ export default {
     passwordRichiesta: 'This link is protected by a password.',
   },
 
+  ricerca: {
+    campo: 'Search in this folder…',
+    cerca: 'Search',
+    azzera: 'Clear',
+    esito: 'no results | 1 result | {n} results',
+    troncata: 'there are more results: narrow the search',
+  },
+
   caricamento: {
     trascina: 'Drop files here to upload',
     scegli: 'Choose from device',
@@ -294,6 +302,7 @@ export default {
     percorso: 'Path',
     radice: 'Top',
     scarica: 'Download',
+    scaricaCartella: 'Download folder',
     vuota: 'This folder is empty.',
     passwordRichiesta: 'This path is protected by a password.',
     sblocca: 'Open',

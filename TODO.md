@@ -78,8 +78,9 @@ nessuna dipende da quelle successive.
       origine e destinazione
 - [x] **Caricamento con trascinamento e avanzamento**, a blocchi e riprendibile
 - [ ] Caricamento di cartelle intere
-- [ ] Download multiplo e cartella come archivio
-- [ ] Ricerca
+- [x] **Cartella come archivio ZIP**, prodotto mentre lo si invia
+- [ ] Download multiplo con selezione
+- [x] **Ricerca** nei nomi, ricorsiva e filtrata dai permessi
 - [x] **Gestione utenti**: creazione, permessi generali, ambito per utente,
       attivazione e cambio della propria password
 

@@ -56,7 +56,7 @@ def tipo_contenuto(nome: str) -> str:
     return indovinato
 
 
-def _disposizione(nome: str, allegato: bool) -> str:
+def _disposizione(nome: str, *, allegato: bool) -> str:
     """Intestazione `Content-Disposition` con il nome del file.
 
     Il nome è codificato due volte, in ASCII e in UTF-8: i client vecchi
@@ -68,6 +68,19 @@ def _disposizione(nome: str, allegato: bool) -> str:
     return f"{tipo}; filename=\"{ripiego}\"; filename*=UTF-8''{quote(nome)}"
 
 
+def intestazioni_allegato(nome: str) -> dict[str, str]:
+    """Intestazioni per una risposta che il browser deve salvare come file.
+
+    Estratta perché la usa anche lo ZIP di una cartella, che l'applicazione
+    invia da sé invece di delegarlo al web server: il nome del file e la
+    protezione dal cambio di tipo valgono comunque.
+    """
+    return {
+        "Content-Disposition": _disposizione(nome, allegato=True),
+        "X-Content-Type-Options": "nosniff",
+    }
+
+
 def prepara(reale: Path, nome: str, *, allegato: bool = True) -> Consegna:
     """Costruisce la consegna secondo il modo configurato.
 
@@ -77,7 +90,7 @@ def prepara(reale: Path, nome: str, *, allegato: bool = True) -> Consegna:
     settings = get_settings()
     tipo = tipo_contenuto(nome)
     intestazioni = {
-        "Content-Disposition": _disposizione(nome, allegato),
+        "Content-Disposition": _disposizione(nome, allegato=allegato),
         "Content-Type": tipo,
         # Un file servito dal pannello non deve poter essere incorniciato né
         # interpretato con un tipo diverso da quello dichiarato.

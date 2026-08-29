@@ -7,12 +7,13 @@ chiunque, altrimenti quella visibilita' non significherebbe nulla.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import asdict
 from pathlib import Path, PurePosixPath
 
 import anyio
 from fastapi import APIRouter, HTTPException, Query, Request, Response, status
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 
 from app.api.deps import Sessione, UtenteFacoltativo
 from app.core.security import (
@@ -30,11 +31,12 @@ from app.schemas.archivio import (
     GettoneOut,
     RichiestaGettone,
     Rinomina,
+    RisultatiRicerca,
     StatoCaricamento,
     Trasferisci,
     VoceOut,
 )
-from app.services import acl, archivio, caricamento, consegna, operazioni
+from app.services import acl, archivio, archivio_zip, caricamento, consegna, operazioni, ricerca
 from app.services.percorsi import PercorsoNonValido, normalizza_relativo, risolvi
 
 router = APIRouter(prefix="/archivio", tags=["archivio"])
@@ -414,3 +416,83 @@ async def annulla_caricamento(
         await caricamento.annulla(reale, dati.nome)
     except operazioni.OperazioneRifiutata as exc:
         raise _rifiuto(exc) from exc
+
+
+# --- ricerca e archivio -----------------------------------------------------
+
+
+async def _filtro(sessione: Sessione, share: Share, utente: User | None) -> Callable[[str], bool]:
+    """Predicato che dice se una voce è visibile a chi sta guardando."""
+    permessi = await archivio.permessi_di(sessione, share.id, utente)
+
+    def consentito(p: str) -> bool:
+        return acl.valuta(share, p, utente, permessi=permessi).consentito and acl.dentro_ambito(
+            utente, p
+        )
+
+    return consentito
+
+
+@router.get("/{slug}/cerca", response_model=RisultatiRicerca)
+async def cerca(
+    slug: str,
+    sessione: Sessione,
+    utente: UtenteFacoltativo,
+    q: str = Query(min_length=2, max_length=128),
+    percorso: str = Query(default="", max_length=1024),
+) -> RisultatiRicerca:
+    """Cerca nei nomi dei file, sotto il percorso indicato.
+
+    Almeno due caratteri: con uno solo il risultato sarebbe mezzo archivio, e
+    la ricerca costerebbe un giro di rete per ogni cartella per nulla.
+    """
+    share = await _pubblicazione(sessione, slug)
+    percorso = _normalizza(percorso)
+    await _autorizza(sessione, share, percorso, utente)
+
+    reale = await _reale(sessione, share, percorso)
+    trovati, troncata = await ricerca.cerca(
+        reale, percorso, q, await _filtro(sessione, share, utente)
+    )
+
+    return RisultatiRicerca(
+        termine=q,
+        percorso=percorso,
+        voci=[VoceOut(**asdict(t)) for t in trovati],
+        troncata=troncata,
+    )
+
+
+@router.get("/{slug}/zip")
+async def scarica_cartella(
+    slug: str,
+    sessione: Sessione,
+    utente: UtenteFacoltativo,
+    percorso: str = Query(default="", max_length=1024),
+    g: str | None = Query(default=None, description="Gettone rilasciato da /gettone"),
+) -> StreamingResponse:
+    """Scarica una cartella intera come archivio ZIP.
+
+    Qui l'applicazione invia davvero i byte, a differenza del download di un
+    singolo file: l'archivio non esiste su disco, viene prodotto mentre lo si
+    invia. Il prezzo è che il browser non può mostrare una percentuale, perché
+    la dimensione totale non è nota in anticipo.
+    """
+    share = await _pubblicazione(sessione, slug)
+    percorso = _normalizza(percorso)
+
+    if g is None or not verifica_gettone_percorso(g, share.id, percorso):
+        await _autorizza(sessione, share, percorso, utente)
+
+    reale = await _reale(sessione, share, percorso)
+    if not await anyio.to_thread.run_sync(reale.is_dir):
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Cartella non trovata.")
+
+    consentito = await _filtro(sessione, share, utente)
+    flusso, nome = await anyio.to_thread.run_sync(archivio_zip.prepara, reale, percorso, consentito)
+
+    return StreamingResponse(
+        flusso,
+        media_type="application/zip",
+        headers=consegna.intestazioni_allegato(nome),
+    )

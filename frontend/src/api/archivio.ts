@@ -30,6 +30,14 @@ export interface Contenuto {
   visibilita: Visibilita
 }
 
+export interface RisultatiRicerca {
+  termine: string
+  percorso: string
+  voci: Voce[]
+  /** Vero se la ricerca si è fermata a un limite: l'elenco non è completo. */
+  troncata: boolean
+}
+
 interface Gettone {
   gettone: string
   valido_secondi: number
@@ -47,6 +55,11 @@ export const archivioApi = {
       percorso,
       password: password ?? null,
     }),
+
+  cerca: (slug: string, percorso: string, q: string) => {
+    const query = new URLSearchParams({ percorso, q })
+    return api.get<RisultatiRicerca>(`/archivio/${encodeURIComponent(slug)}/cerca?${query}`)
+  },
 
   creaCartella: (slug: string, percorso: string, nome: string) =>
     api.post<{ percorso: string }>(`/archivio/${encodeURIComponent(slug)}/cartella`, {
@@ -99,6 +112,18 @@ export async function indirizzoDownload(
   const { gettone } = await archivioApi.gettone(slug, percorso, password)
   const q = new URLSearchParams({ percorso, g: gettone })
   return `${BASE}/archivio/${encodeURIComponent(slug)}/file?${q}`
+}
+
+/**
+ * Indirizzo da cui scaricare una cartella intera come archivio ZIP.
+ *
+ * Come per il singolo file serve un gettone: il download è una navigazione
+ * del browser, che non porta intestazioni.
+ */
+export async function indirizzoZip(slug: string, percorso: string): Promise<string> {
+  const { gettone } = await archivioApi.gettone(slug, percorso)
+  const q = new URLSearchParams({ percorso, g: gettone })
+  return `${BASE}/archivio/${encodeURIComponent(slug)}/zip?${q}`
 }
 
 /**

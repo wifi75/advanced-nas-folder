@@ -268,6 +268,14 @@ export default {
     passwordRichiesta: 'Questo collegamento è protetto da una password.',
   },
 
+  ricerca: {
+    campo: 'Cerca in questa cartella…',
+    cerca: 'Cerca',
+    azzera: 'Azzera',
+    esito: 'nessun risultato | 1 risultato | {n} risultati',
+    troncata: 'ci sono altri risultati: restringi la ricerca',
+  },
+
   caricamento: {
     trascina: 'Trascina qui i file da caricare',
     scegli: 'Scegli dal dispositivo',
@@ -298,6 +306,7 @@ export default {
     percorso: 'Percorso',
     radice: 'Inizio',
     scarica: 'Scarica',
+    scaricaCartella: 'Scarica cartella',
     vuota: 'Questa cartella è vuota.',
     passwordRichiesta: 'Questo percorso è protetto da una password.',
     sblocca: 'Apri',
