@@ -16,8 +16,8 @@ ignore = [
 ]
 
 [lint.per-file-ignores]
-# pytest usa `assert`: e il suo meccanismo, non una svista.
-"tests/**" = ["S101"]
+# pytest usa assert; e i valori fittizi nei test non sono credenziali vere.
+"tests/**" = ["S101", "S105", "S106"]
 
 [format]
 docstring-code-format = true
