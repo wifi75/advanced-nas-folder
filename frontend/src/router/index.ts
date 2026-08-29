@@ -32,6 +32,12 @@ const routes: RouteRecordRaw[] = [
     meta: { titolo: 'archivio.titolo', pubblica: true },
   },
   {
+    path: '/utenti',
+    name: 'utenti',
+    component: () => import('@/views/UtentiView.vue'),
+    meta: { titolo: 'menu.utenti' },
+  },
+  {
     path: '/webserver',
     name: 'webserver',
     component: () => import('@/views/WebServerView.vue'),

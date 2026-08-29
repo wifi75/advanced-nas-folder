@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app.api.v1 import archivio, auth, health, link, mounts, shares, vhosts
+from app.api.v1 import archivio, auth, health, link, mounts, shares, utenti, vhosts
 from app.core.config import get_settings
 from app.core.database import engine
 from app.core.version import (
@@ -61,3 +61,4 @@ app.include_router(shares.router, prefix="/api/v1")
 app.include_router(archivio.router, prefix="/api/v1")
 app.include_router(link.router, prefix="/api/v1")
 app.include_router(vhosts.router, prefix="/api/v1")
+app.include_router(utenti.router, prefix="/api/v1")

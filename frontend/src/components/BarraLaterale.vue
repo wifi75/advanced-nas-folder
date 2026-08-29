@@ -76,7 +76,12 @@ const categorie = computed<Categoria[]>(() => [
   {
     titolo: t('menu.accessi'),
     voci: [
-      { etichetta: t('menu.utenti'), tinta: 'var(--tinta-utenti)', icona: ICONE.persone, fase: 3 },
+      {
+        etichetta: t('menu.utenti'),
+        a: '/utenti',
+        tinta: 'var(--tinta-utenti)',
+        icona: ICONE.persone,
+      },
       // I link si creano dentro la pubblicazione a cui appartengono. Questa
       // voce e' la pagina che li raccoglie tutti, che non esiste ancora.
       { etichetta: t('menu.link'), tinta: 'var(--tinta-link)', icona: ICONE.catena, fase: 4 },

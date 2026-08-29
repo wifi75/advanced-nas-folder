@@ -193,6 +193,35 @@ export default {
     prontoOffline: 'The panel now works offline too.',
   },
 
+  utenti: {
+    titolo: 'Users',
+    descrizione:
+      'Who can sign in and what they can do in general. Which folders they can do it in is decided per publication.',
+    nuovo: 'New user',
+    amministratore: 'Administrator',
+    rendiAdmin: 'Make administrator',
+    togliAdmin: 'Remove administrator',
+    attiva: 'Activate',
+    disattiva: 'Deactivate',
+    disattivato: 'Deactivated',
+    sonoIo: 'this is you',
+    permessi: 'General permissions',
+    passwordMinima: 'At least 10 characters.',
+    ambito: 'Scope',
+    ambitoVuoto: 'no limit',
+    ambitoNota: 'Folder this user cannot go above. Empty = no limit.',
+    can_download: 'Download',
+    can_upload: 'Upload',
+    can_create: 'Create folders',
+    can_rename: 'Rename',
+    can_modify: 'Modify',
+    can_delete: 'Delete',
+    can_share: 'Create links',
+    confermaTitolo: 'Delete “{nome}”?',
+    confermaTesto:
+      'The user and the permissions assigned to them are removed. Files are left untouched.',
+  },
+
   webserver: {
     titolo: 'Web server',
     descrizione:

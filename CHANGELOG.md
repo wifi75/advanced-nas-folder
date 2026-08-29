@@ -83,7 +83,18 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 - ESLint conosce ora i nomi globali del browser. Prima non li dichiarava, e per farlo
   tacere si scriveva `globalThis.document` al posto di `document`: quei giri sono stati
   tolti.
-- 115 test nuovi. Suite complessiva a **294 test**.
+- **Gestione degli utenti**: creazione, permessi generali, ambito, attivazione ed
+  eliminazione. Finora i permessi per utente erano una funzione teorica, perché l'unico
+  account esistente era l'amministratore creato dall'installazione.
+- Due protezioni impediscono di rendere il pannello ingestibile: **non ci si può
+  chiudere fuori da soli** (togliersi i privilegi, disattivarsi o cancellarsi) e
+  **l'ultimo amministratore non si tocca**, nemmeno da parte di un altro amministratore.
+- Il cambio della propria password richiede quella attuale anche a chi ha già effettuato
+  l'accesso: un token rubato non deve bastare a chiudere fuori il proprietario.
+- I permessi generali (cosa può fare una persona) restano separati dai permessi per
+  cartella (dove può farlo): rispondono a domande diverse, e mescolarli renderebbe
+  illeggibili entrambi.
+- 130 test nuovi. Suite complessiva a **309 test**.
 
 ### Modificato
 - In sviluppo la consegna passa da sola a `stream`: senza un web server davanti,

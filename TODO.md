@@ -80,7 +80,8 @@ nessuna dipende da quelle successive.
 - [ ] Caricamento di cartelle intere
 - [ ] Download multiplo e cartella come archivio
 - [ ] Ricerca
-- [ ] Multiutente: ambito per utente, permessi granulari, regole allow/deny
+- [x] **Gestione utenti**: creazione, permessi generali, ambito per utente,
+      attivazione e cambio della propria password
 
 ## Fase 4 — Monitoraggio e contenuti
 

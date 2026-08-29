@@ -196,6 +196,35 @@ export default {
     prontoOffline: 'Il pannello ora funziona anche senza rete.',
   },
 
+  utenti: {
+    titolo: 'Utenti',
+    descrizione:
+      'Chi può accedere al pannello e cosa può fare in generale. In quali cartelle lo può fare si decide nella pubblicazione.',
+    nuovo: 'Nuovo utente',
+    amministratore: 'Amministratore',
+    rendiAdmin: 'Rendi amministratore',
+    togliAdmin: 'Togli amministratore',
+    attiva: 'Attiva',
+    disattiva: 'Disattiva',
+    disattivato: 'Disattivato',
+    sonoIo: 'sei tu',
+    permessi: 'Permessi generali',
+    passwordMinima: 'Almeno 10 caratteri.',
+    ambito: 'Ambito',
+    ambitoVuoto: 'nessun limite',
+    ambitoNota: 'Cartella oltre la quale questo utente non può uscire. Vuoto = nessun limite.',
+    can_download: 'Scaricare',
+    can_upload: 'Caricare',
+    can_create: 'Creare cartelle',
+    can_rename: 'Rinominare',
+    can_modify: 'Modificare',
+    can_delete: 'Eliminare',
+    can_share: 'Creare link',
+    confermaTitolo: 'Eliminare «{nome}»?',
+    confermaTesto:
+      'L’utente e i permessi che gli sono stati assegnati vengono eliminati. I file non vengono toccati.',
+  },
+
   webserver: {
     titolo: 'Web server',
     descrizione:
