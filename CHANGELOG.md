@@ -23,6 +23,12 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
   esplicito. Restano disponibili l'accesso anonimo (`pubblica`), la password e
   l'accesso a tutti gli utenti autenticati.
 - Livelli di permesso: negato, lettura, scrittura.
+- **Documentazione bilingue** per chi usa e installa il progetto: `README.en.md`,
+  `docs/INSTALL.md` e la sua versione inglese, guida alla scrittura NFS su Synology
+  nelle due lingue, con i collegamenti reciproci in cima a ogni documento.
+- `docs/INSTALL.md`: prerequisiti, verifica del NAS prima di installare, cosa fa
+  l'installer passo per passo, aggiornamento, disinstallazione e risoluzione dei
+  problemi più frequenti.
 
 ### Da fare
 Vedere [TODO.md](TODO.md).

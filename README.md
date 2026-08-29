@@ -1,5 +1,7 @@
 # Advanced NAS Folder
 
+🇬🇧 [English version](README.en.md)
+
 [![Platform](https://img.shields.io/badge/Platform-Linux%20%2B%20systemd-FCC624?logo=linux&logoColor=black)](https://systemd.io)
 [![Backend](https://img.shields.io/badge/Backend-FastAPI%200.141-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![Python](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white)](https://www.python.org)
@@ -93,18 +95,17 @@ distribuito già pronto nella release.
 
 ## Installazione
 
-> **Non ancora disponibile.** `install.sh` arriva a fine fase 0. Fino ad allora si
-> usa l'avvio in sviluppo descritto sotto.
+Guida completa: **[docs/INSTALL.md](docs/INSTALL.md)**
 
-Quando sarà pronto, l'installazione sarà in tre passi separati — scaricare,
-controllare, eseguire — perché lo script gira da root e merita che tu possa leggerlo
-prima:
+Scaricare, controllare, eseguire — tre passi separati, perché lo script gira da root:
 
 ```bash
 curl -fsSLO https://github.com/wifi75/advanced-nas-folder/releases/latest/download/install.sh
 sha256sum install.sh
 sudo bash install.sh
 ```
+
+Aggiungi `--dry-run` per vedere esattamente cosa farebbe, senza applicare nulla.
 
 ## Struttura del progetto
 
@@ -183,6 +184,7 @@ nomi delle condivisioni vivono in `.env` e nel database.
 
 ## Documentazione
 
+- [Installazione](docs/INSTALL.md) — guida completa e risoluzione dei problemi
 - [Piano tecnico](docs/PIANO.md) — architettura, modello dei dati, scelte motivate
 - [Versioni delle dipendenze](docs/VERSIONI.md) — stato attuale e come verificarle
 - [Agent privilegiato](agent/README.md) — protocollo e regole di sicurezza

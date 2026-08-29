@@ -97,11 +97,17 @@ nessuna dipende da quelle successive.
 
 Richieste del 2026-08-29 rimaste aperte alla chiusura della v0.3.0:
 
-- [ ] **Documentazione bilingue**: `README.en.md` e versione inglese dei documenti
-      in `docs/`. L'interfaccia è già in due lingue, la documentazione no.
-- [ ] **`docs/INSTALL.md`**: tutti i passi di installazione, nelle due lingue.
+- [x] **Documentazione bilingue, parte rivolta a chi usa il progetto**: `README.en.md`,
+      `docs/INSTALL.md` e `.en.md`, guida NFS Synology nelle due lingue, con i
+      collegamenti fra le versioni.
+- [ ] **Documenti interni ancora solo in italiano**: `docs/PIANO.md`,
+      `docs/VERSIONI.md` e `agent/README.md`. Sono documenti di sviluppo, non
+      di installazione: tradurli ha meno urgenza ma resta da fare.
 - [ ] **PWA**: pannello installabile sul telefono, icona in schermata home.
-- [ ] Installazione reale sul server, quando decidi di procedere.
+- [ ] **Pubblicazione sul server, alla fine dello sviluppo.** Sul server non è
+      ancora stato pubblicato nulla: `install.sh` è pronto e verificato a vuoto,
+      ma l'installazione vera si fa quando il progetto è completo. Da eseguire
+      con `--dry-run` prima, poi per davvero.
 
 ## Emerso durante i rilasci
 

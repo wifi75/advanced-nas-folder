@@ -1,5 +1,7 @@
 # Abilitare la scrittura NFS su Synology
 
+🇬🇧 [English version](synology-nfs-scrittura.en.md)
+
 Advanced NAS Folder crea ogni mount **in sola lettura**. È una scelta deliberata: un
 pannello raggiungibile da Internet che può scrivere sul NAS è un rischio molto diverso
 da uno che può solo leggere.

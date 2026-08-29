@@ -36,8 +36,23 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 - **Interfaccia bilingue** italiano/inglese e tema chiaro/scuro/automatico.
 - Fase 2 iniziata: risoluzione sicura dei percorsi e permessi per sottocartella.
 
-**Da fare subito dopo:** `install.sh` (blocca qualunque installazione reale),
-documentazione bilingue e `docs/INSTALL.md`. Vedere [TODO.md](TODO.md).
+- **`install.sh`** pronto: bilingue, idempotente, con `--dry-run` e `--uninstall`.
+  Verificato con shellcheck e prova a vuoto su server reale.
+- **Permessi per singolo utente**: quale utente accede a quale cartella, o a tutte.
+- Documentazione per chi installa disponibile in italiano e in inglese.
+
+**Sul server non è ancora stato pubblicato nulla.** L'installazione vera si fa alla
+fine dello sviluppo.
+
+**Da fare subito dopo:** endpoint e interfaccia per assegnare i permessi, PWA.
+Vedere [TODO.md](TODO.md).
+
+## Convenzioni della documentazione
+
+Ogni documento rivolto a chi usa o installa il progetto esiste in **due lingue**:
+il file italiano senza suffisso, l'inglese con `.en.md`, e in cima a entrambi il
+collegamento all'altra versione. I documenti interni di sviluppo (`PIANO.md`,
+`VERSIONI.md`, `agent/README.md`) sono per ora solo in italiano.
 
 ## Convenzioni dell'interfaccia
 
