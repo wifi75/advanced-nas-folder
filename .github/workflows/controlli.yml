@@ -1,0 +1,71 @@
+name: Controlli
+
+# Analisi statica e test a ogni push. Prima girava solo la build della release:
+# un errore di tipo o un test rotto si scopriva al momento di rilasciare, cioè
+# nel momento peggiore.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  python:
+    name: Backend e agent
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Prepara Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+
+      - name: Installa le dipendenze
+        working-directory: backend
+        run: pip install -e ".[dev]"
+
+      - name: Formattazione
+        run: ruff format --check .
+
+      - name: Analisi statica
+        run: ruff check .
+
+      - name: Tipi
+        working-directory: backend
+        run: mypy app
+
+      - name: Test
+        # Le variabili d'ambiente le imposta conftest.py prima di importare
+        # l'applicazione: qui non serve aggiungerne.
+        run: pytest
+
+  frontend:
+    name: Pannello
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Prepara Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Installa le dipendenze
+        working-directory: frontend
+        run: npm ci
+
+      - name: Analisi statica
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Tipi
+        working-directory: frontend
+        run: npm run typecheck
+
+      - name: Build
+        working-directory: frontend
+        run: npm run build

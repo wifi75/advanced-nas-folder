@@ -198,3 +198,44 @@ async def test_lo_zip_di_una_cartella_riservata_e_negato(admin: AsyncClient, sha
         "/api/v1/archivio/documenti/zip", params={"percorso": "riservata"}
     )
     assert risposta.status_code == 403
+
+
+# --- archivio di una selezione ---------------------------------------------
+
+
+async def test_archivio_di_piu_elementi_scelti(admin: AsyncClient, share_id: int) -> None:
+    risposta = await admin.post(
+        "/api/v1/archivio/documenti/zip-selezione",
+        json={"percorsi": ["relazione-2026.txt", "foto"], "nome": "scelti"},
+    )
+    assert risposta.status_code == 200
+    assert 'filename="scelti.zip"' in risposta.headers["content-disposition"]
+
+    archivio = zipfile.ZipFile(io.BytesIO(risposta.content))
+    assert "relazione-2026.txt" in archivio.namelist()
+    assert "foto/mare.txt" in archivio.namelist()
+
+
+async def test_la_selezione_non_porta_fuori_dalla_pubblicazione(
+    admin: AsyncClient, share_id: int
+) -> None:
+    """La selezione arriva dal client: concatenarla alla cieca porterebbe fuori."""
+    risposta = await admin.post(
+        "/api/v1/archivio/documenti/zip-selezione",
+        json={"percorsi": ["../../etc/passwd"], "nome": "tentativo"},
+    )
+    # Il percorso viene normalizzato e rifiutato prima di toccare il disco.
+    assert risposta.status_code == 400
+
+
+async def test_la_selezione_ricontrolla_i_permessi(admin: AsyncClient, share_id: int) -> None:
+    """Fidarsi di ciò che il client dice di aver scelto significherebbe lasciargli
+    decidere cosa scaricare."""
+    await _vieta(admin, share_id, "riservata")
+
+    risposta = await _anonimo(admin).post(
+        "/api/v1/archivio/documenti/zip-selezione",
+        json={"percorsi": ["riservata", "relazione-2026.txt"], "nome": "misto"},
+    )
+    archivio = zipfile.ZipFile(io.BytesIO(risposta.content))
+    assert archivio.namelist() == ["relazione-2026.txt"]

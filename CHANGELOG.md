@@ -108,7 +108,20 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 - I file entrano nell'archivio **senza compressione**: su un NAS domestico il contenuto è
   quasi sempre già compresso, e comprimerlo di nuovo consuma processore per guadagnare
   qualche per mille.
-- 143 test nuovi. Suite complessiva a **322 test**.
+- **Selezione multipla**: si scelgono più file e cartelle e si scaricano in un unico
+  archivio. La barra della selezione è fissa in basso invece che nel flusso, perché
+  comparendo fra le voci sposterebbe l'elenco alla prima scelta e la casella successiva
+  finirebbe sotto il dito di chi sta selezionando.
+- Ogni elemento della selezione viene **risolto contro la radice e ricontrollato**: la
+  selezione arriva dal client, e fidarsi di ciò che dichiara significherebbe lasciargli
+  decidere cosa scaricare.
+- **Icone per tipo di file**, con una tinta per famiglia — immagini, video, audio,
+  archivi, documenti, codice. Il colore fa da indice visivo quando l'elenco è lungo,
+  molto più del nome dell'estensione.
+- **La CI esegue i controlli a ogni push**: `ruff`, `mypy`, `pytest`, ESLint, `vue-tsc` e
+  build. Prima girava solo la build della release, e un errore di tipo o un test rotto si
+  scopriva al momento di rilasciare, cioè nel momento peggiore.
+- 146 test nuovi. Suite complessiva a **325 test**.
 
 ### Modificato
 - In sviluppo la consegna passa da sola a `stream`: senza un web server davanti,

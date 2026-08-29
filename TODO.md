@@ -26,7 +26,7 @@ nessuna dipende da quelle successive.
       Verificato con shellcheck e prova a vuoto su server reale; installazione
       vera non ancora eseguita
 - [x] Workflow CI: build di `dist/` e allegato alla release
-- [ ] CI: eseguire anche `ruff`, `mypy` e `pytest` a ogni push, non solo il build
+- [x] **CI**: `ruff`, `mypy`, `pytest`, ESLint, `vue-tsc` e build a ogni push
 
 ## Fase 1 — Mount NFS dal pannello `in corso`
 
@@ -71,15 +71,17 @@ nessuna dipende da quelle successive.
 
 ## Fase 3 — Gestione file completa
 
-- [ ] Navigazione, viste elenco / griglia / galleria, icone per tipo
-- [ ] Menu contestuale, selezione multipla
+- [x] **Icone per tipo di file**, una tinta per famiglia
+- [ ] Viste a griglia e galleria
+- [x] **Selezione multipla** con archivio dei soli elementi scelti
+- [ ] Menu contestuale
 - [x] **Crea, rinomina, sposta, copia, elimina, nuova cartella**, con conferma
       esplicita per le cartelle non vuote e permesso di scrittura richiesto su
       origine e destinazione
 - [x] **Caricamento con trascinamento e avanzamento**, a blocchi e riprendibile
 - [ ] Caricamento di cartelle intere
 - [x] **Cartella come archivio ZIP**, prodotto mentre lo si invia
-- [ ] Download multiplo con selezione
+
 - [x] **Ricerca** nei nomi, ricorsiva e filtrata dai permessi
 - [x] **Gestione utenti**: creazione, permessi generali, ambito per utente,
       attivazione e cambio della propria password

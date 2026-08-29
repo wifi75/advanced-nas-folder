@@ -265,6 +265,13 @@ export default {
     passwordRichiesta: 'This link is protected by a password.',
   },
 
+  selezione: {
+    scegli: 'Select {nome}',
+    scelti: 'no items | 1 item selected | {n} items selected',
+    scarica: 'Download together',
+    azzera: 'Deselect',
+  },
+
   ricerca: {
     campo: 'Search in this folder…',
     cerca: 'Search',

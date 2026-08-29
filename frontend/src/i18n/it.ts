@@ -268,6 +268,13 @@ export default {
     passwordRichiesta: 'Questo collegamento è protetto da una password.',
   },
 
+  selezione: {
+    scegli: 'Seleziona {nome}',
+    scelti: 'nessun elemento | 1 elemento scelto | {n} elementi scelti',
+    scarica: 'Scarica insieme',
+    azzera: 'Deseleziona',
+  },
+
   ricerca: {
     campo: 'Cerca in questa cartella…',
     cerca: 'Cerca',

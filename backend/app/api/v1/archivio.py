@@ -32,6 +32,7 @@ from app.schemas.archivio import (
     RichiestaGettone,
     Rinomina,
     RisultatiRicerca,
+    SelezioneZip,
     StatoCaricamento,
     Trasferisci,
     VoceOut,
@@ -495,4 +496,34 @@ async def scarica_cartella(
         flusso,
         media_type="application/zip",
         headers=consegna.intestazioni_allegato(nome),
+    )
+
+
+@router.post("/{slug}/zip-selezione")
+async def scarica_selezione(
+    slug: str, dati: SelezioneZip, sessione: Sessione, utente: UtenteFacoltativo
+) -> StreamingResponse:
+    """Scarica più elementi scelti a mano in un unico archivio.
+
+    È una POST e non una GET perché l'elenco dei percorsi può essere lungo:
+    in una query string finirebbe troncato dai limiti del web server, e per
+    intero nei suoi log.
+    """
+    share = await _pubblicazione(sessione, slug)
+    await _autorizza(sessione, share, "", utente)
+
+    try:
+        radice = await archivio.radice(sessione, share)
+    except archivio.ArchivioNonDisponibile as exc:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, str(exc)) from exc
+
+    consentito = await _filtro(sessione, share, utente)
+    percorsi = [_normalizza(p) for p in dati.percorsi]
+    flusso = await anyio.to_thread.run_sync(
+        archivio_zip.prepara_selezione, radice, percorsi, consentito
+    )
+
+    nome = f"{operazioni.valida_nome(dati.nome)}.zip"
+    return StreamingResponse(
+        flusso, media_type="application/zip", headers=consegna.intestazioni_allegato(nome)
     )

@@ -22,6 +22,8 @@ from pathlib import Path, PurePosixPath
 
 from zipstream import ZIP_STORED, ZipStream
 
+from app.services.percorsi import PercorsoNonValido, risolvi
+
 #: Come per la ricerca, un tetto alle cartelle visitate: senza, una cartella
 #: con un collegamento circolare produrrebbe uno ZIP infinito.
 MAX_CARTELLE = 5000
@@ -66,6 +68,36 @@ def _raccogli(
 
     dentro.sort(key=lambda voce: voce[1])
     return dentro
+
+
+def prepara_selezione(
+    radice: Path, percorsi: list[str], consentito: Callable[[str], bool]
+) -> Iterator[bytes]:
+    """Archivio di piu' elementi scelti a mano, file e cartelle insieme.
+
+    Ogni elemento viene ricontrollato due volte: **risolto** contro la radice,
+    perche' la selezione arriva dal client e una risalita concatenata alla
+    cieca porterebbe fuori dalla cartella pubblicata, e passato al controllo
+    degli accessi, perche' fidarsi di cio' che il client dice di aver scelto
+    significherebbe lasciargli decidere cosa scaricare.
+    """
+    flusso = ZipStream(compress_type=ZIP_STORED)
+
+    for percorso in percorsi:
+        if not consentito(percorso):
+            continue
+        try:
+            reale = risolvi(radice, percorso)
+        except PercorsoNonValido:
+            continue
+        if reale.is_file():
+            flusso.add_path(reale, arcname=PurePosixPath(percorso).name)
+        elif reale.is_dir():
+            nome = PurePosixPath(percorso).name
+            for file, interno in _raccogli(reale, PurePosixPath(percorso), consentito):
+                flusso.add_path(file, arcname=f"{nome}/{interno}")
+
+    return iter(flusso)
 
 
 def prepara(

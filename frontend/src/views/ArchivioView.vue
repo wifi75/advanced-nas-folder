@@ -14,10 +14,11 @@ import {
   archivioApi,
   indirizzoDownload,
   indirizzoZip,
+  scaricaSelezione,
   type Contenuto,
   type Voce,
 } from '@/api/archivio'
-import { ApiError } from '@/api/client'
+import { ApiError, tokenCorrente } from '@/api/client'
 import Caricamenti from '@/components/Caricamenti.vue'
 
 const route = useRoute()
@@ -90,6 +91,69 @@ async function scarica(voce: Voce): Promise<void> {
   }
 }
 
+// --- selezione ---
+// Un insieme di percorsi, non di indici: cambiando cartella o cercando,
+// l'elenco si rimescola e gli indici punterebbero ad altro.
+const scelti = ref<Set<string>>(new Set())
+
+function alternaScelta(voce: Voce): void {
+  const prossimi = new Set(scelti.value)
+  if (prossimi.has(voce.percorso)) prossimi.delete(voce.percorso)
+  else prossimi.add(voce.percorso)
+  scelti.value = prossimi
+}
+
+function azzeraScelta(): void {
+  scelti.value = new Set()
+}
+
+async function scaricaScelti(): Promise<void> {
+  errore.value = null
+  try {
+    await scaricaSelezione(
+      slug.value,
+      [...scelti.value],
+      percorso.value.split('/').pop() || 'selezione',
+      tokenCorrente(),
+    )
+  } catch (e) {
+    errore.value = e instanceof Error ? e.message : t('errori.generico')
+  }
+}
+
+// --- icone ---
+// Tracciati semplici sulla stessa griglia 24×24, come quelli della barra
+// laterale: hanno tutti lo stesso peso ottico.
+const TRACCIATI: Record<string, string> = {
+  cartella: 'M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z',
+  immagine: 'M4 5h16v14H4Z M4 16l4-4 3 3 4-4 5 5',
+  video: 'M3 6h13v12H3Z M16 10l5-3v10l-5-3',
+  audio: 'M10 17V6l8-2v11 M10 17a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z M18 15a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z',
+  archivio: 'M4 7h16v13H4Z M4 7l2-3h12l2 3 M12 11v5 M10 13h4',
+  documento: 'M6 3h7l5 5v13H6Z M13 3v5h5 M9 13h6 M9 17h4',
+  codice: 'M9 8l-4 4 4 4 M15 8l4 4-4 4',
+  file: 'M6 3h7l5 5v13H6Z M13 3v5h5',
+}
+
+// Bastano poche famiglie: distinguere il .odt dal .docx non aiuta nessuno a
+// trovare un file, distinguere un documento da un video sì.
+const FAMIGLIE: Record<string, RegExp> = {
+  immagine: /\.(jpe?g|png|gif|webp|avif|heic|bmp|tiff?|svg)$/i,
+  video: /\.(mp4|mkv|avi|mov|webm|m4v|mpe?g|wmv)$/i,
+  audio: /\.(mp3|flac|wav|aac|ogg|m4a|opus)$/i,
+  archivio: /\.(zip|rar|7z|tar|gz|bz2|xz|iso)$/i,
+  documento: /\.(pdf|docx?|odt|rtf|txt|md|epub)$/i,
+  codice: /\.(ts|js|vue|py|sh|json|ya?ml|toml|html?|css|sql)$/i,
+}
+
+function famiglia(voce: Voce): string {
+  if (voce.cartella) return 'cartella'
+  for (const [nome, schema] of Object.entries(FAMIGLIE)) {
+    if (schema.test(voce.nome)) return nome
+  }
+  return 'file'
+}
+
 // --- ricerca ---
 const termine = ref('')
 const risultati = ref<Voce[] | null>(null)
@@ -125,7 +189,10 @@ function azzeraRicerca(): void {
 }
 
 // Cambiando cartella la ricerca precedente non ha più senso.
-watch(percorso, azzeraRicerca)
+watch(percorso, () => {
+  azzeraRicerca()
+  azzeraScelta()
+})
 
 async function scaricaCartella(): Promise<void> {
   errore.value = null
@@ -399,6 +466,28 @@ function quando(iso: string | null): string {
       {{ t('archivio.vuota') }}
     </p>
 
+    <div
+      v-if="scelti.size"
+      class="selezione"
+      role="status"
+    >
+      <span>{{ t('selezione.scelti', { n: scelti.size }, scelti.size) }}</span>
+      <button
+        type="button"
+        class="bottone bottone--tenue"
+        @click="scaricaScelti"
+      >
+        {{ t('selezione.scarica') }}
+      </button>
+      <button
+        type="button"
+        class="bottone bottone--tenue"
+        @click="azzeraScelta"
+      >
+        {{ t('selezione.azzera') }}
+      </button>
+    </div>
+
     <ul
       v-if="contenuto && voci.length"
       class="voci"
@@ -408,6 +497,14 @@ function quando(iso: string | null): string {
         :key="voce.percorso"
         class="voce"
       >
+        <input
+          type="checkbox"
+          class="voce__scelta"
+          :checked="scelti.has(voce.percorso)"
+          :aria-label="t('selezione.scegli', { nome: voce.nome })"
+          @change="alternaScelta(voce)"
+        >
+
         <button
           v-if="voce.cartella"
           type="button"
@@ -415,11 +512,12 @@ function quando(iso: string | null): string {
           @click="apri(voce)"
         >
           <svg
-            class="voce__icona voce__icona--cartella"
+            class="voce__icona"
+            :class="`voce__icona--${famiglia(voce)}`"
             viewBox="0 0 24 24"
             aria-hidden="true"
           >
-            <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" />
+            <path :d="TRACCIATI[famiglia(voce)]" />
           </svg>
           <span class="voce__nome">{{ risultati ? voce.percorso : voce.nome }}</span>
         </button>
@@ -430,10 +528,11 @@ function quando(iso: string | null): string {
         >
           <svg
             class="voce__icona"
+            :class="`voce__icona--${famiglia(voce)}`"
             viewBox="0 0 24 24"
             aria-hidden="true"
           >
-            <path d="M6 3h7l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z M13 3v5h5" />
+            <path :d="TRACCIATI[famiglia(voce)]" />
           </svg>
           <span class="voce__nome">{{ risultati ? voce.percorso : voce.nome }}</span>
         </div>
@@ -672,9 +771,34 @@ function quando(iso: string | null): string {
   gap: 0.75rem;
   padding: 0.5rem 0.85rem;
   background: var(--superficie);
-  /* Nome elastico, poi dimensione e data a larghezza fissa così le colonne
-     restano allineate anche quando i nomi sono molto diversi. */
-  grid-template-columns: minmax(0, 1fr) 5.5rem 11rem auto;
+  /* Casella, poi nome elastico, poi dimensione e data a larghezza fissa così
+     le colonne restano allineate anche quando i nomi sono molto diversi. */
+  grid-template-columns: auto minmax(0, 1fr) 5.5rem 11rem auto;
+}
+
+.voce__scelta {
+  margin: 0;
+}
+
+/* Fissa in basso invece che nel flusso: comparendo fra le voci sposterebbe
+   l'elenco a ogni prima selezione, e la casella successiva finirebbe sotto il
+   dito di chi sta selezionando. */
+.selezione {
+  position: fixed;
+  left: 50%;
+  bottom: 1rem;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--accento);
+  border-radius: var(--raggio);
+  background: var(--superficie);
+  box-shadow: var(--ombra);
+  font-size: 0.9rem;
+  transform: translateX(-50%);
 }
 
 .voce__apri {
@@ -709,8 +833,34 @@ function quando(iso: string | null): string {
   stroke-width: 1.6;
 }
 
+/* Una tinta per famiglia: il colore fa da indice visivo quando l'elenco è
+   lungo, molto più del nome dell'estensione. */
 .voce__icona--cartella {
   stroke: var(--tinta-file);
+}
+
+.voce__icona--immagine {
+  stroke: var(--tinta-pubblicazioni);
+}
+
+.voce__icona--video {
+  stroke: var(--tinta-link);
+}
+
+.voce__icona--audio {
+  stroke: var(--tinta-utenti);
+}
+
+.voce__icona--archivio {
+  stroke: var(--tinta-webserver);
+}
+
+.voce__icona--documento {
+  stroke: var(--tinta-nfs);
+}
+
+.voce__icona--codice {
+  stroke: var(--tinta-trasferimenti);
 }
 
 .voce__nome {
@@ -863,7 +1013,7 @@ function quando(iso: string | null): string {
 
 @media (width <= 40rem) {
   .voce {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
   }
 
   .voce__data {

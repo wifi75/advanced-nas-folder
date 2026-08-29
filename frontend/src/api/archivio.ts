@@ -115,6 +115,41 @@ export async function indirizzoDownload(
 }
 
 /**
+ * Scarica più elementi scelti a mano in un unico archivio.
+ *
+ * Una POST e non una navigazione: l'elenco dei percorsi può essere lungo, e in
+ * una query string finirebbe troncato dal web server e per intero nei suoi
+ * log. Il prezzo è che il file passa dalla memoria del browser prima di essere
+ * salvato — accettabile per una selezione, non per una cartella intera.
+ */
+export async function scaricaSelezione(
+  slug: string,
+  percorsi: string[],
+  nome: string,
+  token: string | null,
+): Promise<void> {
+  const intestazioni: Record<string, string> = { 'Content-Type': 'application/json' }
+  if (token) intestazioni.Authorization = `Bearer ${token}`
+
+  const risposta = await fetch(`${BASE}/archivio/${encodeURIComponent(slug)}/zip-selezione`, {
+    method: 'POST',
+    headers: intestazioni,
+    body: JSON.stringify({ percorsi, nome }),
+  })
+  if (!risposta.ok) {
+    const dettaglio = await risposta.json().catch(() => null)
+    throw new Error(dettaglio?.detail ?? `Errore ${risposta.status}`)
+  }
+
+  const url = URL.createObjectURL(await risposta.blob())
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `${nome}.zip`
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+/**
  * Indirizzo da cui scaricare una cartella intera come archivio ZIP.
  *
  * Come per il singolo file serve un gettone: il download è una navigazione

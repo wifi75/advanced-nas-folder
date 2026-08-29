@@ -166,3 +166,11 @@ class RisultatiRicerca(BaseModel):
     voci: list[VoceOut] = []
     #: Vero se la ricerca si è fermata a un limite: l'elenco non è completo.
     troncata: bool = False
+
+
+class SelezioneZip(BaseModel):
+    """Elementi scelti a mano da mettere in un unico archivio."""
+
+    percorsi: list[str] = Field(min_length=1, max_length=500)
+    #: Nome proposto per il file scaricato.
+    nome: str = Field(default="selezione", max_length=128)
