@@ -76,7 +76,7 @@ def test_collegamento_che_esce_viene_rifiutato(tmp_path: Path) -> None:
 
     try:
         os.symlink(fuori, radice / "scorciatoia", target_is_directory=True)
-    except (OSError, NotImplementedError):
+    except OSError, NotImplementedError:
         pytest.skip("creazione di collegamenti simbolici non consentita")
 
     with pytest.raises(PercorsoNonValido):

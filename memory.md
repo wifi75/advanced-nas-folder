@@ -12,7 +12,7 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.2.0
+- Versione corrente: 0.3.0
 
 ## Stato al 29 agosto 2026
 
@@ -30,8 +30,27 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
   smontaggio, rimozione. Tentativi di violazione (slug con `..`, opzioni fuori
   whitelist, comandi iniettati nell'indirizzo) tutti respinti.
 
-**Da fare subito dopo:** endpoint API dei mount collegati all'agent, interfaccia dei
-mount, poi `install.sh`. Vedere [TODO.md](TODO.md).
+- **Endpoint e interfaccia dei mount** completi: scoperta delle condivisioni del NAS,
+  creazione, montaggio, stato, eliminazione. Verificato end-to-end su Linux, pannello
+  → API → agent → NAS reale.
+- **Interfaccia bilingue** italiano/inglese e tema chiaro/scuro/automatico.
+- Fase 2 iniziata: risoluzione sicura dei percorsi e permessi per sottocartella.
+
+**Da fare subito dopo:** `install.sh` (blocca qualunque installazione reale),
+documentazione bilingue e `docs/INSTALL.md`. Vedere [TODO.md](TODO.md).
+
+## Convenzioni dell'interfaccia
+
+- **Ogni testo passa da `frontend/src/i18n/`.** L'italiano è la lingua di riferimento;
+  l'inglese la rispecchia chiave per chiave e il tipo fa fallire la compilazione se
+  ne manca una. Nessuna stringa va scritta direttamente nei componenti.
+- **Nessun colore direttamente nei componenti**: tutto passa dalle variabili in
+  `assets/main.css`, definite per il tema chiaro e ridefinite in *due* blocchi scuri
+  (`prefers-color-scheme` e `[data-tema='scuro']`).
+- Il menu è raggruppato per categoria; le voci non ancora realizzate restano visibili
+  ma disattivate, con la fase indicata.
+- `npm run typecheck` usa `vue-tsc --build`: la variante `--noEmit` non controllava i
+  progetti referenziati e lasciava passare errori che il build trovava.
 
 ## Decisioni architetturali fissate
 

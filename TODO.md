@@ -42,10 +42,11 @@ nessuna dipende da quelle successive.
 - [x] Verifica end-to-end su Linux: pannello → API → agent → NAS reale
 - [ ] Migrazione dei mount preesistenti da `/etc/fstab`
 
-## Fase 2 — Pubblicazione e permessi
+## Fase 2 — Pubblicazione e permessi `in corso`
 
-- [ ] Modello `Share`: cartella pubblicata a partire da un mount
-- [ ] `AccessRule` per prefisso di percorso
+- [x] Modello `Share`: cartella pubblicata a partire da un mount
+- [x] `AccessRule` per prefisso di percorso, con risoluzione sicura dei percorsi
+- [ ] Endpoint e interfaccia degli share
 - [ ] Visibilità: pubblica / password / utenti registrati / link con scadenza
 - [ ] Link di condivisione con limite di download e revoca
 - [ ] Download delegato: `X-Sendfile` e `X-Accel-Redirect`
@@ -76,8 +77,9 @@ nessuna dipende da quelle successive.
 
 ## Fase 5 — Rifinitura
 
-- [ ] Tema chiaro/scuro, branding, titolo e logo personalizzabili
-- [ ] Multilingua
+- [x] Tema chiaro, scuro o automatico *(anticipato su richiesta)*
+- [x] Multilingua italiano e inglese *(anticipato su richiesta)*
+- [ ] Branding, titolo e logo personalizzabili
 - [ ] Spazio disco nella barra laterale, nascondere i file nascosti
 - [ ] `update.sh` e `uninstall.sh`
 - [ ] Documentazione utente completa
@@ -85,15 +87,25 @@ nessuna dipende da quelle successive.
 
 ---
 
+## Chiesto e non ancora fatto
+
+Richieste del 2026-08-29 rimaste aperte alla chiusura della v0.3.0:
+
+- [ ] **`install.sh`: installazione automatica su server Linux.** È anche l'ultima
+      voce aperta della fase 0 e blocca qualunque installazione reale.
+- [ ] **Documentazione bilingue**: `README.en.md` e versione inglese dei documenti
+      in `docs/`. L'interfaccia è già in due lingue, la documentazione no.
+- [ ] **`docs/INSTALL.md`**: tutti i passi di installazione, nelle due lingue.
+
 ## Emerso durante i rilasci
 
 - [ ] **Test end-to-end dell'agent su Linux.** I test attuali sono unitari e coprono
       i validatori; il ciclo completo (creazione, montaggio, stato, rimozione) è stato
       provato a mano contro un NAS reale, ma non è automatizzato. Serve un ambiente di
       prova con systemd.
-- [ ] **Decisione in sospeso:** i commit precedenti al 29 agosto 2026 contengono un
-      riferimento a uno strumento di terze parti nel piè di firma. Toglierlo richiede
-      di riscrivere la cronologia e un force-push, che non è stato ancora autorizzato.
+- [x] Riferimenti a strumenti di terze parti nei piè di firma dei commit: rimossi
+      riscrivendo la cronologia. Verificato che l'API di GitHub riporti un solo
+      contributore.
 
 ## Non in programma, per scelta
 

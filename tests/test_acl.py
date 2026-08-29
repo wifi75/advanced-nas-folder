@@ -11,9 +11,7 @@ def costruisci(
 ) -> Share:
     share = Share(slug="s", label="S", mount_id=1, subpath="", is_enabled=True)
     share.default_visibility = predefinita
-    share.rules = [
-        AccessRule(path_prefix=p, visibility=v) for p, v in (regole or [])
-    ]
+    share.rules = [AccessRule(path_prefix=p, visibility=v) for p, v in (regole or [])]
     return share
 
 
@@ -53,9 +51,7 @@ def test_il_prefisso_non_corrisponde_a_meta_nome() -> None:
 
 def test_sottocartella_piu_restrittiva_della_radice() -> None:
     """È il requisito centrale della fase 2."""
-    share = costruisci(
-        predefinita=Visibilita.PUBBLICA, regole=[("riservato", Visibilita.UTENTI)]
-    )
+    share = costruisci(predefinita=Visibilita.PUBBLICA, regole=[("riservato", Visibilita.UTENTI)])
     assert valuta(share, "pubblico/foto.jpg", None).consentito
     assert not valuta(share, "riservato/nota.txt", None).consentito
     assert valuta(share, "riservato/nota.txt", utente()).consentito

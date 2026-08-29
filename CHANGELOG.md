@@ -7,26 +7,46 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non rilasciato]
 
+### Da fare
+Vedere [TODO.md](TODO.md).
+
+## [0.3.0] - 2026-08-29
+
+I mount NFS si gestiscono dall'interfaccia, in due lingue.
+
 ### Aggiunto
+- **Interfaccia bilingue, italiano e inglese**: menu, testi, messaggi d'errore e
+  titolo della scheda. L'italiano è la lingua di riferimento e il tipo delle chiavi
+  fa fallire la compilazione se l'inglese ne dimentica una.
+- **Tema chiaro, scuro o automatico.** L'automatico non è un terzo colore ma
+  l'assenza di scelta: non marca nulla sulla radice e segue il sistema operativo.
+- **Barra laterale per categorie** — Archivio, Accessi, Sistema — con pulsanti in
+  vetro traslucido e una pastiglia colorata per voce. Le voci non ancora realizzate
+  restano visibili ma disattivate, con la fase indicata.
+- Lingua e tema si scelgono anche dalla pagina di accesso.
+- **Risoluzione sicura dei percorsi** (`services/percorsi.py`): il percorso finale si
+  costruisce dalla radice e si verifica che non ne sia uscito. Il controllo è fatto
+  sul percorso *risolto*, così un collegamento simbolico che punta fuori viene
+  bloccato.
+- **Permessi per sottocartella** (`services/acl.py`): vince la regola con il prefisso
+  più lungo, quindi una sottocartella può essere più restrittiva di quella che la
+  contiene. Il confronto è per componenti, non per stringhe.
 - **Endpoint dei mount**: elenco, scoperta delle condivisioni di un NAS, creazione,
   modifica, avvio, arresto ed eliminazione. Tutti riservati agli amministratori.
-- Client verso l'agent (`app/services/agent_client.py`), unico punto di contatto fra
+- Client verso l'agent (`services/agent_client.py`), unico punto di contatto fra
   l'API e il processo privilegiato.
-- 25 test sugli endpoint, con un agent simulato: verificano che la scrittura resti
-  disattivata se non richiesta, che il percorso di montaggio non sia mai scelto
-  dall'utente, che le opzioni di resilienza siano sempre presenti, e che un mount non
-  venga cancellato dal database se l'agent non ha potuto ripulire il sistema.
 - **Interfaccia dei mount**: elenco con stato richiesto *e* effettivo affiancati,
   creazione con scoperta delle condivisioni dal NAS invece che percorso digitato a
   mano, montaggio, smontaggio, rilettura dello stato ed eliminazione con conferma.
-  Barra di navigazione e disconnessione.
+- 41 test su percorsi e permessi, 25 sugli endpoint. Suite complessiva a **150 test**.
 
 ### Corretto
-- Il client HTTP scartava il messaggio d'errore del server e ne mostrava uno
-  generico: il backend spiega cosa fare, e quella spiegazione ora arriva a schermo.
-
-### Da fare
-Vedere [TODO.md](TODO.md).
+- Cambiando lingua il titolo della scheda restava nella precedente: veniva impostato
+  solo alla navigazione, e cambiare lingua non cambia rotta.
+- Il comando `typecheck` non intercettava errori che il `build` trovava, dando falsa
+  sicurezza. Ora usa lo stesso controllo.
+- La cartella `.claude/` era finita nel repository: rimossa, con la regola di ignore
+  in `.git/info/exclude` e non in `.gitignore`, che viene pubblicato.
 
 ## [0.2.0] - 2026-08-29
 

@@ -6,6 +6,7 @@
 [![Frontend](https://img.shields.io/badge/Frontend-Vue%203.5-4FC08D?logo=vuedotjs&logoColor=white)](https://vuejs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![Vite](https://img.shields.io/badge/Build-Vite%208.2-646CFF?logo=vite&logoColor=white)](https://vite.dev)
+[![Lingue](https://img.shields.io/badge/Interfaccia-italiano%20%7C%20english-C8467C)](frontend/src/i18n)
 [![Database](https://img.shields.io/badge/DB-SQLite%20(WAL)-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/wal.html)
 [![Storage](https://img.shields.io/badge/Storage-NFS%20v3%20%7C%20v4-EE0000?logo=redhat&logoColor=white)](https://linux-nfs.org)
 [![Web server](https://img.shields.io/badge/Web%20server-Apache%20%7C%20Nginx-D22128?logo=apache&logoColor=white)](https://httpd.apache.org)
@@ -16,9 +17,9 @@ Pannello self-hosted che **monta condivisioni NFS**, **pubblica cartelle con per
 per sottocartella** e sostituisce integralmente FileBrowser — senza che tu debba mai
 modificare a mano un file di configurazione del server.
 
-> **Stato: fase 1 in corso.** Autenticazione e agent privilegiato funzionanti e
-> verificati contro un NAS reale. Mancano gli endpoint dei mount, l'interfaccia e
-> l'installer. Vedere [TODO.md](TODO.md) per lo stato di ogni fase.
+> **Stato: fase 1 completata, fase 2 in corso.** Il pannello monta condivisioni NFS
+> dall'interfaccia, in italiano e in inglese, con tema chiaro, scuro o automatico.
+> Mancano la pubblicazione delle cartelle e l'installer. Vedere [TODO.md](TODO.md).
 
 ---
 
