@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app.api.v1 import health
+from app.api.v1 import auth, health
 from app.core.config import get_settings
 from app.core.database import engine
 from app.core.version import (
@@ -16,6 +16,8 @@ from app.core.version import (
     APP_NAME,
     APP_VERSION,
 )
+from app.models import Base
+from app.services.bootstrap import crea_amministratore_iniziale
 
 logger = logging.getLogger("anf")
 
@@ -29,6 +31,15 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None]:
     )
     logger.info("%s v%s in avvio (%s)", APP_NAME, APP_VERSION, settings.env)
     logger.info("Database: %s", settings.db_path)
+
+    if settings.is_dev:
+        # In sviluppo le tabelle si creano da sole, per non dover lanciare le
+        # migrazioni a ogni riavvio. In produzione le applica l'installer.
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+
+    await crea_amministratore_iniziale()
+
     yield
     await engine.dispose()
     logger.info("%s arrestato", APP_NAME)
@@ -44,3 +55,4 @@ app = FastAPI(
 )
 
 app.include_router(health.router, prefix="/api/v1")
+app.include_router(auth.router, prefix="/api/v1")

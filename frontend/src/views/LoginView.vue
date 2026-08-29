@@ -1,19 +1,19 @@
 <script setup lang="ts">
-/**
- * Accesso al pannello.
- *
- * L'autenticazione vera arriva nella fase 1: qui c'e la forma della schermata,
- * gia completa di gestione degli errori e stato di attesa.
- */
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+import { useAuthStore } from '@/stores/auth'
+
+const auth = useAuthStore()
+const router = useRouter()
 
 const username = ref('')
 const password = ref('')
-const errore = ref('')
-const inCorso = ref(false)
 
-function accedi(): void {
-  errore.value = 'Autenticazione non ancora disponibile: arriva nella fase 1.'
+async function accedi(): Promise<void> {
+  if (await auth.accedi(username.value, password.value)) {
+    await router.push('/')
+  }
 }
 </script>
 
@@ -32,6 +32,7 @@ function accedi(): void {
           type="text"
           autocomplete="username"
           required
+          autofocus
         >
       </label>
 
@@ -46,18 +47,18 @@ function accedi(): void {
       </label>
 
       <p
-        v-if="errore"
+        v-if="auth.errore"
         class="errore"
         role="alert"
       >
-        {{ errore }}
+        {{ auth.errore }}
       </p>
 
       <button
         type="submit"
-        :disabled="inCorso"
+        :disabled="auth.inCorso"
       >
-        {{ inCorso ? 'Accesso in corso…' : 'Accedi' }}
+        {{ auth.inCorso ? 'Accesso in corso…' : 'Accedi' }}
       </button>
     </form>
   </div>

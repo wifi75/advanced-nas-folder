@@ -1,18 +1,47 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router'
+
 import { useAppStore } from '@/stores/app'
+import { useAuthStore } from '@/stores/auth'
 
 const app = useAppStore()
+const auth = useAuthStore()
+const router = useRouter()
+
+async function esci(): Promise<void> {
+  auth.esci()
+  await router.push({ name: 'login' })
+}
 </script>
 
 <template>
   <div class="pagina">
     <header class="testata">
-      <h1>{{ app.name }}</h1>
-      <p class="sottotitolo">
-        Monta condivisioni NFS, pubblica cartelle con permessi per sottocartella,
-        gestisci i file.
-      </p>
+      <div>
+        <h1>{{ app.name }}</h1>
+        <p class="sottotitolo">
+          Monta condivisioni NFS, pubblica cartelle con permessi per sottocartella,
+          gestisci i file.
+        </p>
+      </div>
+      <button
+        v-if="auth.autenticato"
+        class="esci"
+        type="button"
+        @click="esci"
+      >
+        Esci
+      </button>
     </header>
+
+    <p
+      v-if="auth.passwordPredefinita"
+      class="allarme"
+      role="alert"
+    >
+      <strong>Stai usando la password iniziale.</strong>
+      Cambiala prima di rendere il pannello raggiungibile da Internet.
+    </p>
 
     <section
       class="stato"
@@ -25,13 +54,19 @@ const app = useAppStore()
       />
       <span v-if="app.online">Servizio attivo</span>
       <span v-else>Servizio non raggiungibile</span>
+      <span
+        v-if="auth.utente"
+        class="chi"
+      >
+        {{ auth.utente.username }}<template v-if="auth.utente.is_admin"> · amministratore</template>
+      </span>
     </section>
 
     <section class="avviso">
-      <h2>Fase 0 — fondamenta</h2>
+      <h2>Fase 1 — in corso</h2>
       <p>
-        Il pannello è in costruzione. La gestione dei mount arriva nella fase 1,
-        la pubblicazione e i permessi nella fase 2.
+        L'accesso funziona. La gestione dei mount NFS è il prossimo passo, la
+        pubblicazione con i permessi arriva nella fase 2.
       </p>
     </section>
   </div>
@@ -45,7 +80,14 @@ const app = useAppStore()
   padding-block: 3rem;
   display: flex;
   flex-direction: column;
-  gap: 1.75rem;
+  gap: 1.5rem;
+}
+
+.testata {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
 .testata h1 {
@@ -60,6 +102,29 @@ const app = useAppStore()
   max-width: 52ch;
 }
 
+.esci {
+  flex: none;
+  padding: 0.45rem 0.85rem;
+  font: inherit;
+  font-size: 0.875rem;
+  color: var(--testo);
+  background: var(--superficie);
+  border: 1px solid var(--bordo);
+  border-radius: var(--raggio);
+  cursor: pointer;
+}
+
+.allarme {
+  margin: 0;
+  padding: 0.85rem 1.1rem;
+  font-size: 0.9375rem;
+  color: var(--testo);
+  background: var(--superficie);
+  border: 1px solid var(--attenzione);
+  border-left-width: 3px;
+  border-radius: var(--raggio);
+}
+
 .stato {
   display: flex;
   align-items: center;
@@ -69,6 +134,12 @@ const app = useAppStore()
   border: 1px solid var(--bordo);
   border-radius: var(--raggio);
   font-size: 0.9375rem;
+}
+
+.chi {
+  margin-inline-start: auto;
+  color: var(--testo-tenue);
+  font-size: 0.875rem;
 }
 
 .pallino {
