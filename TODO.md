@@ -16,8 +16,10 @@ nessuna dipende da quelle successive.
 - [x] Scheletro backend FastAPI: configurazione, database, endpoint di health
 - [x] Modelli del database: User, Mount, Share, AccessRule, ShareLink, Transfer,
       VHost, Setting — verificati creando davvero le tabelle su Python 3.14
-- [ ] Prima migrazione Alembic
-- [ ] Scheletro frontend Vue 3 + TypeScript + Vite
+- [x] Prima migrazione Alembic — verificata con `upgrade`, `downgrade` completo,
+      risalita e `alembic check` senza differenze residue
+- [x] Scheletro frontend Vue 3 + TypeScript + Vite — build, typecheck ed eslint
+      puliti, pagine verificate nel browser in tema chiaro e scuro
 - [ ] `install.sh` funzionante end-to-end
 - [x] Workflow CI: build di `dist/` e allegato alla release
 

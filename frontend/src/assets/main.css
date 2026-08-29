@@ -1,0 +1,105 @@
+/*
+ * Tema di base. I colori sono definiti come variabili sulla radice e
+ * ridefiniti per il tema scuro: nessun colore va scritto direttamente nei
+ * componenti, altrimenti uno dei due temi risulta illeggibile.
+ *
+ * Tre stati, non due: la preferenza esplicita marca l'attributo data-tema,
+ * mentre l'impostazione "automatico" non marca nulla e si affida a
+ * prefers-color-scheme.
+ */
+
+:root {
+  --sfondo: #f4f6f9;
+  --superficie: #ffffff;
+  --superficie-alt: #eef1f5;
+  --bordo: #d8dee7;
+  --testo: #172433;
+  --testo-tenue: #64748b;
+  --accento: #1d5fa8;
+  --accento-testo: #ffffff;
+  --ok: #1f7a4d;
+  --attenzione: #9a6014;
+  --errore: #a5342c;
+
+  --raggio: 6px;
+  --ombra: 0 1px 2px rgba(23, 36, 51, 0.06), 0 8px 24px -14px rgba(23, 36, 51, 0.2);
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema='chiaro']) {
+    --sfondo: #0e151d;
+    --superficie: #16202b;
+    --superficie-alt: #1d2937;
+    --bordo: #2a3949;
+    --testo: #dde5ef;
+    --testo-tenue: #93a3b7;
+    --accento: #6aa9e8;
+    --accento-testo: #0e151d;
+    --ok: #5cb98c;
+    --attenzione: #d6a054;
+    --errore: #e0817a;
+    --ombra: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -14px rgba(0, 0, 0, 0.6);
+  }
+}
+
+:root[data-tema='scuro'] {
+  --sfondo: #0e151d;
+  --superficie: #16202b;
+  --superficie-alt: #1d2937;
+  --bordo: #2a3949;
+  --testo: #dde5ef;
+  --testo-tenue: #93a3b7;
+  --accento: #6aa9e8;
+  --accento-testo: #0e151d;
+  --ok: #5cb98c;
+  --attenzione: #d6a054;
+  --errore: #e0817a;
+  --ombra: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -14px rgba(0, 0, 0, 0.6);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--sfondo);
+  color: var(--testo);
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: var(--accento);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accento);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

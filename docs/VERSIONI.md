@@ -59,10 +59,29 @@ Per i pacchetti con scope, codificare i caratteri speciali:
 | vue-router | 5.3.0 |
 | pinia | 4.0.3 |
 | vite | 8.2.2 |
-| typescript | 7.0.2 |
+| **typescript** | **6.0.3** — vedere sotto |
 | vue-tsc | 3.3.11 |
 | @vitejs/plugin-vue | 6.0.8 |
+| @types/node | 26.4.0 |
 | eslint | 10.9.1 |
+| @eslint/js | 10.0.1 |
+| eslint-plugin-vue | 10.10.0 |
+| typescript-eslint | 8.68.0 |
+| jiti | 2.7.0 |
+
+### L'unica eccezione: TypeScript resta alla 6.0.3
+
+TypeScript 7.0.2 esiste ed è stabile, ma **l'ecosistema non l'ha ancora raggiunta**:
+`typescript-eslint` stabile dichiara `typescript >=4.8.4 <6.1.0`, e per la 7 esistono
+solo build *alpha*. Verificato con un'installazione reale, che infatti fallisce.
+
+Le alternative erano rinunciare al linter tipizzato o installare pacchetti alpha:
+entrambe peggiori del restare una versione maggiore indietro su un compilatore.
+
+La configurazione è comunque già pronta per la 7: `baseUrl` è stato rimosso da
+`tsconfig.app.json` perché deprecato nella 6 ed eliminato nella 7.
+
+**Da rivalutare** quando `typescript-eslint` pubblica una versione stabile compatibile.
 
 ### Piattaforma
 
@@ -79,9 +98,10 @@ Per i pacchetti con scope, codificare i caratteri speciali:
 Alcune di queste versioni sono cambi di versione maggiore molto recenti. Sono da usare,
 ma il primo build va guardato:
 
-- **TypeScript 7** è la riscrittura in Go del compilatore. Va verificato che `vue-tsc`
-  3.3.11 lo supporti pienamente prima di considerare stabile la pipeline di build.
-- **mypy 2.x** è un cambio maggiore: attese nuove segnalazioni in modalità `strict`.
+- ~~**TypeScript 7**~~ — verificato: l'ecosistema non è pronto, si resta alla 6.0.3.
+- ~~**mypy 2.x**~~ — verificato il 2026-08-29: `mypy --strict` passa pulito su tutto
+  il backend.
+- ~~**Vite 8 + vue-tsc 3.3.11**~~ — verificato: build completo in 184 ms.
 - **Vue Router 5** e **Pinia 4** hanno modifiche non retrocompatibili rispetto alle
   versioni precedenti: seguire le guide di migrazione ufficiali, non gli esempi
   trovati online, che in larga maggioranza sono ancora fermi alle versioni 4 e 2.

@@ -1,0 +1,7 @@
+{
+  // Progetto suddiviso: il codice dell'applicazione gira nel browser, i file di
+  // configurazione girano in Node. Tenerli separati evita che il codice della
+  // pagina veda per sbaglio le API di Node.
+  "files": [],
+  "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }]
+}
