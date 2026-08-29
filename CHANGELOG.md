@@ -7,6 +7,12 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non rilasciato]
 
+### Cambiato
+- **Database: SQLite in modalità WAL al posto di PostgreSQL.** Il profilo d'uso del
+  pannello (pochi utenti, scritture rare, letture frequenti) è esattamente quello per
+  cui SQLite è progettato. Elimina un servizio da installare, configurare e mantenere,
+  e rende l'installazione molto più leggera.
+
 ### Da fare
 Vedere [TODO.md](TODO.md) per il piano completo delle fasi.
 

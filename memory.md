@@ -57,7 +57,11 @@ su un pannello esposto a Internet.
 
 ## Standard applicati
 
-- Backend FastAPI, frontend Vue 3 + TypeScript + Vite, database PostgreSQL
+- Backend FastAPI, frontend Vue 3 + TypeScript + Vite
+- **Database SQLite in modalità WAL**, non PostgreSQL: scelta esplicita di Tiziano.
+  Deroga consapevole allo standard "niente SQLite in produzione", giustificata dal
+  profilo d'uso (utenti pochi, scritture rare) e dal fatto che elimina un servizio
+  da mantenere. Il file sta in `/var/lib/anf/`.
 - Installazione sotto `/var/www/`, servizi systemd
 - Versione e attribuzione da un'unica sorgente: `backend/app/core/version.py`
 - Ogni pagina del frontend mostra a piè di pagina, su una riga:

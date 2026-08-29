@@ -70,8 +70,8 @@ Due scelte deliberate:
 
 - Linux con systemd (sviluppato e testato su Ubuntu 24.04 LTS)
 - Apache con `mod_xsendfile`, **oppure** Nginx
-- PostgreSQL 16 o superiore
 - Python 3.12 o superiore
+- Nessun server di database: i dati stanno in un file SQLite
 - `nfs-common` per i mount NFS
 
 Node.js **non** è richiesto sul server: il frontend viene compilato dalla CI e

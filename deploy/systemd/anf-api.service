@@ -1,8 +1,7 @@
 [Unit]
 Description=Advanced NAS Folder - API
 Documentation=https://github.com/wifi75/advanced-nas-folder
-After=network.target postgresql.service anf-agent.service
-Wants=postgresql.service
+After=network.target anf-agent.service
 Requires=anf-agent.service
 
 [Service]
@@ -28,7 +27,9 @@ ProtectControlGroups=yes
 RestrictSUIDSGID=yes
 RestrictRealtime=yes
 LockPersonality=yes
-ReadWritePaths=/var/www/advanced-nas-folder /srv/nas
+ReadWritePaths=/var/www/advanced-nas-folder /var/lib/anf /srv/nas
+StateDirectory=anf
+StateDirectoryMode=0750
 
 [Install]
 WantedBy=multi-user.target

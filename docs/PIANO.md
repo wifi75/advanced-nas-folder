@@ -127,15 +127,23 @@ Versioni stabili verificate il 29 agosto 2026.
 | Backend | FastAPI | 0.141.1 |
 | Frontend | Vue 3 + TypeScript | 3.5.33 |
 | Build | Vite | 8.0.9 |
-| Database | PostgreSQL | 18.6 |
+| Database | SQLite (modalità WAL) | libreria standard |
 | Node (solo CI) | LTS | 24.18.1 |
 | Agent | Python standard library | — |
 
+**Perché SQLite e non PostgreSQL.** Il pannello ha pochi utenti e scritture rare:
+creare un mount, salvare una regola, registrare un trasferimento. Le letture sono
+frequenti, le scritture concorrenti praticamente assenti — è il caso d'uso per cui
+SQLite è progettato, e lo stesso FileBrowser usa un database embedded. In cambio
+sparisce un intero servizio da installare, configurare, aggiornare e mettere in
+sicurezza. La modalità **WAL** è obbligatoria: consente le letture durante una
+scrittura, e senza di essa il pannello si bloccherebbe a ogni salvataggio.
+
+Il file vive in `/var/lib/anf/`, di proprietà dell'utente `anf`, e viene incluso nel
+backup dall'installer.
+
 L'agent privilegiato **non usa dipendenze esterne**, di proposito: è il processo che
 gira da root, e ogni libreria in più è superficie di attacco in più.
-
-Ubuntu 24.04 distribuisce PostgreSQL 16; per la 18 serve il repository PGDG.
-L'installer gestisce entrambi i casi.
 
 ### Il frontend non si compila sul server
 
