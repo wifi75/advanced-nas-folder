@@ -309,6 +309,20 @@ export default {
     eliminaCartella: 'The folder is deleted with everything in it. This cannot be undone.',
   },
 
+  fstab: {
+    titolo: 'Mounts already on the system',
+    descrizione:
+      'NFS lines found in /etc/fstab. Importing them hands them to the panel, without rewriting them by hand.',
+    importa: 'Import',
+    giaGestito: 'Managed by the panel',
+    disattiva: 'Comment out the fstab line',
+    solaLettura: 'read only',
+    notaDisattiva:
+      'Do this only after checking that the panel’s mount works: while both are active the system tries to mount the same path twice.',
+    disattivata: 'Line commented out. Backup of the file: {copia}',
+    nonDisponibile: 'Cannot read /etc/fstab: the system service is not responding.',
+  },
+
   archivio: {
     titolo: 'Files',
     apri: 'Browse',

@@ -15,7 +15,7 @@ import os
 from pathlib import Path, PurePosixPath
 from typing import Any
 
-from anf_agent import nfs, systemd_units, webserver
+from anf_agent import fstab, nfs, systemd_units, webserver
 from anf_agent.protocol import CodiceErrore, ErroreAgent, Richiesta, Risposta, Verbo
 from anf_agent.validators import (
     mountpoint_per,
@@ -73,6 +73,16 @@ class Agent:
                         hostname=valida_hostname(richiesta.dati.get("hostname")),
                     )
                 )
+            case Verbo.FSTAB_LIST:
+                return Risposta.successo({"montaggi": fstab.elenca()})
+            case Verbo.FSTAB_DISABLE:
+                # Il mountpoint non viene costruito qui ma cercato tale e
+                # quale fra le righe di fstab: nessun percorso dell'API
+                # raggiunge il filesystem.
+                mountpoint = richiesta.dati.get("mountpoint")
+                if not isinstance(mountpoint, str) or not mountpoint.startswith("/"):
+                    raise ErroreAgent(CodiceErrore.VALIDAZIONE, "Punto di montaggio non valido.")
+                return Risposta.successo(fstab.disattiva(mountpoint))
             case Verbo.VHOST_LIST:
                 return Risposta.successo(
                     {

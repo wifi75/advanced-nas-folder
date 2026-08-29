@@ -90,3 +90,23 @@ class ScopertaRisposta(BaseModel):
     #: Versioni NFS che il NAS espone davvero. Se manca la 4, chiedere NFSv4
     #: fallisce con "Protocol not supported".
     versioni: list[str]
+
+
+class MontaggioPreesistente(BaseModel):
+    """Un montaggio NFS trovato in /etc/fstab, non ancora gestito dal pannello."""
+
+    riga: int
+    server: str
+    export: str
+    mountpoint: str
+    tipo: str
+    opzioni: str
+    #: Identificatore proposto, ricavato dal percorso di montaggio.
+    slug_proposto: str
+    #: Vero se il pannello gestisce già una condivisione con quello stesso NAS
+    #: e percorso: importarla di nuovo creerebbe un doppione.
+    gia_gestito: bool = False
+
+
+class DisattivaFstab(BaseModel):
+    mountpoint: str = Field(min_length=1, max_length=1024, pattern=r"^/.*")

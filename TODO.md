@@ -42,7 +42,8 @@ nessuna dipende da quelle successive.
 - [x] Interruttore scrittura, disattivato di default, con avviso quando il NAS la nega
 - [x] Interfaccia: elenco mount, scoperta, creazione, avvio e arresto
 - [x] Verifica end-to-end su Linux: pannello → API → agent → NAS reale
-- [ ] Migrazione dei mount preesistenti da `/etc/fstab`
+- [x] **Migrazione dei mount preesistenti da `/etc/fstab`**, con disattivazione
+      della riga separata e copia di sicurezza
 
 ## Fase 2 — Pubblicazione e permessi `in corso`
 

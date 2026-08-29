@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 from fastapi import APIRouter, HTTPException, status
 from sqlalchemy import select
 
@@ -11,6 +13,8 @@ from app.core.config import get_settings
 from app.models import Mount
 from app.models.enums import AccessoNFS, StatoMount
 from app.schemas.mount import (
+    DisattivaFstab,
+    MontaggioPreesistente,
     MountCreate,
     MountDettaglio,
     MountOut,
@@ -97,6 +101,71 @@ async def crea(dati: MountCreate, sessione: Sessione, _: Amministratore) -> Moun
     await sessione.commit()
     await sessione.refresh(mount)
     return await _dettaglio(mount)
+
+
+# --- montaggi preesistenti --------------------------------------------------
+
+
+def _slug_da(mountpoint: str) -> str:
+    """Identificatore proposto a partire dal punto di montaggio.
+
+    Solo una proposta: chi importa può cambiarlo. Serve a non far inventare un
+    nome da zero per ogni riga di fstab.
+    """
+    grezzo = mountpoint.strip("/").replace("/", "-").lower()
+    pulito = re.sub(r"[^a-z0-9-]+", "-", grezzo).strip("-")
+    return (pulito or "importato")[:63]
+
+
+@router.get("/preesistenti", response_model=list[MontaggioPreesistente])
+async def preesistenti(sessione: Sessione, _: Amministratore) -> list[MontaggioPreesistente]:
+    """I montaggi NFS descritti in `/etc/fstab` e non ancora gestiti dal pannello.
+
+    Serve a chi installa il pannello su una macchina che i mount ce li ha già:
+    ricopiarli a mano significa riscrivere server, percorsi e opzioni senza
+    sbagliare, e poi accorgersi di aver dimenticato una riga.
+    """
+    try:
+        risposta = await agent_client.chiedi("fstab.list", {})
+    except (agent_client.AgentNonDisponibile, agent_client.AgentRifiuta) as exc:
+        raise errore_agent(exc) from exc
+
+    esistenti = await sessione.execute(select(Mount))
+    gia = {(m.server, m.export_path.rstrip("/")) for m in esistenti.scalars().all()}
+
+    trovati: list[MontaggioPreesistente] = []
+    for voce in risposta.get("montaggi", []):
+        trovati.append(
+            MontaggioPreesistente(
+                riga=int(voce["riga"]),
+                server=voce["server"],
+                export=voce["export"],
+                mountpoint=voce["mountpoint"],
+                tipo=voce["tipo"],
+                opzioni=voce["opzioni"],
+                slug_proposto=_slug_da(voce["mountpoint"]),
+                gia_gestito=(voce["server"], voce["export"].rstrip("/")) in gia,
+            )
+        )
+    return trovati
+
+
+@router.post("/fstab/disattiva")
+async def disattiva_fstab(dati: DisattivaFstab, _: Amministratore) -> dict[str, str]:
+    """Commenta in `/etc/fstab` la riga di un montaggio ormai gestito dal pannello.
+
+    Va fatto **dopo** aver importato e verificato il mount, non insieme: finché
+    entrambi sono attivi il sistema prova a montare due volte lo stesso
+    percorso, e chi si trova davanti l'errore non capisce da dove venga.
+
+    La riga non viene cancellata ma commentata, dopo una copia di sicurezza del
+    file: una riga sbagliata in `/etc/fstab` può impedire l'avvio della
+    macchina, e chi ci si trova davanti deve poter capire cos'è successo.
+    """
+    try:
+        return dict(await agent_client.chiedi("fstab.disable", {"mountpoint": dati.mountpoint}))
+    except (agent_client.AgentNonDisponibile, agent_client.AgentRifiuta) as exc:
+        raise errore_agent(exc) from exc
 
 
 @router.get("/{mount_id}", response_model=MountDettaglio)

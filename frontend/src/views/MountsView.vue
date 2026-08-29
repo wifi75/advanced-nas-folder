@@ -10,6 +10,7 @@ import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import type { Mount } from '@/api/mounts'
+import ImportaFstab from '@/components/ImportaFstab.vue'
 import NuovoMount from '@/components/NuovoMount.vue'
 import { useMountsStore } from '@/stores/mounts'
 
@@ -66,6 +67,8 @@ function creato(): void {
         {{ t('mount.nuova') }}
       </button>
     </header>
+
+    <ImportaFstab @importato="mounts.carica()" />
 
     <p
       v-if="mounts.errore"

@@ -314,6 +314,21 @@ export default {
       'La cartella viene eliminata con tutto il suo contenuto. L’operazione non si può annullare.',
   },
 
+  fstab: {
+    titolo: 'Montaggi già presenti sul sistema',
+    descrizione:
+      'Righe NFS trovate in /etc/fstab. Importandole le gestisce il pannello, senza doverle riscrivere a mano.',
+    importa: 'Importa',
+    giaGestito: 'Gestito dal pannello',
+    disattiva: 'Commenta la riga in fstab',
+    solaLettura: 'sola lettura',
+    notaDisattiva:
+      'Fallo solo dopo aver verificato che il mount del pannello funzioni: finché entrambi sono attivi il sistema prova a montare due volte lo stesso percorso.',
+    disattivata: 'Riga commentata. Copia di sicurezza del file: {copia}',
+    nonDisponibile:
+      'Non riesco a leggere /etc/fstab: il servizio di sistema non risponde.',
+  },
+
   archivio: {
     titolo: 'Archivio',
     apri: 'Sfoglia',

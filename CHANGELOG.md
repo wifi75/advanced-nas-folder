@@ -130,7 +130,18 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
   arrivato è identico a quello che c'era? Confrontare le dimensioni non basta — due file
   diversi possono pesare uguale. Viene letto a blocchi, perché caricarlo in memoria lo
   renderebbe impossibile proprio sui file per cui serve di più.
-- 156 test nuovi. Suite complessiva a **335 test**.
+- **Import dei montaggi già presenti in `/etc/fstab`**: il pannello li legge, propone un
+  identificatore e li prende in gestione. Ricopiarli a mano significa riscrivere server,
+  percorsi e opzioni senza sbagliare, e poi accorgersi di aver dimenticato una riga.
+- Commentare la riga di fstab è **un'azione separata e successiva**: finché entrambi sono
+  attivi il sistema prova a montare due volte lo stesso percorso, ma disattivare prima di
+  aver verificato il mount del pannello lascerebbe la cartella irraggiungibile.
+- La riga non viene mai cancellata: viene commentata con un marcatore che dice chi l'ha
+  spenta e quando, dopo una copia di sicurezza del file. Una riga sbagliata in `/etc/fstab`
+  può impedire l'avvio della macchina.
+- L'import parte sempre in **sola lettura**, anche quando la riga di fstab concedeva la
+  scrittura: la scrittura si concede di proposito, non per eredità.
+- 165 test nuovi. Suite complessiva a **344 test**.
 
 ### Modificato
 - In sviluppo la consegna passa da sola a `stream`: senza un web server davanti,

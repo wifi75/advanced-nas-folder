@@ -60,6 +60,19 @@ export interface Scoperta {
   versioni: string[]
 }
 
+export interface MontaggioPreesistente {
+  riga: number
+  server: string
+  export: string
+  mountpoint: string
+  tipo: string
+  opzioni: string
+  /** Identificatore proposto, ricavato dal percorso di montaggio. */
+  slug_proposto: string
+  /** Vero se il pannello gestisce già quello stesso NAS e percorso. */
+  gia_gestito: boolean
+}
+
 export const mountsApi = {
   elenca: () => api.get<Mount[]>('/mounts'),
   dettaglio: (id: number) => api.get<MountDettaglio>(`/mounts/${id}`),
@@ -70,4 +83,8 @@ export const mountsApi = {
   ferma: (id: number) => api.post<MountDettaglio>(`/mounts/${id}/ferma`),
   elimina: (id: number) => api.delete<void>(`/mounts/${id}`),
   scopri: (server: string) => api.post<Scoperta>('/mounts/discover', { server }),
+
+  preesistenti: () => api.get<MontaggioPreesistente[]>('/mounts/preesistenti'),
+  disattivaFstab: (mountpoint: string) =>
+    api.post<{ mountpoint: string; copia: string }>('/mounts/fstab/disattiva', { mountpoint }),
 }
