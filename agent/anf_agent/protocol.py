@@ -27,6 +27,11 @@ class Verbo(StrEnum):
     MOUNT_REMOVE = "mount.remove"
     MOUNT_STATUS = "mount.status"
     MOUNT_LIST = "mount.list"
+    WEBSERVER_DETECT = "webserver.detect"
+    VHOST_PREVIEW = "vhost.preview"
+    VHOST_WRITE = "vhost.write"
+    VHOST_REMOVE = "vhost.remove"
+    VHOST_LIST = "vhost.list"
 
 
 class CodiceErrore(StrEnum):

@@ -39,6 +39,10 @@ class Settings(BaseSettings):
     agent_socket: Path = Path("/run/anf/agent.sock")
     mount_root: Path = Path("/srv/nas")
 
+    #: Cartella in cui l'installer mette i file compilati del pannello. Serve
+    #: alla configurazione del web server, che deve sapere cosa servire.
+    panel_dir: Path = Path("/var/www/anf/pannello")
+
     # --- Consegna dei download ---
     #: In sviluppo diventa "stream" da solo: senza un web server davanti,
     #: "xsendfile" produce risposte vuote che sembrano un difetto del codice.
@@ -49,10 +53,14 @@ class Settings(BaseSettings):
     access_log: Path | None = None
     trusted_proxies: str = "127.0.0.1"
 
-    @field_validator("mount_root", "agent_socket", "db_path")
+    @field_validator("mount_root", "agent_socket", "db_path", "panel_dir")
     @classmethod
     def _deve_essere_assoluto(cls, v: Path) -> Path:
-        if not v.is_absolute():
+        # I valori predefiniti sono percorsi Linux, dove il progetto gira. Su
+        # Windows, dove lo si sviluppa, `is_absolute()` li considera relativi:
+        # senza questa seconda condizione l'applicazione non partirebbe li
+        # nemmeno per guardarla.
+        if not v.is_absolute() and not str(v).replace("\\", "/").startswith("/"):
             raise ValueError(f"{v} deve essere un percorso assoluto")
         return v
 

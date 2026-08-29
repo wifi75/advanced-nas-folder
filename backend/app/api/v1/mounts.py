@@ -6,6 +6,7 @@ from fastapi import APIRouter, HTTPException, status
 from sqlalchemy import select
 
 from app.api.deps import Amministratore, Sessione
+from app.api.errori import errore_agent
 from app.core.config import get_settings
 from app.models import Mount
 from app.models.enums import AccessoNFS, StatoMount
@@ -22,24 +23,6 @@ from app.services import agent_client
 from app.services import mounts as servizio
 
 router = APIRouter(prefix="/mounts", tags=["mount"])
-
-
-def _errore_agent(exc: Exception) -> HTTPException:
-    """Traduce un problema dell'agent in una risposta comprensibile.
-
-    Un rifiuto per validazione e un difetto del pannello (500): l'utente non
-    puo farci nulla e non deve vedersi dare la colpa. Gli altri rifiuti sono
-    problemi del sistema o del NAS, e vanno raccontati.
-    """
-    if isinstance(exc, agent_client.AgentNonDisponibile):
-        return HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, str(exc))
-    if isinstance(exc, agent_client.AgentRifiuta):
-        if exc.codice == "validazione":
-            return HTTPException(
-                status.HTTP_400_BAD_REQUEST, f"Richiesta non valida: {exc.messaggio}"
-            )
-        return HTTPException(status.HTTP_502_BAD_GATEWAY, exc.messaggio)
-    return HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, "Errore interno.")
 
 
 async def _carica(sessione: Sessione, mount_id: int) -> Mount:
@@ -68,7 +51,7 @@ async def scopri(dati: ScopertaRichiesta, _: Amministratore) -> ScopertaRisposta
     try:
         risultato = await agent_client.chiedi("nfs.discover", {"server": dati.server})
     except (agent_client.AgentNonDisponibile, agent_client.AgentRifiuta) as exc:
-        raise _errore_agent(exc) from exc
+        raise errore_agent(exc) from exc
     return ScopertaRisposta.model_validate(risultato)
 
 
@@ -107,7 +90,7 @@ async def crea(dati: MountCreate, sessione: Sessione, _: Amministratore) -> Moun
     try:
         risultato = await agent_client.chiedi("mount.create", servizio.dati_creazione(mount))
     except (agent_client.AgentNonDisponibile, agent_client.AgentRifiuta) as exc:
-        raise _errore_agent(exc) from exc
+        raise errore_agent(exc) from exc
 
     mount.mountpoint = str(risultato.get("mountpoint") or mount.mountpoint)
     sessione.add(mount)
@@ -150,7 +133,7 @@ async def modifica(
     try:
         await agent_client.chiedi("mount.create", servizio.dati_creazione(mount))
     except (agent_client.AgentNonDisponibile, agent_client.AgentRifiuta) as exc:
-        raise _errore_agent(exc) from exc
+        raise errore_agent(exc) from exc
 
     await sessione.commit()
     await sessione.refresh(mount)
@@ -168,9 +151,9 @@ async def avvia(mount_id: int, sessione: Sessione, _: Amministratore) -> MountDe
         mount.state = StatoMount.ERRORE
         mount.last_error = exc.messaggio
         await sessione.commit()
-        raise _errore_agent(exc) from exc
+        raise errore_agent(exc) from exc
     except agent_client.AgentNonDisponibile as exc:
-        raise _errore_agent(exc) from exc
+        raise errore_agent(exc) from exc
 
     servizio.applica_stato(mount, stato)
     await sessione.commit()
@@ -183,7 +166,7 @@ async def ferma(mount_id: int, sessione: Sessione, _: Amministratore) -> MountDe
     try:
         stato = await agent_client.chiedi("mount.stop", {"slug": mount.slug})
     except (agent_client.AgentNonDisponibile, agent_client.AgentRifiuta) as exc:
-        raise _errore_agent(exc) from exc
+        raise errore_agent(exc) from exc
 
     servizio.applica_stato(mount, stato)
     await sessione.commit()
@@ -198,9 +181,9 @@ async def elimina(mount_id: int, sessione: Sessione, _: Amministratore) -> None:
     except agent_client.AgentNonDisponibile as exc:
         # Non si cancella il record se il sistema non e stato ripulito:
         # resterebbero unit systemd orfane senza piu nulla che le rappresenti.
-        raise _errore_agent(exc) from exc
+        raise errore_agent(exc) from exc
     except agent_client.AgentRifiuta as exc:
-        raise _errore_agent(exc) from exc
+        raise errore_agent(exc) from exc
 
     await sessione.delete(mount)
     await sessione.commit()

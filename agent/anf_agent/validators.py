@@ -170,3 +170,75 @@ def valida_opzioni(opzioni: object) -> list[str]:
         raise _errore("Non si possono richiedere insieme sola lettura e scrittura.")
 
     return risultato
+
+
+#: Web server gestibili dal pannello.
+WEBSERVER = frozenset({"apache", "nginx"})
+
+
+def valida_hostname(valore: object) -> str:
+    """Nome host di un vhost.
+
+    Finisce nel nome del file di configurazione oltre che nel suo contenuto:
+    accettare qui una barra o uno spazio significherebbe far scrivere all'agent
+    un file dove non deve.
+    """
+    if not isinstance(valore, str) or not _HOSTNAME.match(valore.strip()):
+        raise _errore("Nome host non valido.")
+    return valore.strip().lower()
+
+
+def valida_webserver(valore: object) -> str:
+    if not isinstance(valore, str) or valore not in WEBSERVER:
+        raise _errore(f"Web server non supportato. Ammessi: {sorted(WEBSERVER)}")
+    return valore
+
+
+def valida_prefisso_url(valore: object) -> str:
+    """Prefisso di percorso sotto cui il pannello risponde.
+
+    Restituito sempre nella forma `/qualcosa/`, cioe con barra iniziale e
+    finale: e la forma che sia Apache sia Nginx si aspettano, e normalizzarla
+    qui evita di dover ricordare la regola in ogni modello.
+    """
+    if valore is None or valore == "":
+        return "/"
+    if not isinstance(valore, str):
+        raise _errore("Prefisso non valido.")
+
+    pezzi = [p for p in valore.split("/") if p not in ("", ".")]
+    if any(p == ".." for p in pezzi):
+        raise _errore("Il prefisso non puo contenere '..'.")
+    if not all(re.fullmatch(r"[A-Za-z0-9._-]{1,64}", p) for p in pezzi):
+        raise _errore("Il prefisso puo contenere solo lettere, cifre, punto, trattino e _.")
+
+    return "/" + "".join(f"{p}/" for p in pezzi)
+
+
+def valida_porta(valore: object) -> int:
+    """Porta su cui gira l'API, verso cui il web server inoltra le richieste."""
+    if isinstance(valore, bool) or not isinstance(valore, int):
+        raise _errore("Porta non valida.")
+    if not 1 <= valore <= 65535:
+        raise _errore("Porta fuori intervallo.")
+    return valore
+
+
+def valida_cartella_assoluta(valore: object, *, nome: str) -> PurePosixPath:
+    """Percorso assoluto e senza risalite, da mettere in una configurazione.
+
+    Non si verifica che esista: la cartella del pannello puo essere creata
+    dopo. Si verifica che sia una forma che non possa uscire dal contesto in
+    cui verra scritta.
+    """
+    if not isinstance(valore, str) or not valore.startswith("/"):
+        raise _errore(f"{nome}: serve un percorso assoluto.")
+    percorso = PurePosixPath(valore)
+    if any(parte == ".." for parte in percorso.parts):
+        raise _errore(f"{nome}: il percorso non puo contenere '..'.")
+    if any(c in valore for c in "\n\r\x00\"'\\"):
+        # Questi caratteri chiuderebbero una direttiva e ne aprirebbero
+        # un'altra: e il modo in cui una configurazione generata diventa
+        # esecuzione di codice altrui.
+        raise _errore(f"{nome}: il percorso contiene caratteri non ammessi.")
+    return PurePosixPath(str(percorso).rstrip("/") or "/")

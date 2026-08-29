@@ -15,15 +15,20 @@ import os
 from pathlib import Path, PurePosixPath
 from typing import Any
 
-from anf_agent import nfs, systemd_units
+from anf_agent import nfs, systemd_units, webserver
 from anf_agent.protocol import CodiceErrore, ErroreAgent, Richiesta, Risposta, Verbo
 from anf_agent.validators import (
     mountpoint_per,
+    valida_cartella_assoluta,
+    valida_hostname,
     valida_opzioni,
     valida_percorso_export,
+    valida_porta,
+    valida_prefisso_url,
     valida_server,
     valida_slug,
     valida_versione_nfs,
+    valida_webserver,
 )
 
 logger = logging.getLogger("anf.agent")
@@ -55,8 +60,57 @@ class Agent:
                 return self._stato(richiesta.dati)
             case Verbo.MOUNT_LIST:
                 return self._elenca()
+            case Verbo.WEBSERVER_DETECT:
+                return Risposta.successo({"installati": webserver.installati()})
+            case Verbo.VHOST_PREVIEW:
+                return Risposta.successo({"configurazione": self._rendi(richiesta.dati)})
+            case Verbo.VHOST_WRITE:
+                return self._scrivi_vhost(richiesta.dati)
+            case Verbo.VHOST_REMOVE:
+                return Risposta.successo(
+                    webserver.rimuovi(
+                        webserver=valida_webserver(richiesta.dati.get("webserver")),
+                        hostname=valida_hostname(richiesta.dati.get("hostname")),
+                    )
+                )
+            case Verbo.VHOST_LIST:
+                return Risposta.successo(
+                    {
+                        "hostname": webserver.elenca(
+                            valida_webserver(richiesta.dati.get("webserver"))
+                        )
+                    }
+                )
 
     # --- operazioni ---
+
+    def _rendi(self, dati: dict[str, Any]) -> str:
+        """Costruisce il testo del vhost dai valori validati.
+
+        La radice dei mount non arriva dall'API: e quella con cui l'agent e
+        stato avviato. Accettarla da fuori significherebbe poter far servire al
+        web server una cartella qualunque del disco.
+        """
+        return webserver.rendi(
+            webserver=valida_webserver(dati.get("webserver")),
+            hostname=valida_hostname(dati.get("hostname")),
+            prefisso=valida_prefisso_url(dati.get("prefisso")),
+            porta=valida_porta(dati.get("porta")),
+            cartella_pannello=valida_cartella_assoluta(
+                dati.get("cartella_pannello"), nome="Cartella del pannello"
+            ),
+            radice_mount=self.radice,
+            prefisso_interno=valida_prefisso_url(dati.get("prefisso_interno")),
+        )
+
+    def _scrivi_vhost(self, dati: dict[str, Any]) -> Risposta:
+        contenuto = self._rendi(dati)
+        esito = webserver.scrivi(
+            webserver=valida_webserver(dati.get("webserver")),
+            hostname=valida_hostname(dati.get("hostname")),
+            contenuto=contenuto,
+        )
+        return Risposta.successo({**esito, "configurazione": contenuto})
 
     def _discover(self, dati: dict[str, Any]) -> Risposta:
         server = valida_server(dati.get("server"))

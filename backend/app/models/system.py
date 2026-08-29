@@ -55,7 +55,7 @@ class Transfer(Base):
 
 
 class VHost(Base, TimestampMixin):
-    """Pubblicazione di uno share su un hostname del web server.
+    """Pubblicazione del pannello su un hostname del web server.
 
     L'applicazione genera solo la configurazione locale: DNS e certificati
     vivono altrove, tipicamente su un reverse proxy a monte.
@@ -66,7 +66,12 @@ class VHost(Base, TimestampMixin):
     id: Mapped[int] = mapped_column(primary_key=True)
     hostname: Mapped[str] = mapped_column(String(255), index=True)
     path_prefix: Mapped[str] = mapped_column(String(255), default="/")
-    share_id: Mapped[int] = mapped_column(ForeignKey("shares.id", ondelete="CASCADE"))
+    #: Pubblicazione a cui il vhost e dedicato. Vuoto significa tutto il
+    #: pannello: e il caso normale, perche un solo vhost serve l'API e con
+    #: essa ogni cartella pubblicata, ciascuna con i suoi permessi.
+    share_id: Mapped[int | None] = mapped_column(
+        ForeignKey("shares.id", ondelete="CASCADE"), default=None
+    )
 
     webserver: Mapped[WebServer] = mapped_column(Enum(WebServer, native_enum=False))
     is_enabled: Mapped[bool] = mapped_column(Boolean, default=True)

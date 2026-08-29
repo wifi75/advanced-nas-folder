@@ -4,7 +4,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.models.enums import Visibilita
+from app.models.enums import Visibilita, WebServer
 
 
 class VoceOut(BaseModel):
@@ -82,3 +82,35 @@ class LinkCreato(LinkOut):
     """
 
     token: str
+
+
+class VHostCreate(BaseModel):
+    """Pubblicazione del pannello su un nome host del web server."""
+
+    hostname: str = Field(min_length=1, max_length=255)
+    webserver: WebServer
+    #: Prefisso sotto cui il pannello risponde. `/` = radice del sito.
+    prefisso: str = Field(default="/", max_length=255)
+    share_id: int | None = None
+
+
+class VHostOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    hostname: str
+    path_prefix: str
+    webserver: WebServer
+    is_enabled: bool
+    share_id: int | None
+    last_error: str | None
+
+
+class VHostAnteprima(BaseModel):
+    """Cio che verrebbe scritto, prima di scriverlo davvero."""
+
+    configurazione: str
+
+
+class WebServerDisponibili(BaseModel):
+    installati: list[WebServer]
