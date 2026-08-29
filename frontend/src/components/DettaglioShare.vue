@@ -126,12 +126,12 @@ async function revocaLink(linkId: number): Promise<void> {
 
 /** Indirizzo completo da consegnare a chi deve ricevere i file. */
 function indirizzoLink(token: string): string {
-  return `${globalThis.location.origin}${import.meta.env.BASE_URL}l/${token}`
+  return `${window.location.origin}${import.meta.env.BASE_URL}l/${token}`
 }
 
 async function copia(token: string): Promise<void> {
   try {
-    await globalThis.navigator.clipboard.writeText(indirizzoLink(token))
+    await navigator.clipboard.writeText(indirizzoLink(token))
     copiato.value = true
   } catch {
     // Senza permesso per gli appunti resta la selezione manuale: il testo è

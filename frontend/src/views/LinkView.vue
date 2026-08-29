@@ -61,7 +61,7 @@ function apri(voce: Voce): void {
 }
 
 function scarica(voce: Voce): void {
-  globalThis.location.href = indirizzoDownloadLink(
+  window.location.href = indirizzoDownloadLink(
     token.value,
     voce.percorso,
     password.value || undefined,

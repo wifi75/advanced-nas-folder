@@ -12,6 +12,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { archivioApi, indirizzoDownload, type Contenuto, type Voce } from '@/api/archivio'
 import { ApiError } from '@/api/client'
+import Caricamenti from '@/components/Caricamenti.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -71,7 +72,7 @@ async function scarica(voce: Voce): Promise<void> {
   try {
     // Una navigazione, non una fetch: è il browser a doversi occupare della
     // barra di avanzamento e della ripresa se la rete cade.
-    globalThis.location.href = await indirizzoDownload(
+    window.location.href = await indirizzoDownload(
       slug.value,
       voce.percorso,
       password.value || undefined,
@@ -220,6 +221,13 @@ function quando(iso: string | null): string {
         </template>
       </nav>
     </header>
+
+    <Caricamenti
+      v-if="puoScrivere"
+      :slug="slug"
+      :percorso="percorso"
+      @caricato="carica"
+    />
 
     <form
       v-if="puoScrivere"

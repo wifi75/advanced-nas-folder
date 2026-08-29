@@ -28,6 +28,16 @@ export function setAuthToken(token: string | null): void {
   authToken = token
 }
 
+/**
+ * Il token in uso, per le poche richieste che non passano da `request`.
+ *
+ * Serve al caricamento a blocchi, che invia byte grezzi e costruisce la
+ * richiesta da sé: il token resta comunque definito in un posto solo.
+ */
+export function tokenCorrente(): string | null {
+  return authToken
+}
+
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers)
   if (!headers.has('Accept')) headers.set('Accept', 'application/json')

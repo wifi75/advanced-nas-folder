@@ -141,3 +141,20 @@ class Elimina(BaseModel):
     percorso: str = Field(min_length=1, max_length=1024)
     #: Necessario per eliminare una cartella che contiene qualcosa.
     ricorsivo: bool = False
+
+
+class StatoCaricamento(BaseModel):
+    """Da dove riprendere un caricamento interrotto."""
+
+    nome: str
+    #: Byte già arrivati. Zero significa che si parte dall'inizio.
+    ricevuti: int
+    #: Vero se esiste già un file con quel nome: completare fallirebbe.
+    gia_presente: bool
+
+
+class CompletaCaricamento(BaseModel):
+    percorso: str = Field(default="", max_length=1024)
+    nome: str = Field(min_length=1, max_length=255)
+    #: Dimensione totale attesa. Serve a non completare un file troncato.
+    dimensione: int | None = Field(default=None, ge=0)

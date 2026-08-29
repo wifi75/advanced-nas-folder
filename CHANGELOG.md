@@ -67,7 +67,23 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
   finiscono con uno spazio.
 - La scrittura viene verificata provandoci, non fidandosi di ciò che il pannello ha
   chiesto: se la regola NFS sul NAS è in sola lettura, il mount lo è.
-- 102 test nuovi. Suite complessiva a **281 test**.
+- **Caricamento dei file**, con trascinamento, avanzamento e ripresa. Il file viene
+  inviato a blocchi: su una rete domestica un file da qualche gigabyte non arriva al
+  primo tentativo, e ricominciare da capo a ogni interruzione renderebbe la funzione
+  inutile.
+- **Lo stato della ripresa è il file parziale stesso**, non una riga in un database:
+  quanti byte sono arrivati lo dice la sua dimensione. Non c'è nulla da tenere
+  allineato, e un caricamento interrotto ieri riprende oggi senza che nessuno se ne sia
+  dovuto ricordare.
+- Il file parziale è nascosto e non compare fra i file: un caricamento a metà non deve
+  sembrare un file scaricabile. Il completamento è una rinomina atomica, quindi non
+  esiste un istante in cui il file esiste ma è incompleto.
+- Un blocco inviato alla posizione sbagliata viene rifiutato invece che scritto:
+  scriverlo comunque produrrebbe un file corrotto che nessuno nota fino all'apertura.
+- ESLint conosce ora i nomi globali del browser. Prima non li dichiarava, e per farlo
+  tacere si scriveva `globalThis.document` al posto di `document`: quei giri sono stati
+  tolti.
+- 115 test nuovi. Suite complessiva a **294 test**.
 
 ### Modificato
 - In sviluppo la consegna passa da sola a `stream`: senza un web server davanti,

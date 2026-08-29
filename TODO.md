@@ -76,8 +76,8 @@ nessuna dipende da quelle successive.
 - [x] **Crea, rinomina, sposta, copia, elimina, nuova cartella**, con conferma
       esplicita per le cartelle non vuote e permesso di scrittura richiesto su
       origine e destinazione
-- [ ] Upload drag&drop con avanzamento, upload di cartelle
-- [ ] Upload a blocchi riprendibile
+- [x] **Caricamento con trascinamento e avanzamento**, a blocchi e riprendibile
+- [ ] Caricamento di cartelle intere
 - [ ] Download multiplo e cartella come archivio
 - [ ] Ricerca
 - [ ] Multiutente: ambito per utente, permessi granulari, regole allow/deny

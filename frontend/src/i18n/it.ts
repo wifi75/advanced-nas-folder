@@ -239,6 +239,16 @@ export default {
     passwordRichiesta: 'Questo collegamento è protetto da una password.',
   },
 
+  caricamento: {
+    trascina: 'Trascina qui i file da caricare',
+    scegli: 'Scegli dal dispositivo',
+    fatto: 'Caricato',
+    annullato: 'Annullato',
+    riprova: 'Riprova',
+    pulisci: 'Pulisci elenco',
+    esiste: 'Esiste già un file con questo nome in questa cartella.',
+  },
+
   operazioni: {
     nuovaCartella: 'Nome della nuova cartella',
     crea: 'Crea cartella',

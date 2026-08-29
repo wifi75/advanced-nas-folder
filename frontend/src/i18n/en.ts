@@ -236,6 +236,16 @@ export default {
     passwordRichiesta: 'This link is protected by a password.',
   },
 
+  caricamento: {
+    trascina: 'Drop files here to upload',
+    scegli: 'Choose from device',
+    fatto: 'Uploaded',
+    annullato: 'Cancelled',
+    riprova: 'Try again',
+    pulisci: 'Clear list',
+    esiste: 'A file with this name already exists in this folder.',
+  },
+
   operazioni: {
     nuovaCartella: 'Name of the new folder',
     crea: 'Create folder',
