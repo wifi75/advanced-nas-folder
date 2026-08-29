@@ -12,9 +12,17 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    // Ascolta su tutte le interfacce, non solo su localhost: serve a provare il
+    // pannello da un altro dispositivo della rete, per esempio un telefono.
+    host: true,
+    // Vite rifiuta le richieste con un Host che non conosce, come difesa dal
+    // rebinding DNS. Arrivando da un indirizzo IP della LAN servono queste
+    // eccezioni, altrimenti la pagina risponde "host non consentito".
+    allowedHosts: ['localhost', '.local', '.lan'],
     proxy: {
-      // In sviluppo il frontend gira per conto suo e l'API sta altrove:
-      // questo evita di dover gestire CORS.
+      // Il frontend gira per conto suo e l'API sta altrove: il proxy evita di
+      // dover gestire CORS. Punta a 127.0.0.1 perché gira sulla stessa
+      // macchina del backend, anche quando il browser arriva dalla rete.
       '/api': {
         target: 'http://127.0.0.1:8100',
         changeOrigin: true,

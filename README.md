@@ -118,27 +118,49 @@ docs/        piano tecnico, versioni delle dipendenze, guide operative
 
 ## Avvio in sviluppo
 
-Servono Python 3.14 e Node 24. Backend:
+Servono Python 3.14 e Node 24. Preparazione, una volta sola:
 
 ```bash
-cd backend && python3.14 -m venv .venv && .venv/bin/pip install -e ".[dev]"
+cd backend && python3.14 -m venv .venv && .venv/bin/pip install -e ".[dev]" && cd ../frontend && npm install
 ```
 
 Copia `.env.example` in `.env`, imposta `ANF_ENV=development` e genera la chiave con
 `openssl rand -hex 32`. In sviluppo le tabelle si creano da sole e viene creato
 l'utente **`admin`** con password **`admin`**, segnalata dal pannello finché resta
-quella. Poi:
+quella.
+
+### Su Windows
+
+Uno script avvia entrambi i servizi e stampa gli indirizzi:
 
 ```bash
-cd backend && .venv/bin/uvicorn app.main:app --port 8100 --reload
+.\avvia-dev.ps1
 ```
 
-In un secondo terminale il frontend, che gira su `5173` e inoltra `/api` alla porta
-8100:
+Apre backend e frontend come schede della stessa finestra di Windows Terminal, o in
+due finestre separate se non è installato.
+
+### A mano
 
 ```bash
-cd frontend && npm install && npm run dev
+cd backend && .venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8100 --reload
 ```
+
+In un secondo terminale il frontend, che inoltra `/api` alla porta 8100:
+
+```bash
+cd frontend && npm run dev -- --host
+```
+
+### Provare da un altro dispositivo
+
+Con `--host` (e con `avvia-dev.ps1` senza argomenti) i servizi ascoltano su tutte le
+interfacce: il pannello si raggiunge da telefono o tablet all'indirizzo della macchina
+in rete, per esempio `http://192.168.1.50:5195`.
+
+> **Attenzione:** così il pannello è raggiungibile da chiunque sia nella stessa rete,
+> e in sviluppo le credenziali iniziali sono `admin`/`admin`. Usa `-SoloLocale`
+> (oppure `--host 127.0.0.1`) quando non ti serve.
 
 ## Comandi utili
 
