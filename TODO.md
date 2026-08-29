@@ -48,12 +48,15 @@ nessuna dipende da quelle successive.
 
 - [x] Modello `Share`: cartella pubblicata a partire da un mount
 - [x] `AccessRule` per prefisso di percorso, con risoluzione sicura dei percorsi
-- [ ] Endpoint e interfaccia degli share
 - [x] Visibilità del percorso: pubblica (anonima), password, utenti registrati,
       solo utenti autorizzati, negata
 - [x] **Permessi per singolo utente**: quale utente accede a quale cartella, o a
       tutte. Divieto esplicito che batte la regola del percorso
-- [ ] Endpoint e interfaccia per assegnare i permessi
+- [x] **Endpoint delle pubblicazioni**: elenco, creazione, modifica, eliminazione,
+      regole di visibilità per prefisso, permessi per utente
+- [x] **Verifica dell'accesso** (`prova-accesso`): dice se un percorso è
+      raggiungibile e *quale regola l'ha deciso*, anche in forma anonima
+- [ ] Interfaccia delle pubblicazioni e dei permessi
 - [ ] Link di condivisione con scadenza, limite di download e revoca
 - [ ] Download delegato: `X-Sendfile` e `X-Accel-Redirect`
 - [ ] Verifica del resume (Range, `If-Range`, ETag, 206)

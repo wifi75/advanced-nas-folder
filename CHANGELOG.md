@@ -7,6 +7,25 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non rilasciato]
 
+### Aggiunto
+- **Endpoint delle pubblicazioni**: elenco, creazione, modifica ed eliminazione delle
+  cartelle pubblicate, con regole di visibilità per prefisso di percorso e permessi
+  assegnati ai singoli utenti.
+- **`prova-accesso`**: dice se un percorso è raggiungibile e **quale regola l'ha
+  deciso**, con o senza utente. Configurare permessi a prefissi senza poterli
+  verificare significa scoprire gli errori quando è troppo tardi.
+- I prefissi vengono normalizzati prima di essere salvati: `foto`, `/foto` e `/foto/`
+  sono la stessa regola, e una sola regola per percorso è ammessa — due
+  renderebbero la decisione dipendente dall'ordine di lettura.
+- L'assegnazione di un permesso è idempotente (`PUT`): riassegnare lo stesso percorso
+  allo stesso utente ne cambia il livello invece di creare un secondo permesso che
+  contraddirebbe il primo.
+- 20 test sugli endpoint. Suite complessiva a **179 test**.
+
+### Corretto
+- Un percorso con risalita passato alla verifica dell'accesso produceva un errore
+  interno invece di una risposta comprensibile.
+
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
