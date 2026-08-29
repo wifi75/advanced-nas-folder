@@ -7,12 +7,14 @@
  * attiva anche quando il NAS la sta negando.
  */
 import { onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import type { Mount } from '@/api/mounts'
 import NuovoMount from '@/components/NuovoMount.vue'
 import { useMountsStore } from '@/stores/mounts'
 
 const mounts = useMountsStore()
+const { t } = useI18n()
 const nuovoAperto = ref(false)
 const daEliminare = ref<Mount | null>(null)
 
@@ -21,13 +23,13 @@ onMounted(() => mounts.carica())
 function etichettaStato(m: Mount): string {
   switch (m.state) {
     case 'montato':
-      return 'Montato'
+      return t('mount.statoMontato')
     case 'smontato':
-      return 'Non montato'
+      return t('mount.statoSmontato')
     case 'errore':
-      return 'Errore'
+      return t('mount.statoErrore')
     default:
-      return 'Configurato'
+      return t('mount.statoConfigurato')
   }
 }
 
@@ -52,16 +54,16 @@ function creato(): void {
   <div class="pagina">
     <header class="testata">
       <div>
-        <h1>Condivisioni NFS</h1>
+        <h1>{{ t('mount.titolo') }}</h1>
         <p class="sottotitolo">
-          Monta le cartelle del NAS senza toccare file di configurazione.
+          {{ t('mount.sottotitolo') }}
         </p>
       </div>
       <button
         type="button"
         @click="nuovoAperto = true"
       >
-        Nuova condivisione
+        {{ t('mount.nuova') }}
       </button>
     </header>
 
@@ -77,15 +79,14 @@ function creato(): void {
       v-if="mounts.caricamento"
       class="vuoto"
     >
-      Carico…
+      {{ t('comune.carico') }}
     </p>
 
     <p
       v-else-if="mounts.elenco.length === 0"
       class="vuoto"
     >
-      Nessuna condivisione configurata. Comincia da <em>Nuova condivisione</em>:
-      il pannello legge dal NAS l'elenco delle cartelle disponibili.
+      {{ t('mount.vuoto') }}
     </p>
 
     <ul
@@ -114,30 +115,32 @@ function creato(): void {
 
         <dl class="dettagli">
           <div>
-            <dt>Percorso</dt>
+            <dt>{{ t('mount.percorso') }}</dt>
             <dd class="mono">
               {{ m.mountpoint }}
             </dd>
           </div>
           <div>
-            <dt>Versione</dt>
+            <dt>{{ t('mount.versione') }}</dt>
             <dd>NFS {{ m.nfs_version }}</dd>
           </div>
           <div>
-            <dt>Accesso richiesto</dt>
-            <dd>{{ m.requested_access === 'rw' ? 'Lettura e scrittura' : 'Sola lettura' }}</dd>
+            <dt>{{ t('mount.accessoRichiesto') }}</dt>
+            <dd>
+              {{ m.requested_access === 'rw' ? t('mount.letturaScrittura') : t('mount.solaLettura') }}
+            </dd>
           </div>
           <div>
-            <dt>Accesso effettivo</dt>
+            <dt>{{ t('mount.accessoEffettivo') }}</dt>
             <dd>
               <template v-if="m.effective_read_write === null">
-                Non rilevato
+                {{ t('mount.nonRilevato') }}
               </template>
               <template v-else-if="m.effective_read_write">
-                Lettura e scrittura
+                {{ t('mount.letturaScrittura') }}
               </template>
               <template v-else>
-                Sola lettura
+                {{ t('mount.solaLettura') }}
               </template>
             </dd>
           </div>
@@ -148,9 +151,8 @@ function creato(): void {
           class="allarme"
           role="alert"
         >
-          <strong>Il NAS sta negando la scrittura.</strong>
-          Hai richiesto lettura e scrittura, ma la condivisione risulta in sola
-          lettura. Va abilitata anche nei permessi NFS della cartella sul NAS.
+          <strong>{{ t('mount.scritturaNegata') }}</strong>
+          {{ t('mount.scritturaNegataDettaglio') }}
         </p>
 
         <p
@@ -168,7 +170,7 @@ function creato(): void {
             :disabled="mounts.inCorso.has(m.id)"
             @click="mounts.dettaglio(m.id)"
           >
-            Rileggi stato
+            {{ t('mount.rileggi') }}
           </button>
           <button
             v-if="m.state !== 'montato'"
@@ -176,7 +178,7 @@ function creato(): void {
             :disabled="mounts.inCorso.has(m.id)"
             @click="mounts.avvia(m.id)"
           >
-            Monta
+            {{ t('mount.monta') }}
           </button>
           <button
             v-else
@@ -185,7 +187,7 @@ function creato(): void {
             :disabled="mounts.inCorso.has(m.id)"
             @click="mounts.ferma(m.id)"
           >
-            Smonta
+            {{ t('mount.smonta') }}
           </button>
           <button
             type="button"
@@ -193,7 +195,7 @@ function creato(): void {
             :disabled="mounts.inCorso.has(m.id)"
             @click="daEliminare = m"
           >
-            Elimina
+            {{ t('comune.elimina') }}
           </button>
         </div>
       </li>
@@ -214,25 +216,22 @@ function creato(): void {
         class="conferma"
         role="alertdialog"
       >
-        <h2>Eliminare «{{ daEliminare.label }}»?</h2>
-        <p>
-          La condivisione viene smontata e la sua configurazione rimossa dal
-          server. <strong>I file sul NAS non vengono toccati.</strong>
-        </p>
+        <h2>{{ t('mount.confermaTitolo', { nome: daEliminare.label }) }}</h2>
+        <p>{{ t('mount.confermaTesto') }}</p>
         <div class="azioni">
           <button
             type="button"
             class="secondario"
             @click="daEliminare = null"
           >
-            Annulla
+            {{ t('comune.annulla') }}
           </button>
           <button
             type="button"
             class="pericolo"
             @click="conferma"
           >
-            Elimina
+            {{ t('comune.elimina') }}
           </button>
         </div>
       </section>

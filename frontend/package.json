@@ -14,14 +14,15 @@
     "build": "vue-tsc --build && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
-    "typecheck": "vue-tsc --noEmit"
+    "typecheck": "vue-tsc --build --force"
   },
   "comment-versioni": "Interrogate su registry.npmjs.org il 2026-08-29. Non aggiornarle a memoria: vedere docs/VERSIONI.md",
   "comment-typescript": "TypeScript resta alla 6.0.3 e non alla 7.0.2: typescript-eslint stabile richiede <6.1 e per la 7 esistono solo build alpha. Rivalutare quando typescript-eslint pubblica una stabile compatibile.",
   "dependencies": {
+    "pinia": "4.0.3",
     "vue": "3.5.42",
-    "vue-router": "5.3.0",
-    "pinia": "4.0.3"
+    "vue-i18n": "11.4.10",
+    "vue-router": "5.3.0"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

@@ -6,6 +6,7 @@
  * indovinarlo a memoria è il modo più comune di sbagliare.
  */
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import { mountsApi, type Esportazione, type NuovoMount } from '@/api/mounts'
 import { ApiError } from '@/api/client'
@@ -14,6 +15,7 @@ import { useMountsStore } from '@/stores/mounts'
 const emit = defineEmits<{ chiudi: []; creato: [] }>()
 
 const mounts = useMountsStore()
+const { t } = useI18n()
 
 const server = ref('')
 const esportazioni = ref<Esportazione[]>([])
@@ -52,11 +54,10 @@ async function scopri(): Promise<void> {
     versioni.value = risultato.versioni
     form.value.server = risultato.server
     if (risultato.esportazioni.length === 0) {
-      erroreScoperta.value =
-        'Il NAS risponde ma non esporta nulla verso questo server. Controlla i permessi NFS della cartella condivisa.'
+      erroreScoperta.value = t('nuovoMount.nessunaEsportazione')
     }
   } catch (e) {
-    erroreScoperta.value = e instanceof ApiError ? e.message : 'Errore imprevisto.'
+    erroreScoperta.value = e instanceof ApiError ? e.message : t('errori.imprevisto')
   } finally {
     scopertaInCorso.value = false
   }
@@ -94,13 +95,13 @@ async function salva(): Promise<void> {
       aria-labelledby="titolo-nuovo"
     >
       <h2 id="titolo-nuovo">
-        Nuova condivisione
+        {{ t('nuovoMount.titolo') }}
       </h2>
 
       <!-- 1. scoperta -->
       <div class="passo">
         <label class="campo">
-          <span>Indirizzo del NAS</span>
+          <span>{{ t('nuovoMount.indirizzoNas') }}</span>
           <div class="riga">
             <input
               v-model="server"
@@ -113,7 +114,7 @@ async function salva(): Promise<void> {
               :disabled="!server || scopertaInCorso"
               @click="scopri"
             >
-              {{ scopertaInCorso ? 'Cerco…' : 'Cerca condivisioni' }}
+              {{ scopertaInCorso ? t('nuovoMount.cercando') : t('nuovoMount.cerca') }}
             </button>
           </div>
         </label>
@@ -141,7 +142,7 @@ async function salva(): Promise<void> {
               @click="scegli(e.percorso)"
             >
               <span class="percorso">{{ e.percorso }}</span>
-              <span class="client">consentito a {{ e.client }}</span>
+              <span class="client">{{ t('nuovoMount.consentitoA', { client: e.client }) }}</span>
             </button>
           </li>
         </ul>
@@ -150,8 +151,7 @@ async function salva(): Promise<void> {
           v-if="versioni.length && !supportaV4"
           class="nota"
         >
-          Il NAS espone solo NFS {{ versioni.join(', ') }}: la versione 4 non è
-          disponibile e chiederla farebbe fallire il montaggio.
+          {{ t('nuovoMount.soloVersioni', { versioni: versioni.join(', ') }) }}
         </p>
       </div>
 
@@ -162,7 +162,7 @@ async function salva(): Promise<void> {
       >
         <div class="doppio">
           <label class="campo">
-            <span>Nome</span>
+            <span>{{ t('nuovoMount.nome') }}</span>
             <input
               v-model="form.label"
               type="text"
@@ -170,7 +170,7 @@ async function salva(): Promise<void> {
             >
           </label>
           <label class="campo">
-            <span>Identificatore</span>
+            <span>{{ t('nuovoMount.identificatore') }}</span>
             <input
               v-model="form.slug"
               type="text"
@@ -182,7 +182,7 @@ async function salva(): Promise<void> {
 
         <div class="doppio">
           <label class="campo">
-            <span>Versione NFS</span>
+            <span>{{ t('nuovoMount.versioneNfs') }}</span>
             <select v-model="form.nfs_version">
               <option value="3">
                 3
@@ -206,7 +206,7 @@ async function salva(): Promise<void> {
               v-model="form.automount"
               type="checkbox"
             >
-            <span>Monta alla prima richiesta</span>
+            <span>{{ t('nuovoMount.montaARichiesta') }}</span>
           </label>
         </div>
 
@@ -216,12 +216,8 @@ async function salva(): Promise<void> {
             type="checkbox"
           >
           <span>
-            <strong>Consenti la scrittura</strong>
-            <em>
-              Il pannello potrà modificare ed eliminare file sul NAS. Va abilitata
-              anche nei permessi NFS della cartella condivisa, altrimenti resterà
-              in sola lettura.
-            </em>
+            <strong>{{ t('nuovoMount.consentiScrittura') }}</strong>
+            <em>{{ t('nuovoMount.consentiScritturaDettaglio') }}</em>
           </span>
         </label>
       </div>
@@ -240,14 +236,14 @@ async function salva(): Promise<void> {
           class="secondario"
           @click="emit('chiudi')"
         >
-          Annulla
+          {{ t('comune.annulla') }}
         </button>
         <button
           type="button"
           :disabled="!puoSalvare || salvataggio"
           @click="salva"
         >
-          {{ salvataggio ? 'Creo…' : 'Crea' }}
+          {{ salvataggio ? t('nuovoMount.creando') : t('comune.crea') }}
         </button>
       </footer>
     </section>

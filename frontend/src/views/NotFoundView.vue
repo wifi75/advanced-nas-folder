@@ -1,13 +1,16 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { RouterLink } from 'vue-router'
+
+const { t } = useI18n()
 </script>
 
 <template>
   <div class="pagina">
-    <h1>Pagina non trovata</h1>
-    <p>L'indirizzo richiesto non esiste in questo pannello.</p>
+    <h1>{{ t('nonTrovata.titolo') }}</h1>
+    <p>{{ t('nonTrovata.testo') }}</p>
     <RouterLink to="/">
-      Torna al pannello
+      {{ t('nonTrovata.torna') }}
     </RouterLink>
   </div>
 </template>

@@ -2,17 +2,28 @@
 /**
  * Piede di pagina con versione e attribuzione.
  *
- * Presente in ogni vista, comprese quelle a schermo intero senza la shell:
- * per questo e un componente e non parte del solo layout autenticato.
+ * Presente in ogni vista, comprese quelle a schermo intero senza la barra
+ * laterale: per questo è un componente e non parte del solo guscio.
  */
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
 import { useAppStore } from '@/stores/app'
 
 const app = useAppStore()
+const { t } = useI18n()
+
+/** Versione e attribuzione su un'unica riga, come da standard di progetto. */
+const riga = computed(() =>
+  app.version && app.author
+    ? `v${app.version} — ${t('piede.attribuzione', { autore: app.author })}`
+    : '',
+)
 </script>
 
 <template>
   <footer class="piede">
-    <span v-if="app.footer">{{ app.footer }}</span>
+    <span v-if="riga">{{ riga }}</span>
   </footer>
 </template>
 

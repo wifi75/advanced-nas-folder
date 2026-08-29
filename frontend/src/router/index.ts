@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
+import { i18n } from '@/i18n'
 import { useAuthStore } from '@/stores/auth'
 
 const routes: RouteRecordRaw[] = [
@@ -7,25 +8,25 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     name: 'home',
     component: () => import('@/views/HomeView.vue'),
-    meta: { titolo: 'Pannello' },
+    meta: { titolo: 'menu.stato' },
   },
   {
     path: '/condivisioni',
     name: 'mounts',
     component: () => import('@/views/MountsView.vue'),
-    meta: { titolo: 'Condivisioni NFS' },
+    meta: { titolo: 'menu.condivisioni' },
   },
   {
     path: '/accedi',
     name: 'login',
     component: () => import('@/views/LoginView.vue'),
-    meta: { titolo: 'Accedi', pubblica: true },
+    meta: { titolo: 'accesso.titolo', pubblica: true },
   },
   {
     path: '/:percorso(.*)*',
     name: 'non-trovata',
     component: () => import('@/views/NotFoundView.vue'),
-    meta: { titolo: 'Pagina non trovata', pubblica: true },
+    meta: { titolo: 'nonTrovata.titolo', pubblica: true },
   },
 ]
 
@@ -47,10 +48,20 @@ router.beforeEach((to) => {
   return true
 })
 
-router.afterEach((to) => {
-  const titolo = to.meta.titolo
+/**
+ * Aggiorna il titolo della scheda.
+ *
+ * Esportata perché non basta chiamarla alla navigazione: cambiando lingua la
+ * rotta non cambia, e senza una nuova chiamata il titolo resterebbe nella
+ * lingua precedente.
+ */
+export function aggiornaTitolo(chiave: unknown): void {
   document.title =
-    typeof titolo === 'string' ? `${titolo} · Advanced NAS Folder` : 'Advanced NAS Folder'
-})
+    typeof chiave === 'string'
+      ? `${i18n.global.t(chiave)} · Advanced NAS Folder`
+      : 'Advanced NAS Folder'
+}
+
+router.afterEach((to) => aggiornaTitolo(to.meta.titolo))
 
 export default router

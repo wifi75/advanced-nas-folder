@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { RouterLink } from 'vue-router'
 
 import { useAppStore } from '@/stores/app'
@@ -6,18 +7,16 @@ import { useAuthStore } from '@/stores/auth'
 
 const app = useAppStore()
 const auth = useAuthStore()
+const { t } = useI18n()
 </script>
 
 <template>
   <div class="pagina">
     <header class="testata">
-      <div>
-        <h1>{{ app.name }}</h1>
-        <p class="sottotitolo">
-          Monta condivisioni NFS, pubblica cartelle con permessi per sottocartella,
-          gestisci i file.
-        </p>
-      </div>
+      <h1>{{ app.name }}</h1>
+      <p class="sottotitolo">
+        {{ t('home.sottotitolo') }}
+      </p>
     </header>
 
     <p
@@ -25,8 +24,8 @@ const auth = useAuthStore()
       class="allarme"
       role="alert"
     >
-      <strong>Stai usando la password iniziale.</strong>
-      Cambiala prima di rendere il pannello raggiungibile da Internet.
+      <strong>{{ t('home.passwordIniziale') }}</strong>
+      {{ t('home.passwordInizialeDettaglio') }}
     </p>
 
     <section
@@ -38,37 +37,30 @@ const auth = useAuthStore()
         :class="app.online ? 'pallino--ok' : 'pallino--ko'"
         aria-hidden="true"
       />
-      <span v-if="app.online">Servizio attivo</span>
-      <span v-else>Servizio non raggiungibile</span>
+      <span>{{ app.online ? t('home.servizioAttivo') : t('home.servizioNonRaggiungibile') }}</span>
       <span
         v-if="auth.utente"
         class="chi"
       >
-        {{ auth.utente.username }}<template v-if="auth.utente.is_admin"> · amministratore</template>
+        {{ auth.utente.username
+        }}<template v-if="auth.utente.is_admin"> · {{ t('comune.amministratore') }}</template>
       </span>
     </section>
 
     <section class="avviso">
-      <h2>Condivisioni NFS</h2>
-      <p>
-        Monta le cartelle del NAS dal pannello, senza toccare file di
-        configurazione: il sistema legge dal NAS l'elenco delle cartelle
-        disponibili e le monta al posto tuo.
-      </p>
+      <h2>{{ t('menu.condivisioni') }}</h2>
+      <p>{{ t('home.condivisioniDescrizione') }}</p>
       <RouterLink
         class="collegamento"
         to="/condivisioni"
       >
-        Vai alle condivisioni
+        {{ t('home.vaiCondivisioni') }}
       </RouterLink>
     </section>
 
     <section class="avviso">
-      <h2>In arrivo</h2>
-      <p>
-        La pubblicazione delle cartelle con i permessi per sottocartella arriva
-        nella fase 2, la gestione dei file nella fase 3.
-      </p>
+      <h2>{{ t('home.inArrivoTitolo') }}</h2>
+      <p>{{ t('home.inArrivoDescrizione') }}</p>
     </section>
   </div>
 </template>
@@ -84,13 +76,6 @@ const auth = useAuthStore()
   gap: 1.5rem;
 }
 
-.testata {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
 .testata h1 {
   margin: 0 0 0.35rem;
   font-size: clamp(1.75rem, 4vw, 2.35rem);
@@ -101,18 +86,6 @@ const auth = useAuthStore()
   margin: 0;
   color: var(--testo-tenue);
   max-width: 52ch;
-}
-
-.esci {
-  flex: none;
-  padding: 0.45rem 0.85rem;
-  font: inherit;
-  font-size: 0.875rem;
-  color: var(--testo);
-  background: var(--superficie);
-  border: 1px solid var(--bordo);
-  border-radius: var(--raggio);
-  cursor: pointer;
 }
 
 .allarme {
@@ -171,8 +144,12 @@ const auth = useAuthStore()
 }
 
 .avviso p {
-  margin: 0;
+  margin: 0 0 0.5rem;
   color: var(--testo-tenue);
+  font-size: 0.9375rem;
+}
+
+.collegamento {
   font-size: 0.9375rem;
 }
 </style>

@@ -24,6 +24,28 @@
   --raggio: 6px;
   --ombra: 0 1px 2px rgba(23, 36, 51, 0.06), 0 8px 24px -14px rgba(23, 36, 51, 0.2);
 
+  /* Vetro traslucido della barra laterale. Non è un colore piatto: è una
+     sfumatura con sfocatura dietro e un filo di luce sul bordo superiore,
+     che è ciò che dà il rilievo. */
+  --vetro-sfondo: linear-gradient(158deg, rgb(255 255 255 / 78%), rgb(255 255 255 / 42%));
+  --vetro-bordo: rgb(255 255 255 / 70%);
+  --vetro-luce: rgb(255 255 255 / 85%);
+  --vetro-ombra: 0 6px 18px -10px rgb(23 36 51 / 38%);
+  --vetro-attivo: linear-gradient(158deg, rgb(255 255 255 / 95%), rgb(255 255 255 / 68%));
+  --barra-fondo: linear-gradient(180deg, #e9edf3, #dfe5ee);
+
+  /* Tinte dei pulsanti, una per voce, sul modello delle icone di sistema. */
+  --tinta-nfs: #0a84ff;
+  --tinta-pubblicazioni: #30b0a0;
+  --tinta-file: #ff9f0a;
+  --tinta-utenti: #7d5cf6;
+  --tinta-link: #ff375f;
+  --tinta-stato: #32ac5a;
+  --tinta-trasferimenti: #5e5ce6;
+  --tinta-impostazioni: #7d8798;
+  --tinta-lingua: #d1517a;
+  --tinta-tema: #4a6fa5;
+
   color-scheme: light dark;
 }
 
@@ -41,6 +63,24 @@
     --attenzione: #d6a054;
     --errore: #e0817a;
     --ombra: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -14px rgba(0, 0, 0, 0.6);
+
+    --vetro-sfondo: linear-gradient(158deg, rgb(255 255 255 / 13%), rgb(255 255 255 / 4%));
+    --vetro-bordo: rgb(255 255 255 / 15%);
+    --vetro-luce: rgb(255 255 255 / 22%);
+    --vetro-ombra: 0 6px 18px -10px rgb(0 0 0 / 70%);
+    --vetro-attivo: linear-gradient(158deg, rgb(255 255 255 / 22%), rgb(255 255 255 / 9%));
+    --barra-fondo: linear-gradient(180deg, #131d28, #0d151e);
+
+    --tinta-nfs: #4aa3ff;
+    --tinta-pubblicazioni: #45c9b8;
+    --tinta-file: #ffb340;
+    --tinta-utenti: #9c85f8;
+    --tinta-link: #ff6b86;
+    --tinta-stato: #58c47c;
+    --tinta-trasferimenti: #8886f0;
+    --tinta-impostazioni: #93a3b7;
+    --tinta-lingua: #e07a9e;
+    --tinta-tema: #7fa3d4;
   }
 }
 
@@ -57,6 +97,24 @@
   --attenzione: #d6a054;
   --errore: #e0817a;
   --ombra: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -14px rgba(0, 0, 0, 0.6);
+
+  --vetro-sfondo: linear-gradient(158deg, rgb(255 255 255 / 13%), rgb(255 255 255 / 4%));
+  --vetro-bordo: rgb(255 255 255 / 15%);
+  --vetro-luce: rgb(255 255 255 / 22%);
+  --vetro-ombra: 0 6px 18px -10px rgb(0 0 0 / 70%);
+  --vetro-attivo: linear-gradient(158deg, rgb(255 255 255 / 22%), rgb(255 255 255 / 9%));
+  --barra-fondo: linear-gradient(180deg, #131d28, #0d151e);
+
+  --tinta-nfs: #4aa3ff;
+  --tinta-pubblicazioni: #45c9b8;
+  --tinta-file: #ffb340;
+  --tinta-utenti: #9c85f8;
+  --tinta-link: #ff6b86;
+  --tinta-stato: #58c47c;
+  --tinta-trasferimenti: #8886f0;
+  --tinta-impostazioni: #93a3b7;
+  --tinta-lingua: #e07a9e;
+  --tinta-tema: #7fa3d4;
 }
 
 *,

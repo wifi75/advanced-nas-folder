@@ -2,17 +2,21 @@ import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 
 import App from '@/App.vue'
+import { i18n, linguaIniziale, ricordaLingua } from '@/i18n'
 import router from '@/router'
 import { useAppStore } from '@/stores/app'
 import { useAuthStore } from '@/stores/auth'
 
 import '@/assets/main.css'
 
+ricordaLingua(linguaIniziale())
+
 const app = createApp(App)
 app.use(createPinia())
+app.use(i18n)
 
 // La sessione va ripristinata PRIMA del router: altrimenti la prima guardia
-// gira senza utente e rimanda all'accesso chi era gia autenticato.
+// gira senza utente e rimanda all'accesso chi era già autenticato.
 await Promise.all([useAppStore().carica(), useAuthStore().ripristina()])
 
 app.use(router)

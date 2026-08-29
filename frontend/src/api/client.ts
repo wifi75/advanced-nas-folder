@@ -6,6 +6,8 @@
  * componenti.
  */
 
+import { i18n } from '@/i18n'
+
 export class ApiError extends Error {
   constructor(
     public readonly status: number,
@@ -36,7 +38,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   } catch {
     // Rete irraggiungibile: distinguerlo da un errore applicativo permette di
     // mostrare all'utente un messaggio che dice cosa fare.
-    throw new ApiError(0, 'Server non raggiungibile. Controlla la connessione.')
+    throw new ApiError(0, i18n.global.t('errori.serverNonRaggiungibile'))
   }
 
   if (!response.ok) {
@@ -72,17 +74,20 @@ function dettaglioLeggibile(detail: unknown): string | null {
 }
 
 function messaggioPerStato(status: number): string {
+  // `i18n.global.t` e non `useI18n()`: questo modulo non è un componente e
+  // viene usato anche fuori dal ciclo di vita di Vue.
+  const t = i18n.global.t
   switch (status) {
     case 401:
-      return 'Sessione scaduta. Accedi di nuovo.'
+      return t('errori.sessioneScaduta')
     case 403:
-      return 'Non hai i permessi per questa operazione.'
+      return t('errori.permessiMancanti')
     case 404:
-      return 'Risorsa non trovata.'
+      return t('errori.nonTrovato')
     case 409:
-      return 'Operazione in conflitto con lo stato attuale.'
+      return t('errori.conflitto')
     default:
-      return status >= 500 ? 'Errore del server.' : 'Richiesta non valida.'
+      return status >= 500 ? t('errori.erroreServer') : t('errori.richiestaNonValida')
   }
 }
 

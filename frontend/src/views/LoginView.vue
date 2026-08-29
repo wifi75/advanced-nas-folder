@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
+import SelettoreLingua from '@/components/SelettoreLingua.vue'
+import SelettoreTema from '@/components/SelettoreTema.vue'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
 const router = useRouter()
+const { t } = useI18n()
 
 const username = ref('')
 const password = ref('')
@@ -23,21 +27,20 @@ async function accedi(): Promise<void> {
       class="riquadro"
       @submit.prevent="accedi"
     >
-      <h1>Accedi</h1>
+      <h1>{{ t('accesso.titolo') }}</h1>
 
       <label class="campo">
-        <span>Nome utente</span>
+        <span>{{ t('accesso.utente') }}</span>
         <input
           v-model="username"
           type="text"
           autocomplete="username"
           required
-          autofocus
         >
       </label>
 
       <label class="campo">
-        <span>Password</span>
+        <span>{{ t('accesso.password') }}</span>
         <input
           v-model="password"
           type="password"
@@ -58,8 +61,15 @@ async function accedi(): Promise<void> {
         type="submit"
         :disabled="auth.inCorso"
       >
-        {{ auth.inCorso ? 'Accesso in corso…' : 'Accedi' }}
+        {{ auth.inCorso ? t('accesso.inCorso') : t('accesso.titolo') }}
       </button>
+
+      <!-- Lingua e tema si scelgono anche prima di entrare: chi arriva qui
+           deve poter leggere la pagina nella propria lingua. -->
+      <div class="preferenze">
+        <SelettoreTema compatto />
+        <SelettoreLingua compatto />
+      </div>
     </form>
   </div>
 </template>
@@ -125,5 +135,15 @@ button:disabled {
   margin: 0;
   font-size: 0.875rem;
   color: var(--errore);
+}
+
+.preferenze {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding-block-start: 0.4rem;
+  border-block-start: 1px solid var(--bordo);
+  margin-block-start: 0.15rem;
 }
 </style>

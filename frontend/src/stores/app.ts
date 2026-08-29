@@ -6,7 +6,7 @@
  */
 
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 
 import { api } from '@/api/client'
 
@@ -24,13 +24,6 @@ export const useAppStore = defineStore('app', () => {
   const online = ref(false)
   const caricato = ref(false)
 
-  /** Riga di attribuzione, su un'unica riga come da standard di progetto. */
-  const footer = computed(() =>
-    version.value && author.value
-      ? `v${version.value} — Ideato e sviluppato da ${author.value}`
-      : '',
-  )
-
   async function carica(): Promise<void> {
     try {
       const health = await api.get<Health>('/health')
@@ -47,5 +40,5 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
-  return { name, version, author, online, caricato, footer, carica }
+  return { name, version, author, online, caricato, carica }
 })
