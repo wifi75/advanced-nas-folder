@@ -99,9 +99,9 @@ const categorie = computed<Categoria[]>(() => [
       },
       {
         etichetta: t('menu.trasferimenti'),
+        a: '/trasferimenti',
         tinta: 'var(--tinta-trasferimenti)',
         icona: ICONE.frecce,
-        fase: 4,
       },
       {
         etichetta: t('menu.impostazioni'),

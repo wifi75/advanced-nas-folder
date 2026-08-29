@@ -40,7 +40,16 @@ from app.schemas.archivio import (
     Trasferisci,
     VoceOut,
 )
-from app.services import acl, archivio, archivio_zip, caricamento, consegna, operazioni, ricerca
+from app.services import (
+    acl,
+    archivio,
+    archivio_zip,
+    caricamento,
+    consegna,
+    operazioni,
+    ricerca,
+    trasferimenti,
+)
 from app.services.percorsi import PercorsoNonValido, normalizza_relativo, risolvi
 
 router = APIRouter(prefix="/archivio", tags=["archivio"])
@@ -174,6 +183,7 @@ async def gettone(
 @router.get("/{slug}/file")
 async def scarica(
     slug: str,
+    richiesta: Request,
     sessione: Sessione,
     utente: UtenteFacoltativo,
     percorso: str = Query(max_length=1024),
@@ -204,6 +214,17 @@ async def scarica(
     # tipo qualunque significherebbe farlo interpretare dal browser, e un file
     # caricato da altri diventerebbe codice eseguito nel contesto del pannello.
     in_linea = mostra and consegna.si_puo_mostrare(reale.name)
+
+    # Annotato prima di consegnare: appena il web server prende in carico il
+    # file l'applicazione non sa piu' nulla di quel trasferimento.
+    await trasferimenti.registra_download(
+        sessione,
+        richiesta=richiesta,
+        share_id=share.id,
+        percorso=percorso,
+        utente_id=utente.id if utente else None,
+        dimensione=reale.stat().st_size,
+    )
 
     preparata = consegna.prepara(reale, reale.name, allegato=not in_linea)
     if preparata.invia_direttamente is not None:
@@ -397,19 +418,33 @@ async def carica_blocco(
 
 @router.post("/{slug}/carica/completa", status_code=status.HTTP_201_CREATED)
 async def completa_caricamento(
-    slug: str, dati: CompletaCaricamento, sessione: Sessione, utente: UtenteFacoltativo
+    slug: str,
+    dati: CompletaCaricamento,
+    richiesta: Request,
+    sessione: Sessione,
+    utente: UtenteFacoltativo,
 ) -> dict[str, str]:
     """Trasforma il file parziale nel file definitivo.
 
     La rinomina finale e' atomica: non esiste un istante in cui il file esiste
     ma e' incompleto, e chi lo scarica non puo' trovarne meta'.
     """
-    _, percorso, reale = await _prepara(sessione, slug, dati.percorso, utente)
+    share, percorso, reale = await _prepara(sessione, slug, dati.percorso, utente)
     try:
         definitivo = await caricamento.completa(reale, dati.nome, dati.dimensione)
     except operazioni.OperazioneRifiutata as exc:
         raise _rifiuto(exc) from exc
-    return {"percorso": str(PurePosixPath(percorso) / definitivo.name)}
+
+    finale = str(PurePosixPath(percorso) / definitivo.name)
+    await trasferimenti.registra_upload(
+        sessione,
+        richiesta=richiesta,
+        share_id=share.id,
+        percorso=finale,
+        utente_id=utente.id if utente else None,
+        dimensione=definitivo.stat().st_size,
+    )
+    return {"percorso": finale}
 
 
 @router.post("/{slug}/carica/annulla", status_code=status.HTTP_204_NO_CONTENT)

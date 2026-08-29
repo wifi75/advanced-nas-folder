@@ -47,3 +47,27 @@ async def admin(client):  # noqa: ANN001, ANN201 - tipo fornito dalla fixture cl
     token = risposta.json()["access_token"]
     client.headers["Authorization"] = f"Bearer {token}"
     return client
+
+
+@pytest.fixture(autouse=True)
+async def registro_pulito():  # noqa: ANN201
+    """Svuota il registro dei trasferimenti dopo ogni test.
+
+    Ogni download e ogni caricamento vi lasciano una riga, anche nei test che
+    non se ne occupano: senza questa pulizia le prove sul monitoraggio
+    contano anche le righe lasciate dai file di test eseguiti prima.
+    """
+    yield
+    from app.core.database import SessionLocal
+    from app.models import Transfer
+    from sqlalchemy import delete
+    from sqlalchemy.exc import OperationalError
+
+    try:
+        async with SessionLocal() as sessione:
+            await sessione.execute(delete(Transfer))
+            await sessione.commit()
+    except OperationalError:
+        # I test dell'agent non avviano l'applicazione, quindi le tabelle non
+        # esistono: non c'e' nulla da ripulire e non e' un errore.
+        pass

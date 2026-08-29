@@ -141,7 +141,19 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
   può impedire l'avvio della macchina.
 - L'import parte sempre in **sola lettura**, anche quando la riga di fstab concedeva la
   scrittura: la scrittura si concede di proposito, non per eredità.
-- 165 test nuovi. Suite complessiva a **344 test**.
+- **Registro dei trasferimenti e cruscotto dal vivo**: cosa è stato scaricato e caricato,
+  da chi e da quale indirizzo, con aggiornamento in tempo reale.
+- Il flusso dal vivo usa **SSE e non WebSocket**: qui i dati vanno in una sola direzione,
+  e un WebSocket dietro Apache richiede `mod_proxy_wstunnel` e una configurazione in più
+  che qualcuno dimenticherà. Una risposta che non finisce mai passa da qualunque proxy.
+- **`X-Forwarded-For` viene letto solo dai proxy dichiarati fidati**: quell'intestazione la
+  può scrivere chiunque, e fidarsene sempre permetterebbe a ogni visitatore di dichiarare
+  l'indirizzo che preferisce.
+- **Lettura dell'access log del web server** per i byte davvero trasferiti, con gestione
+  della rotazione: senza, dopo la prima rotazione notturna il monitoraggio smetterebbe di
+  aggiornarsi in silenzio. Finché quei byte non arrivano restano vuoti — un numero
+  inventato sarebbe peggio di uno assente.
+- 178 test nuovi. Suite complessiva a **357 test**.
 
 ### Modificato
 - In sviluppo la consegna passa da sola a `stream`: senza un web server davanti,

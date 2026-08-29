@@ -89,10 +89,10 @@ nessuna dipende da quelle successive.
 
 ## Fase 4 — Monitoraggio e contenuti
 
-- [ ] Lettura in tempo reale dell'access log del web server
-- [ ] `mod_remoteip` + `X-Forwarded-For` per gli IP reali dietro il reverse proxy
-- [ ] Dashboard download live via WebSocket: file, IP, percentuale, velocità
-- [ ] Avanzamento lato visitatore con pausa e ripresa
+- [x] **Lettura in tempo reale dell'access log**, con gestione della rotazione
+- [x] **IP reali dietro il reverse proxy** (`X-Forwarded-For` dai soli proxy fidati)
+- [x] **Cruscotto dei trasferimenti dal vivo** via SSE: file, indirizzo, byte, esito
+- [ ] Avanzamento lato visitatore con pausa e ripresa *(vedi nota sui limiti)*
 - [ ] Editor di testo e codice con evidenziazione sintassi
 - [x] **Anteprime**: immagini, video, audio, PDF e testo semplice
 - [x] **Checksum SHA-256** calcolato su richiesta e mostrato nell'anteprima

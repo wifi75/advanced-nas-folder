@@ -193,6 +193,31 @@ export default {
     prontoOffline: 'The panel now works offline too.',
   },
 
+  trasferimenti: {
+    titolo: 'Transfers',
+    descrizione: 'What was downloaded and uploaded, by whom and from where.',
+    dalVivo: 'Live updates',
+    fermo: 'Updates stopped',
+    nessuno: 'No transfers recorded.',
+    riepilogo: '{n} transfers, {corso} in progress',
+    quando: 'When',
+    cosa: 'What',
+    file: 'File',
+    dimensione: 'Size',
+    trasferiti: 'Transferred',
+    da: 'Address',
+    stato: 'Status',
+    download: 'Download',
+    upload: 'Upload',
+    ripresa: 'resumed',
+    stato_in_corso: 'in progress',
+    stato_completato: 'completed',
+    stato_interrotto: 'interrupted',
+    stato_fallito: 'failed',
+    notaByte:
+      'Transferred bytes are written by the web server in its log: they appear only if that log is set in the configuration (ANF_ACCESS_LOG). Until then they stay empty, because an invented number would be worse than a missing one.',
+  },
+
   utenti: {
     titolo: 'Users',
     descrizione:

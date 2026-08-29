@@ -196,6 +196,31 @@ export default {
     prontoOffline: 'Il pannello ora funziona anche senza rete.',
   },
 
+  trasferimenti: {
+    titolo: 'Trasferimenti',
+    descrizione: 'Cosa è stato scaricato e caricato, da chi e da dove.',
+    dalVivo: 'Aggiornamento dal vivo',
+    fermo: 'Aggiornamento fermo',
+    nessuno: 'Nessun trasferimento registrato.',
+    riepilogo: '{n} trasferimenti, {corso} in corso',
+    quando: 'Quando',
+    cosa: 'Cosa',
+    file: 'File',
+    dimensione: 'Dimensione',
+    trasferiti: 'Trasferiti',
+    da: 'Indirizzo',
+    stato: 'Stato',
+    download: 'Scaricamento',
+    upload: 'Caricamento',
+    ripresa: 'ripresa',
+    stato_in_corso: 'in corso',
+    stato_completato: 'completato',
+    stato_interrotto: 'interrotto',
+    stato_fallito: 'fallito',
+    notaByte:
+      'I byte trasferiti li scrive il web server nel suo log: compaiono solo se quel log è indicato nella configurazione (ANF_ACCESS_LOG). Finché non ci sono restano vuoti, perché un numero inventato sarebbe peggio di uno assente.',
+  },
+
   utenti: {
     titolo: 'Utenti',
     descrizione:

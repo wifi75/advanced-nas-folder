@@ -11,7 +11,7 @@ from dataclasses import asdict
 from pathlib import Path
 
 import anyio
-from fastapi import APIRouter, HTTPException, Query, Response, status
+from fastapi import APIRouter, HTTPException, Query, Request, Response, status
 from fastapi.responses import FileResponse
 from sqlalchemy import select
 
@@ -19,7 +19,7 @@ from app.api.deps import Sessione
 from app.core.security import verifica_password
 from app.models import Share, ShareLink
 from app.schemas.archivio import ContenutoOut, VoceOut
-from app.services import archivio, consegna
+from app.services import archivio, consegna, trasferimenti
 from app.services import link as servizio_link
 from app.services.percorsi import PercorsoNonValido, normalizza_relativo, risolvi
 
@@ -125,6 +125,7 @@ async def contenuto(
 @router.get("/{token}/file")
 async def scarica(
     token: str,
+    richiesta: Request,
     sessione: Sessione,
     percorso: str = Query(max_length=1024),
     password: str | None = None,
@@ -144,6 +145,15 @@ async def scarica(
     # fallito; contare dopo non conterebbe affatto.
     collegamento.download_count += 1
     await sessione.commit()
+
+    await trasferimenti.registra_download(
+        sessione,
+        richiesta=richiesta,
+        share_id=share.id,
+        percorso=richiesto,
+        link_id=collegamento.id,
+        dimensione=reale.stat().st_size,
+    )
 
     preparata = consegna.prepara(reale, reale.name)
     if preparata.invia_direttamente is not None:

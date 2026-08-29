@@ -4,7 +4,12 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.models.enums import Visibilita, WebServer
+from app.models.enums import (
+    StatoTrasferimento,
+    TipoTrasferimento,
+    Visibilita,
+    WebServer,
+)
 
 
 class VoceOut(BaseModel):
@@ -185,3 +190,22 @@ class Checksum(BaseModel):
     algoritmo: str = "sha256"
     valore: str
     dimensione: int
+
+
+class TrasferimentoOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    kind: TipoTrasferimento
+    status: StatoTrasferimento
+    share_id: int | None
+    user_id: int | None
+    path: str
+    size: int | None
+    #: Byte davvero arrivati. Resta vuoto finché il web server non li ha
+    #: scritti nel suo log: un numero inventato sarebbe peggio di uno assente.
+    bytes_transferred: int | None
+    client_ip: str | None
+    is_resumed: bool
+    started_at: datetime
+    finished_at: datetime | None
