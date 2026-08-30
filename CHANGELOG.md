@@ -18,6 +18,18 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.18.2] - 2026-08-30
+
+### Corretto
+- **La galleria mostrava una foto per riga, larga quanto la pagina.** La regola
+  di base dell'elenco era scritta *dopo* quelle di griglia e galleria: a parita'
+  di specificita' vince l'ultima, quindi `display: flex` annullava il
+  `display: grid` e il mosaico non si formava. Introdotto nella 0.18.1.
+- **L'albero delle condivisioni era vuoto nell'archivio.** La barra laterale
+  aspettava che a caricare i dati fosse una pagina, e nell'archivio nessuno lo
+  faceva: mancava proprio dove serve di piu' per tornare indietro. Ora li carica
+  da se'.
+
 ## [0.18.1] - 2026-08-30
 
 ### Modificato

@@ -11,7 +11,7 @@
  * che si leggeva aprendo il menu. Una voce che non porta da nessuna parte e'
  * peggio di una voce assente.
  */
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RouterLink, useRoute } from 'vue-router'
 
@@ -54,6 +54,15 @@ const route = useRoute()
  * una condivisione — e mostrarla nel menu evita di doverla ricostruire a mente
  * saltando fra due elenchi separati.
  */
+// La barra carica i propri dati invece di aspettare che lo faccia una pagina:
+// nell'archivio nessuno lo faceva, e l'albero delle condivisioni compariva
+// vuoto proprio dove serve di piu' per tornare indietro.
+onMounted(() => {
+  if (!auth.utente?.is_admin) return
+  if (mounts.elenco.length === 0) void mounts.carica()
+  if (shares.elenco.length === 0) void shares.carica()
+})
+
 const albero = computed(() =>
   mounts.elenco.map((m) => ({
     mount: m,

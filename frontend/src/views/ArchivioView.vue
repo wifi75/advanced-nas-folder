@@ -1002,6 +1002,19 @@ function quando(iso: string | null): string {
    Dimensione e data restano fuori — in una scheda stretta finirebbero a capo
    e renderebbero le colonne irregolari, che e proprio cio che una griglia
    dovrebbe evitare. */
+/* La regola di base deve precedere i modificatori: hanno la stessa
+   specificita', quindi a parita' vince l'ultima scritta. Messa dopo,
+   `display: flex` annullava il `display: grid` di griglia e galleria e
+   ogni voce diventava una riga larga quanto la pagina. */
+.voci {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 .voci--griglia,
 .voci--galleria {
   display: grid;
@@ -1161,14 +1174,6 @@ function quando(iso: string | null): string {
   justify-self: start;
 }
 
-.voci {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
 
 .voce {
   display: grid;
