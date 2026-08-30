@@ -73,6 +73,7 @@ export default {
   },
 
   mount: {
+    gestisci: 'Open and configure',
     titolo: 'NFS shares',
     sottotitolo:
       'Step 1. Mounts NAS folders onto the server. Mounted does not mean reachable: that takes a publication.',
@@ -125,6 +126,25 @@ export default {
     consentiScritturaDettaglio:
       'The panel will be able to modify and delete files on the NAS. It must also be allowed in the NFS permissions of the shared folder, otherwise the share stays read only.',
     creando: 'Creating…',
+  },
+
+  condivisione: {
+    panoramica: 'Overview',
+    montaggio: 'Mounting',
+    pubblicazioni: 'Published folders',
+    avanzate: 'Advanced',
+    salvato: 'Changes saved',
+    apri: 'Open',
+    gestisci: 'Permissions and links',
+    nessunaPubblicazione:
+      'This share does not publish any folder yet, so it is reachable by nobody.',
+    zonaPericolosa: 'Removal',
+    zonaPericolosaAiuto:
+      'Removes the share from the panel and unmounts the folder. Files on the NAS are not touched.',
+    haPubblicazioni:
+      'Careful: {n} published folder will stop working. | Careful: {n} published folders will stop working.',
+    confermaEliminazione:
+      'The folder is unmounted and the share removed from the panel. Nothing is deleted on the NAS.',
   },
 
   share: {

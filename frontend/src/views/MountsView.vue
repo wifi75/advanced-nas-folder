@@ -118,7 +118,11 @@ function creato(): void {
       >
         <div class="intestazione">
           <div>
-            <h2>{{ m.label }}</h2>
+            <h2>
+              <RouterLink :to="`/condivisioni/${m.id}`">
+                {{ m.label }}
+              </RouterLink>
+            </h2>
             <p class="origine">
               {{ m.server }}:{{ m.export_path }}
             </p>
@@ -193,6 +197,12 @@ function creato(): void {
         </p>
 
         <div class="azioni">
+          <RouterLink
+            class="bottone bottone--principale"
+            :to="`/condivisioni/${m.id}`"
+          >
+            {{ t('mount.gestisci') }}
+          </RouterLink>
           <button
             type="button"
             class="bottone bottone--tenue"

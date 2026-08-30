@@ -17,6 +17,15 @@ const routes: RouteRecordRaw[] = [
     meta: { titolo: 'menu.condivisioni' },
   },
   {
+    // Il dettaglio sta su una rotta propria e non in un pannello a comparsa:
+    // cosi' l'indirizzo di una condivisione si puo' salvare fra i preferiti e
+    // il tasto «indietro» del browser fa quello che ci si aspetta.
+    path: '/condivisioni/:id',
+    name: 'condivisione',
+    component: () => import('@/views/CondivisioneView.vue'),
+    meta: { titolo: 'menu.condivisioni' },
+  },
+  {
     path: '/pubblicazioni',
     name: 'shares',
     component: () => import('@/views/SharesView.vue'),

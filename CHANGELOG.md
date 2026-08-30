@@ -18,6 +18,45 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.12.0] - 2026-08-30
+
+Il pannello sapeva fare tutto ma era organizzato per **tipo di oggetto**, non
+per cosa si sta facendo: quel che riguarda una condivisione stava sparso fra tre
+pagine, e ogni pagina era un elenco piatto di campi. Chi non conosceva gia' il
+pannello non aveva modo di capire che erano parti della stessa cosa.
+
+### Aggiunto
+- **Pagina della singola condivisione** (`/condivisioni/<id>`), con sottomenu:
+  *Panoramica* (stato, percorso, accesso richiesto ed effettivo, monta/smonta),
+  *Montaggio* (nome, versione NFS, montaggio su richiesta, scrittura —
+  **modificabili**, prima si potevano solo decidere alla creazione),
+  *Cartelle pubblicate* (solo quelle di questa condivisione, con i loro
+  indirizzi), *Avanzate* (rimozione, che avvisa quante pubblicazioni si
+  fermeranno).
+
+  Sta su un indirizzo proprio e non in un pannello a comparsa: cosi' si puo'
+  salvare fra i preferiti e il tasto «indietro» fa quello che ci si aspetta.
+- **Sottomenu anche dentro una pubblicazione**: regole per cartella, permessi
+  per utente, link di condivisione e verifica di un accesso erano quattro
+  argomenti distinti impilati in un'unica colonna lunghissima.
+- **Campi raggruppati** nei moduli di configurazione, ognuno con un titolo e una
+  riga che dice a cosa serve quel gruppo: «Quale cartella», «Come si chiama»,
+  «Chi puo' accedere» per una pubblicazione; «Come chiamarla», «Come montarla»
+  per una condivisione. Erano elenchi piatti in cui non si capiva quante
+  decisioni restassero.
+
+### Corretto
+- **Il pannello mostrava «share.modifica» al posto di «Modifica».** Le chiavi di
+  quei testi erano finite nel blocco sbagliato del file delle traduzioni. Build,
+  controllo dei tipi e lint passavano tutti: una chiave mancante si vede solo
+  aprendo quella pagina.
+- **Un test ora controlla che ogni testo usato esista in entrambe le lingue**, e
+  ha subito trovato altri due casi: `errori.generico` non era definito affatto —
+  quindi un errore imprevisto mostrava il nome della chiave — e
+  l'identificatore del modulo dei mount era stato spostato via per sbaglio.
+- La formattazione di `shares.py` faceva fallire i controlli automatici a ogni
+  push. Il gate locale eseguiva `ruff check` ma non `ruff format --check`.
+
 ## [0.11.0] - 2026-08-30
 
 Chiude la fase 4. La fase 3 era gia' completa.

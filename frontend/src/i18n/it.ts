@@ -74,6 +74,7 @@ export default {
   },
 
   mount: {
+    gestisci: 'Apri e configura',
     titolo: 'Condivisioni NFS',
     sottotitolo:
       'Passo 1. Monta le cartelle del NAS sul server. Montata non vuol dire raggiungibile: per quello serve una pubblicazione.',
@@ -126,6 +127,25 @@ export default {
     consentiScritturaDettaglio:
       'Il pannello potrà modificare ed eliminare file sul NAS. Va abilitata anche nei permessi NFS della cartella condivisa, altrimenti resterà in sola lettura.',
     creando: 'Creo…',
+  },
+
+  condivisione: {
+    panoramica: 'Panoramica',
+    montaggio: 'Montaggio',
+    pubblicazioni: 'Cartelle pubblicate',
+    avanzate: 'Avanzate',
+    salvato: 'Modifiche salvate',
+    apri: 'Apri',
+    gestisci: 'Permessi e link',
+    nessunaPubblicazione:
+      'Questa condivisione non pubblica ancora nessuna cartella, quindi non è raggiungibile da nessuno.',
+    zonaPericolosa: 'Rimozione',
+    zonaPericolosaAiuto:
+      'Toglie la condivisione dal pannello e smonta la cartella. I file sul NAS non vengono toccati.',
+    haPubblicazioni:
+      'Attenzione: {n} cartella pubblicata smetterà di funzionare. | Attenzione: {n} cartelle pubblicate smetteranno di funzionare.',
+    confermaEliminazione:
+      'La cartella viene smontata e la condivisione tolta dal pannello. Sul NAS non viene eliminato niente.',
   },
 
   share: {

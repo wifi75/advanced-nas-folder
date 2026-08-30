@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Schede from '@/components/Schede.vue'
 /**
  * Regole, permessi e verifica di una pubblicazione.
  *
@@ -22,6 +23,16 @@ import { useSharesStore } from '@/stores/shares'
 const props = defineProps<{ id: number }>()
 
 const { t } = useI18n()
+
+// Quattro argomenti distinti, non quattro paragrafi dello stesso: impilati
+// producevano una pagina in cui non si capiva dove finisse uno e cominciasse
+// il successivo.
+const schede = computed(() => [
+  { chiave: 'regole', etichetta: t('regole.titolo') },
+  { chiave: 'permessi', etichetta: t('permessi.titolo') },
+  { chiave: 'link', etichetta: t('link.titolo') },
+  { chiave: 'prova', etichetta: t('prova.titolo') },
+])
 const shares = useSharesStore()
 
 const VISIBILITA: Visibilita[] = ['pubblica', 'password', 'utenti', 'utenti_scelti', 'negata']
@@ -202,320 +213,329 @@ const chiHaDeciso = computed(() => {
     v-if="share"
     class="dettaglio"
   >
-    <!-- regole per cartella -->
-    <section class="blocco">
-      <h3>{{ t('regole.titolo') }}</h3>
-      <p class="spiega">
-        {{ t('regole.descrizione') }}
-      </p>
+    <Schede
+      v-slot="{ attiva }"
+      :schede="schede"
+    >
+      <template v-if="attiva === 'regole'">
+        <!-- regole per cartella -->
+        <section class="blocco">
+          <p class="spiega">
+            {{ t('regole.descrizione') }}
+          </p>
 
-      <ul
-        v-if="share.regole.length"
-        class="elenco"
-      >
-        <li
-          v-for="r in share.regole"
-          :key="r.id"
-        >
-          <span class="percorso">{{ r.path_prefix || t('regole.radice') }}</span>
-          <span class="etichetta">{{ t(`visibilita.breve_${r.visibility}`) }}</span>
-          <span
-            v-if="r.protetta_da_password"
-            class="nota"
-          >{{ t('regole.protetta') }}</span>
-          <button
-            type="button"
-            class="togli"
-            :title="t('comune.elimina')"
-            @click="shares.togliRegola(id, r.id)"
+          <ul
+            v-if="share.regole.length"
+            class="elenco"
           >
-            ×
-          </button>
-        </li>
-      </ul>
-      <p
-        v-else
-        class="vuoto"
-      >
-        {{ t('regole.nessuna') }}
-      </p>
-
-      <div class="riga-form">
-        <input
-          v-model="nuovoPercorso"
-          type="text"
-          :placeholder="t('regole.percorso')"
-        >
-        <select v-model="nuovaVisibilita">
-          <option
-            v-for="v in VISIBILITA"
-            :key="v"
-            :value="v"
+            <li
+              v-for="r in share.regole"
+              :key="r.id"
+            >
+              <span class="percorso">{{ r.path_prefix || t('regole.radice') }}</span>
+              <span class="etichetta">{{ t(`visibilita.breve_${r.visibility}`) }}</span>
+              <span
+                v-if="r.protetta_da_password"
+                class="nota"
+              >{{ t('regole.protetta') }}</span>
+              <button
+                type="button"
+                class="togli"
+                :title="t('comune.elimina')"
+                @click="shares.togliRegola(id, r.id)"
+              >
+                ×
+              </button>
+            </li>
+          </ul>
+          <p
+            v-else
+            class="vuoto"
           >
-            {{ t(`visibilita.${v}`) }}
-          </option>
-        </select>
-        <input
-          v-if="nuovaVisibilita === 'password'"
-          v-model="nuovaPassword"
-          type="password"
-          :placeholder="t('regole.password')"
-        >
-        <button
-          class="bottone bottone--principale"
-          type="button"
-          @click="aggiungiRegola"
-        >
-          {{ t('regole.aggiungi') }}
-        </button>
-      </div>
-    </section>
+            {{ t('regole.nessuna') }}
+          </p>
 
-    <!-- permessi per utente -->
-    <section class="blocco">
-      <h3>{{ t('permessi.titolo') }}</h3>
-      <p class="spiega">
-        {{ t('permessi.descrizione') }}
-      </p>
+          <div class="riga-form">
+            <input
+              v-model="nuovoPercorso"
+              type="text"
+              :placeholder="t('regole.percorso')"
+            >
+            <select v-model="nuovaVisibilita">
+              <option
+                v-for="v in VISIBILITA"
+                :key="v"
+                :value="v"
+              >
+                {{ t(`visibilita.${v}`) }}
+              </option>
+            </select>
+            <input
+              v-if="nuovaVisibilita === 'password'"
+              v-model="nuovaPassword"
+              type="password"
+              :placeholder="t('regole.password')"
+            >
+            <button
+              class="bottone bottone--principale"
+              type="button"
+              @click="aggiungiRegola"
+            >
+              {{ t('regole.aggiungi') }}
+            </button>
+          </div>
+        </section>
+      </template>
 
-      <ul
-        v-if="share.permessi.length"
-        class="elenco"
-      >
-        <li
-          v-for="p in share.permessi"
-          :key="p.id"
-        >
-          <span class="percorso">#{{ p.user_id }}</span>
-          <span class="freccia">→</span>
-          <span class="percorso">{{ p.path_prefix || t('permessi.tutte') }}</span>
-          <span
-            class="etichetta"
-            :class="{ 'etichetta--negato': p.livello === 'negato' }"
+      <template v-else-if="attiva === 'permessi'">
+        <!-- permessi per utente -->
+        <section class="blocco">
+          <p class="spiega">
+            {{ t('permessi.descrizione') }}
+          </p>
+
+          <ul
+            v-if="share.permessi.length"
+            class="elenco"
           >
-            {{ t(`permessi.${p.livello}`) }}
-          </span>
-          <button
-            type="button"
-            class="togli"
-            :title="t('comune.elimina')"
-            @click="shares.togliPermesso(id, p.id)"
+            <li
+              v-for="p in share.permessi"
+              :key="p.id"
+            >
+              <span class="percorso">#{{ p.user_id }}</span>
+              <span class="freccia">→</span>
+              <span class="percorso">{{ p.path_prefix || t('permessi.tutte') }}</span>
+              <span
+                class="etichetta"
+                :class="{ 'etichetta--negato': p.livello === 'negato' }"
+              >
+                {{ t(`permessi.${p.livello}`) }}
+              </span>
+              <button
+                type="button"
+                class="togli"
+                :title="t('comune.elimina')"
+                @click="shares.togliPermesso(id, p.id)"
+              >
+                ×
+              </button>
+            </li>
+          </ul>
+          <p
+            v-else
+            class="vuoto"
           >
-            ×
-          </button>
-        </li>
-      </ul>
-      <p
-        v-else
-        class="vuoto"
-      >
-        {{ t('permessi.nessuno') }}
-      </p>
+            {{ t('permessi.nessuno') }}
+          </p>
 
-      <div class="riga-form">
-        <input
-          v-model.number="permessoUtente"
-          type="number"
-          min="1"
-          :placeholder="t('permessi.utente')"
-        >
-        <input
-          v-model="permessoPercorso"
-          type="text"
-          :placeholder="t('permessi.cartella')"
-        >
-        <select v-model="permessoLivello">
-          <option
-            v-for="l in LIVELLI"
-            :key="l"
-            :value="l"
+          <div class="riga-form">
+            <input
+              v-model.number="permessoUtente"
+              type="number"
+              min="1"
+              :placeholder="t('permessi.utente')"
+            >
+            <input
+              v-model="permessoPercorso"
+              type="text"
+              :placeholder="t('permessi.cartella')"
+            >
+            <select v-model="permessoLivello">
+              <option
+                v-for="l in LIVELLI"
+                :key="l"
+                :value="l"
+              >
+                {{ t(`permessi.${l}`) }}
+              </option>
+            </select>
+            <button
+              class="bottone bottone--principale"
+              type="button"
+              :disabled="permessoUtente === null"
+              @click="assegnaPermesso"
+            >
+              {{ t('permessi.assegna') }}
+            </button>
+          </div>
+        </section>
+      </template>
+
+      <template v-else-if="attiva === 'link'">
+        <!-- link di condivisione -->
+        <section class="blocco">
+          <p class="spiega">
+            {{ t('link.descrizione') }}
+          </p>
+
+          <div
+            v-if="tokenNuovo"
+            class="token"
+            role="status"
           >
-            {{ t(`permessi.${l}`) }}
-          </option>
-        </select>
-        <button
-          class="bottone bottone--principale"
-          type="button"
-          :disabled="permessoUtente === null"
-          @click="assegnaPermesso"
-        >
-          {{ t('permessi.assegna') }}
-        </button>
-      </div>
-    </section>
+            <p class="token__avviso">
+              {{ t('link.copiaOra') }}
+            </p>
+            <code class="token__valore">{{ indirizzoLink(tokenNuovo) }}</code>
+            <div class="token__azioni">
+              <button
+                class="bottone bottone--principale"
+                type="button"
+                @click="copia(tokenNuovo)"
+              >
+                {{ copiato ? t('link.copiato') : t('link.copia') }}
+              </button>
+              <button
+                type="button"
+                class="bottone bottone--tenue"
+                @click="tokenNuovo = null"
+              >
+                {{ t('comune.chiudi') }}
+              </button>
+            </div>
+          </div>
 
-    <!-- link di condivisione -->
-    <section class="blocco">
-      <h3>{{ t('link.titolo') }}</h3>
-      <p class="spiega">
-        {{ t('link.descrizione') }}
-      </p>
-
-      <div
-        v-if="tokenNuovo"
-        class="token"
-        role="status"
-      >
-        <p class="token__avviso">
-          {{ t('link.copiaOra') }}
-        </p>
-        <code class="token__valore">{{ indirizzoLink(tokenNuovo) }}</code>
-        <div class="token__azioni">
-          <button
-            class="bottone bottone--principale"
-            type="button"
-            @click="copia(tokenNuovo)"
+          <ul
+            v-if="link.length"
+            class="elenco"
           >
-            {{ copiato ? t('link.copiato') : t('link.copia') }}
-          </button>
-          <button
-            type="button"
-            class="bottone bottone--tenue"
-            @click="tokenNuovo = null"
+            <li
+              v-for="c in link"
+              :key="c.id"
+            >
+              <span class="percorso">{{ c.label || c.path || t('regole.radice') }}</span>
+              <span
+                class="etichetta"
+                :class="{ 'etichetta--negato': c.esaurito }"
+              >
+                {{ c.esaurito ? t('link.chiuso') : t('link.attivo') }}
+              </span>
+              <span class="nota">
+                {{ t('link.usato', { n: c.download_count }) }}
+                <template v-if="c.max_downloads">/ {{ c.max_downloads }}</template>
+                <template v-if="c.expires_at"> · {{ quando(c.expires_at) }}</template>
+                <template v-if="c.protetto_da_password"> · {{ t('regole.protetta') }}</template>
+              </span>
+              <button
+                v-if="!c.is_revoked"
+                type="button"
+                class="togli"
+                :title="t('link.revoca')"
+                @click="revocaLink(c.id)"
+              >
+                ×
+              </button>
+            </li>
+          </ul>
+          <p
+            v-else
+            class="vuoto"
           >
-            {{ t('comune.chiudi') }}
-          </button>
-        </div>
-      </div>
+            {{ t('link.nessuno') }}
+          </p>
 
-      <ul
-        v-if="link.length"
-        class="elenco"
-      >
-        <li
-          v-for="c in link"
-          :key="c.id"
-        >
-          <span class="percorso">{{ c.label || c.path || t('regole.radice') }}</span>
-          <span
-            class="etichetta"
-            :class="{ 'etichetta--negato': c.esaurito }"
+          <div class="riga-form">
+            <input
+              v-model="linkPercorso"
+              type="text"
+              :placeholder="t('link.cartella')"
+            >
+            <input
+              v-model="linkEtichetta"
+              type="text"
+              :placeholder="t('link.etichetta')"
+            >
+            <input
+              v-model.number="linkGiorni"
+              type="number"
+              min="1"
+              :placeholder="t('link.giorni')"
+            >
+            <input
+              v-model.number="linkMaxDownload"
+              type="number"
+              min="1"
+              :placeholder="t('link.maxDownload')"
+            >
+            <input
+              v-model="linkPassword"
+              type="password"
+              :placeholder="t('link.password')"
+            >
+            <button
+              class="bottone bottone--principale"
+              type="button"
+              @click="creaLink"
+            >
+              {{ t('link.crea') }}
+            </button>
+          </div>
+
+          <p
+            v-if="erroreLink"
+            class="errore-prova"
+            role="alert"
           >
-            {{ c.esaurito ? t('link.chiuso') : t('link.attivo') }}
-          </span>
-          <span class="nota">
-            {{ t('link.usato', { n: c.download_count }) }}
-            <template v-if="c.max_downloads">/ {{ c.max_downloads }}</template>
-            <template v-if="c.expires_at"> · {{ quando(c.expires_at) }}</template>
-            <template v-if="c.protetto_da_password"> · {{ t('regole.protetta') }}</template>
-          </span>
-          <button
-            v-if="!c.is_revoked"
-            type="button"
-            class="togli"
-            :title="t('link.revoca')"
-            @click="revocaLink(c.id)"
+            {{ erroreLink }}
+          </p>
+        </section>
+      </template>
+
+      <template v-else>
+        <!-- verifica -->
+        <section class="blocco blocco--prova">
+          <p class="spiega">
+            {{ t('prova.descrizione') }}
+          </p>
+
+          <div class="riga-form">
+            <input
+              v-model="provaPercorso"
+              type="text"
+              :placeholder="t('prova.percorso')"
+            >
+            <input
+              v-model.number="provaUtente"
+              type="number"
+              min="1"
+              :placeholder="t('prova.anonimo')"
+            >
+            <button
+              class="bottone bottone--principale"
+              type="button"
+              :disabled="provaInCorso"
+              @click="verifica"
+            >
+              {{ t('prova.verifica') }}
+            </button>
+          </div>
+
+          <p
+            v-if="erroreProva"
+            class="errore-prova"
+            role="alert"
           >
-            ×
-          </button>
-        </li>
-      </ul>
-      <p
-        v-else
-        class="vuoto"
-      >
-        {{ t('link.nessuno') }}
-      </p>
+            {{ erroreProva }}
+          </p>
 
-      <div class="riga-form">
-        <input
-          v-model="linkPercorso"
-          type="text"
-          :placeholder="t('link.cartella')"
-        >
-        <input
-          v-model="linkEtichetta"
-          type="text"
-          :placeholder="t('link.etichetta')"
-        >
-        <input
-          v-model.number="linkGiorni"
-          type="number"
-          min="1"
-          :placeholder="t('link.giorni')"
-        >
-        <input
-          v-model.number="linkMaxDownload"
-          type="number"
-          min="1"
-          :placeholder="t('link.maxDownload')"
-        >
-        <input
-          v-model="linkPassword"
-          type="password"
-          :placeholder="t('link.password')"
-        >
-        <button
-          class="bottone bottone--principale"
-          type="button"
-          @click="creaLink"
-        >
-          {{ t('link.crea') }}
-        </button>
-      </div>
-
-      <p
-        v-if="erroreLink"
-        class="errore-prova"
-        role="alert"
-      >
-        {{ erroreLink }}
-      </p>
-    </section>
-
-    <!-- verifica -->
-    <section class="blocco blocco--prova">
-      <h3>{{ t('prova.titolo') }}</h3>
-      <p class="spiega">
-        {{ t('prova.descrizione') }}
-      </p>
-
-      <div class="riga-form">
-        <input
-          v-model="provaPercorso"
-          type="text"
-          :placeholder="t('prova.percorso')"
-        >
-        <input
-          v-model.number="provaUtente"
-          type="number"
-          min="1"
-          :placeholder="t('prova.anonimo')"
-        >
-        <button
-          class="bottone bottone--principale"
-          type="button"
-          :disabled="provaInCorso"
-          @click="verifica"
-        >
-          {{ t('prova.verifica') }}
-        </button>
-      </div>
-
-      <p
-        v-if="erroreProva"
-        class="errore-prova"
-        role="alert"
-      >
-        {{ erroreProva }}
-      </p>
-
-      <div
-        v-if="esito"
-        class="esito"
-        :class="esito.consentito ? 'esito--ok' : 'esito--no'"
-        role="status"
-      >
-        <strong>
-          {{ esito.consentito ? t('prova.consentito') : t('prova.negato') }}
-          <template v-if="esito.consentito && esito.scrittura">
-            · {{ t('prova.conScrittura') }}
-          </template>
-        </strong>
-        <span>{{ esito.motivo }}</span>
-        <span class="chi">{{ chiHaDeciso }}</span>
-      </div>
-    </section>
+          <div
+            v-if="esito"
+            class="esito"
+            :class="esito.consentito ? 'esito--ok' : 'esito--no'"
+            role="status"
+          >
+            <strong>
+              {{ esito.consentito ? t('prova.consentito') : t('prova.negato') }}
+              <template v-if="esito.consentito && esito.scrittura">
+                · {{ t('prova.conScrittura') }}
+              </template>
+            </strong>
+            <span>{{ esito.motivo }}</span>
+            <span class="chi">{{ chiHaDeciso }}</span>
+          </div>
+        </section>
+      </template>
+    </Schede>
   </div>
 </template>
 
