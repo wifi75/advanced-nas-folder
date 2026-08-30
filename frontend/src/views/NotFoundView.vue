@@ -16,16 +16,6 @@ const { t } = useI18n()
 </template>
 
 <style scoped>
-.pagina {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.6rem;
-  padding: 3rem 1.25rem;
-  text-align: center;
-}
 
 h1 {
   margin: 0;

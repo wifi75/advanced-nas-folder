@@ -18,6 +18,33 @@ const VISIBILITA: Visibilita[] = ['pubblica', 'password', 'utenti', 'utenti_scel
 
 const nuovoAperto = ref(false)
 const daEliminare = ref<Share | null>(null)
+
+// Modifica di una pubblicazione esistente. Il nome nell'indirizzo resta fuori
+// di proposito: cambiarlo romperebbe i collegamenti gia condivisi, che e
+// esattamente cio che una pubblicazione serve a produrre.
+const inModifica = ref<Share | null>(null)
+const modifiche = ref({
+  label: '',
+  description: null as string | null,
+  default_visibility: 'utenti' as Visibilita,
+})
+
+function apriModifica(s: Share): void {
+  inModifica.value = s
+  modifiche.value = {
+    label: s.label,
+    description: s.description,
+    default_visibility: s.default_visibility,
+  }
+}
+
+async function salvaModifiche(): Promise<void> {
+  if (!inModifica.value) return
+  salvataggio.value = true
+  await shares.modifica(inModifica.value.id, modifiche.value)
+  salvataggio.value = false
+  inModifica.value = null
+}
 const salvataggio = ref(false)
 
 const form = ref({
@@ -103,6 +130,7 @@ function alterna(s: Share): void {
         </p>
       </div>
       <button
+        class="bottone bottone--principale"
         type="button"
         :disabled="mounts.elenco.length === 0"
         @click="apriNuovo"
@@ -172,28 +200,35 @@ function alterna(s: Share): void {
 
         <div class="azioni">
           <RouterLink
-            class="sfoglia"
+            class="bottone"
             :to="`/archivio/${s.slug}`"
           >
             {{ t('archivio.apri') }}
           </RouterLink>
           <button
             type="button"
-            class="secondario"
+            class="bottone bottone--tenue"
             @click="alterna(s)"
           >
             {{ shares.aperta?.id === s.id ? t('comune.chiudi') : t('regole.titolo') }}
           </button>
           <button
             type="button"
-            class="secondario"
-            @click="shares.modifica(s.id, { is_enabled: !s.is_enabled })"
+            class="bottone bottone--tenue"
+            @click="apriModifica(s)"
           >
-            {{ s.is_enabled ? t('share.disattivata') : t('share.attiva') }}
+            {{ t('share.modifica') }}
           </button>
           <button
             type="button"
-            class="pericolo"
+            class="bottone bottone--tenue"
+            @click="shares.modifica(s.id, { is_enabled: !s.is_enabled })"
+          >
+            {{ s.is_enabled ? t('share.disattivaAzione') : t('share.attivaAzione') }}
+          </button>
+          <button
+            type="button"
+            class="bottone bottone--pericolo"
             @click="daEliminare = s"
           >
             {{ t('comune.elimina') }}
@@ -294,17 +329,89 @@ function alterna(s: Share): void {
         <footer class="azioni">
           <button
             type="button"
-            class="secondario"
+            class="bottone bottone--tenue"
             @click="nuovoAperto = false"
           >
             {{ t('comune.annulla') }}
           </button>
           <button
+            class="bottone bottone--principale"
             type="button"
             :disabled="!puoCreare || salvataggio"
             @click="salva"
           >
             {{ salvataggio ? t('share.creando') : t('comune.crea') }}
+          </button>
+        </footer>
+      </section>
+    </div>
+
+    <!-- modifica di una pubblicazione -->
+    <div
+      v-if="inModifica"
+      class="velo"
+      @click.self="inModifica = null"
+    >
+      <section class="pannello">
+        <h2>{{ t('share.modificaTitolo', { nome: inModifica.label }) }}</h2>
+
+        <label class="campo">
+          <span>{{ t('share.nome') }}</span>
+          <input
+            v-model="modifiche.label"
+            type="text"
+            maxlength="128"
+          >
+        </label>
+
+        <label class="campo">
+          <span>{{ t('share.descrizione') }}</span>
+          <input
+            v-model="modifiche.description"
+            type="text"
+          >
+        </label>
+
+        <label class="campo">
+          <span>{{ t('share.visibilitaPredefinita') }}</span>
+          <select v-model="modifiche.default_visibility">
+            <option
+              v-for="v in VISIBILITA"
+              :key="v"
+              :value="v"
+            >
+              {{ t(`visibilita.${v}`) }}
+            </option>
+          </select>
+        </label>
+
+        <p class="aiuto">
+          {{ t('share.identificatoreImmutabile') }}
+        </p>
+
+        <p
+          v-if="shares.errore"
+          class="errore"
+          role="alert"
+        >
+          {{ shares.errore }}
+        </p>
+
+        <footer class="azioni">
+          <button
+            type="button"
+            class="bottone bottone--tenue"
+            @click="inModifica = null"
+          >
+            {{ t('comune.annulla') }}
+          </button>
+          <button
+            class="bottone bottone--principale"
+            type="button"
+            :disabled="!modifiche.label || salvataggio"
+            @click="salvaModifiche"
+          >
+            {{ salvataggio ? t('comune.carico') : t('comune.salva') }}
           </button>
         </footer>
       </section>
@@ -325,14 +432,14 @@ function alterna(s: Share): void {
         <footer class="azioni">
           <button
             type="button"
-            class="secondario"
+            class="bottone bottone--tenue"
             @click="daEliminare = null"
           >
             {{ t('comune.annulla') }}
           </button>
           <button
             type="button"
-            class="pericolo"
+            class="bottone bottone--pericolo"
             @click="conferma"
           >
             {{ t('comune.elimina') }}
@@ -344,15 +451,6 @@ function alterna(s: Share): void {
 </template>
 
 <style scoped>
-.pagina {
-  flex: 1;
-  width: min(880px, 100% - 2.5rem);
-  margin-inline: auto;
-  padding-block: 2.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
 
 .testata {
   display: flex;
@@ -435,57 +533,14 @@ h1 {
   gap: 0.5rem;
 }
 
-button {
-  padding: 0.45rem 0.85rem;
-  font: inherit;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--accento-testo);
-  background: var(--accento);
-  border: none;
-  border-radius: var(--raggio);
-  cursor: pointer;
-}
 
-button:disabled {
-  opacity: 0.55;
-  cursor: default;
-}
 
 /* Un collegamento, non un bottone: deve poter essere aperto in una nuova
    scheda: e' il modo naturale di consultare una cartella mentre se ne
    configurano i permessi. */
-.sfoglia {
-  padding: 0.45rem 0.85rem;
-  border: 1px solid var(--bordo);
-  border-radius: var(--raggio);
-  color: var(--testo);
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-decoration: none;
-}
 
-button.secondario {
-  color: var(--testo);
-  background: transparent;
-  border: 1px solid var(--bordo);
-}
 
-button.pericolo {
-  color: var(--errore);
-  background: transparent;
-  border: 1px solid var(--errore);
-}
 
-.vuoto {
-  margin: 0;
-  padding: 2rem 1.25rem;
-  text-align: center;
-  color: var(--testo-tenue);
-  background: var(--superficie);
-  border: 1px dashed var(--bordo);
-  border-radius: var(--raggio);
-}
 
 .errore {
   margin: 0;

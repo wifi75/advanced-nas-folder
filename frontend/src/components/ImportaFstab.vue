@@ -154,6 +154,7 @@ async function disattiva(voce: MontaggioPreesistente): Promise<void> {
         <div class="azioni">
           <button
             v-if="!v.gia_gestito"
+            class="bottone bottone--principale"
             type="button"
             :disabled="inCorso === v.mountpoint"
             @click="importa(v)"
@@ -164,7 +165,7 @@ async function disattiva(voce: MontaggioPreesistente): Promise<void> {
             <span class="etichetta etichetta--ok">{{ t('fstab.giaGestito') }}</span>
             <button
               type="button"
-              class="secondario"
+              class="bottone bottone--tenue"
               :disabled="inCorso === v.mountpoint"
               @click="disattiva(v)"
             >
@@ -267,25 +268,6 @@ async function disattiva(voce: MontaggioPreesistente): Promise<void> {
   gap: 0.5rem;
 }
 
-button {
-  padding: 0.35rem 0.7rem;
-  border: none;
-  border-radius: var(--raggio);
-  background: var(--accento);
-  color: var(--accento-testo);
-  cursor: pointer;
-  font: inherit;
-  font-size: 0.85rem;
-}
 
-button.secondario {
-  border: 1px solid var(--bordo);
-  background: transparent;
-  color: var(--testo);
-}
 
-button:disabled {
-  cursor: default;
-  opacity: 0.55;
-}
 </style>

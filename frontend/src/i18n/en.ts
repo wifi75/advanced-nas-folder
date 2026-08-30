@@ -114,6 +114,12 @@ export default {
     soloVersioni:
       'This NAS only offers NFS {versioni}: version 4 is unavailable, and asking for it would make the mount fail.',
     nome: 'Name',
+    modifica: 'Edit',
+    modificaTitolo: 'Edit “{nome}”',
+    identificatoreImmutabile:
+      'The name in the address cannot be changed: links already shared would stop working. To change it, create a new publication.',
+    attivaAzione: 'Enable',
+    disattivaAzione: 'Disable',
     identificatore: 'Name in the address',
     identificatoreAiuto:
       'You choose it. It is proposed from the name, but you can rewrite it: letters, numbers, - and _.',

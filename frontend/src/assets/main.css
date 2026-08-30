@@ -227,3 +227,135 @@ a {
 .hljs-tag {
   color: var(--codice-nome);
 }
+
+/* --- pulsanti -------------------------------------------------------------
+   Un solo sistema per tutto il pannello. Prima ne convivevano due — .bottone
+   con le sue varianti in certe pagine, .secondario/.pericolo in altre, piu' i
+   `button` nudi stilizzati dal foglio di ogni vista — e lo stesso pulsante
+   cambiava aspetto a seconda della pagina in cui si trovava.
+
+   La forma segue quella delle voci del menu: stesso raggio, stesso peso del
+   testo, stessa distanza dal bordo. */
+
+.bottone {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--bordo);
+  border-radius: var(--raggio);
+  background: var(--superficie);
+  color: var(--testo);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.bottone:hover {
+  background: var(--superficie-alt);
+}
+
+.bottone:disabled,
+.bottone[aria-disabled='true'] {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.bottone:disabled:hover {
+  background: var(--superficie);
+}
+
+/* L'azione principale della pagina: una sola per schermata, altrimenti non e'
+   piu' principale. */
+.bottone--principale {
+  background: var(--accento);
+  border-color: var(--accento);
+  color: var(--accento-testo);
+}
+
+.bottone--principale:hover {
+  background: var(--accento);
+  filter: brightness(1.08);
+}
+
+.bottone--tenue {
+  color: var(--testo-tenue);
+}
+
+.bottone--pericolo {
+  color: var(--errore);
+  border-color: var(--errore);
+}
+
+.bottone--pericolo:hover {
+  background: color-mix(in srgb, var(--errore) 10%, transparent);
+}
+
+/* Riga di azioni sotto una scheda: tutte alla stessa altezza, a capo quando
+   lo schermo si stringe invece di uscire dal riquadro. */
+.azioni {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* --- impianto delle pagine ------------------------------------------------
+   Erano definiti in ogni vista, nove volte, e avevano gia' cominciato a
+   divergere: larghezze uguali ma spaziature diverse, cosi' passando da una
+   pagina all'altra il contenuto si spostava di qualche pixel senza motivo. */
+
+.pagina {
+  flex: 1;
+  width: min(880px, 100% - 2.5rem);
+  margin-inline: auto;
+  padding-block: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Titolo a sinistra, azione principale a destra, sempre nello stesso posto:
+   e' cosi' che si impara dove cercare senza doverlo rileggere ogni volta. */
+.testata {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.testata h1 {
+  margin: 0 0 0.3rem;
+  font-size: clamp(1.5rem, 3vw, 1.9rem);
+  letter-spacing: -0.02em;
+}
+
+.testata p {
+  margin: 0;
+  color: var(--testo-tenue);
+  max-width: 62ch;
+}
+
+.scheda {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--bordo);
+  border-radius: var(--raggio);
+  background: var(--superficie);
+}
+
+.vuoto {
+  margin: 0;
+  padding: 1.5rem;
+  border: 1px dashed var(--bordo);
+  border-radius: var(--raggio);
+  color: var(--testo-tenue);
+  text-align: center;
+}

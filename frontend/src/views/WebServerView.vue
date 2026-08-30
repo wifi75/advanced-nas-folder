@@ -165,14 +165,14 @@ async function mostraScritta(vhost: VHost): Promise<void> {
         <div class="azioni">
           <button
             type="button"
-            class="secondario"
+            class="bottone bottone--tenue"
             @click="mostraScritta(v)"
           >
             {{ t('webserver.vediConfigurazione') }}
           </button>
           <button
             type="button"
-            class="pericolo"
+            class="bottone bottone--pericolo"
             @click="daEliminare = v"
           >
             {{ t('comune.elimina') }}
@@ -216,13 +216,14 @@ async function mostraScritta(vhost: VHost): Promise<void> {
         >
         <button
           type="button"
-          class="secondario"
+          class="bottone bottone--tenue"
           :disabled="!puoProcedere"
           @click="vediAnteprima"
         >
           {{ t('webserver.anteprima') }}
         </button>
         <button
+          class="bottone bottone--principale"
           type="button"
           :disabled="!puoProcedere"
           @click="pubblica"
@@ -251,14 +252,14 @@ async function mostraScritta(vhost: VHost): Promise<void> {
         <div class="azioni">
           <button
             type="button"
-            class="secondario"
+            class="bottone bottone--tenue"
             @click="daEliminare = null"
           >
             {{ t('comune.annulla') }}
           </button>
           <button
             type="button"
-            class="pericolo"
+            class="bottone bottone--pericolo"
             :disabled="inCorso"
             @click="elimina"
           >
@@ -271,15 +272,6 @@ async function mostraScritta(vhost: VHost): Promise<void> {
 </template>
 
 <style scoped>
-.pagina {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  width: min(880px, 100% - 2.5rem);
-  margin-inline: auto;
-  gap: 1.25rem;
-  padding-block: 1.5rem;
-}
 
 .testa h1 {
   margin: 0;
@@ -379,34 +371,9 @@ async function mostraScritta(vhost: VHost): Promise<void> {
   gap: 0.5rem;
 }
 
-button {
-  padding: 0.45rem 0.85rem;
-  border: none;
-  border-radius: var(--raggio);
-  background: var(--accento);
-  color: var(--accento-testo);
-  cursor: pointer;
-  font: inherit;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
 
-button:disabled {
-  cursor: default;
-  opacity: 0.55;
-}
 
-button.secondario {
-  border: 1px solid var(--bordo);
-  background: transparent;
-  color: var(--testo);
-}
 
-button.pericolo {
-  border: 1px solid var(--errore);
-  background: transparent;
-  color: var(--errore);
-}
 
 .avviso {
   margin: 0;

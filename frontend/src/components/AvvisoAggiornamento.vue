@@ -36,7 +36,7 @@ function chiudi(): void {
     <button
       v-if="needRefresh"
       type="button"
-      class="principale"
+      class="bottone bottone--principale"
       @click="aggiorna"
     >
       {{ t('pwa.ricarica') }}
@@ -83,21 +83,7 @@ function chiudi(): void {
   min-inline-size: 0;
 }
 
-button {
-  flex: none;
-  font: inherit;
-  cursor: pointer;
-  border-radius: 8px;
-}
 
-.principale {
-  padding: 0.35rem 0.75rem;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--accento-testo);
-  background: var(--accento);
-  border: none;
-}
 
 .chiudi {
   inline-size: 26px;

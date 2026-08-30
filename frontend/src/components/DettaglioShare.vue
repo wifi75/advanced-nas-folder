@@ -262,6 +262,7 @@ const chiHaDeciso = computed(() => {
           :placeholder="t('regole.password')"
         >
         <button
+          class="bottone bottone--principale"
           type="button"
           @click="aggiungiRegola"
         >
@@ -333,6 +334,7 @@ const chiHaDeciso = computed(() => {
           </option>
         </select>
         <button
+          class="bottone bottone--principale"
           type="button"
           :disabled="permessoUtente === null"
           @click="assegnaPermesso"
@@ -360,6 +362,7 @@ const chiHaDeciso = computed(() => {
         <code class="token__valore">{{ indirizzoLink(tokenNuovo) }}</code>
         <div class="token__azioni">
           <button
+            class="bottone bottone--principale"
             type="button"
             @click="copia(tokenNuovo)"
           >
@@ -367,7 +370,7 @@ const chiHaDeciso = computed(() => {
           </button>
           <button
             type="button"
-            class="secondario"
+            class="bottone bottone--tenue"
             @click="tokenNuovo = null"
           >
             {{ t('comune.chiudi') }}
@@ -443,6 +446,7 @@ const chiHaDeciso = computed(() => {
           :placeholder="t('link.password')"
         >
         <button
+          class="bottone bottone--principale"
           type="button"
           @click="creaLink"
         >
@@ -479,6 +483,7 @@ const chiHaDeciso = computed(() => {
           :placeholder="t('prova.anonimo')"
         >
         <button
+          class="bottone bottone--principale"
           type="button"
           :disabled="provaInCorso"
           @click="verifica"

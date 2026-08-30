@@ -10,6 +10,36 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.10.0] - 2026-08-30
+
+Pagine più coerenti, e le cose che mancavano per governare una pubblicazione.
+
+### Aggiunto
+- **Tasto Modifica su una pubblicazione.** Si potevano cambiare solo lo stato
+  acceso/spento e nient'altro: nome, descrizione e visibilità erano decisi alla
+  creazione e poi immutabili dal pannello, pur essendo tutte cose che l'API
+  accetta. Il nome nell'indirizzo resta invece fisso di proposito, e la finestra
+  lo spiega: cambiarlo romperebbe i collegamenti già condivisi, che sono
+  esattamente ciò che una pubblicazione serve a produrre.
+
+### Modificato
+- **Un solo sistema di pulsanti per tutto il pannello.** Ne convivevano due —
+  `.bottone` con le sue varianti in certe pagine, `.secondario`/`.pericolo` in
+  altre, più i `button` nudi stilizzati dal foglio di ogni vista — e lo stesso
+  pulsante cambiava aspetto a seconda della pagina. La forma segue ora quella
+  delle voci del menu: stesso raggio, stesso peso, stessa distanza dal bordo.
+- **Impianto delle pagine unificato**: `.pagina`, `.testata`, `.scheda` e
+  `.vuoto` erano definiti in ogni vista, nove volte, e avevano già cominciato a
+  divergere — larghezze uguali ma spaziature diverse, così passando da una
+  pagina all'altra il contenuto si spostava senza motivo.
+- **Il menu non ha più voci disattivate.** «File» e «Link di condivisione»
+  erano segnate come in arrivo «nella fase 3 e 4», ma quelle funzioni ci sono da
+  parecchie versioni: annunciarle come future era la prima cosa che si leggeva
+  aprendo il menu. «File» porta ora davvero all'archivio; i link si creano
+  dentro la pubblicazione a cui appartengono, quindi la voce a sé è sparita.
+- **Le etichette dell'interruttore erano stati, non azioni**: il pulsante per
+  spegnere una pubblicazione diceva «Disattivata». Ora dice «Disattiva».
+
 ## [0.9.1] - 2026-08-30
 
 ### Modificato

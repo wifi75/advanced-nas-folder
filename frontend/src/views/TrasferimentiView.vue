@@ -207,15 +207,6 @@ function quando(iso: string): string {
 </template>
 
 <style scoped>
-.pagina {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  width: min(1100px, 100% - 2.5rem);
-  margin-inline: auto;
-  gap: 1rem;
-  padding-block: 1.5rem;
-}
 
 .testa {
   display: flex;

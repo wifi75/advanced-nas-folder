@@ -115,6 +115,12 @@ export default {
     soloVersioni:
       'Il NAS espone solo NFS {versioni}: la versione 4 non è disponibile e chiederla farebbe fallire il montaggio.',
     nome: 'Nome',
+    modifica: 'Modifica',
+    modificaTitolo: 'Modifica «{nome}»',
+    identificatoreImmutabile:
+      'Il nome nell’indirizzo non si cambia: i collegamenti già condivisi smetterebbero di funzionare. Per cambiarlo, crea una nuova pubblicazione.',
+    attivaAzione: 'Attiva',
+    disattivaAzione: 'Disattiva',
     identificatore: 'Nome nell’indirizzo',
     identificatoreAiuto:
       'Lo scegli tu. Viene proposto dal nome, ma puoi riscriverlo: lettere, numeri, - e _.',

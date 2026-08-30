@@ -119,15 +119,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.pagina {
-  flex: 1;
-  width: min(760px, 100% - 2.5rem);
-  margin-inline: auto;
-  padding-block: 3rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
 
 .testata h1 {
   margin: 0 0 0.35rem;

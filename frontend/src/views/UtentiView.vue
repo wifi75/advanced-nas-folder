@@ -132,6 +132,7 @@ function sonoIo(utente: Utente): boolean {
         </p>
       </div>
       <button
+        class="bottone bottone--principale"
         type="button"
         @click="nuovoAperto = true"
       >
@@ -201,21 +202,21 @@ function sonoIo(utente: Utente): boolean {
         <div class="azioni">
           <button
             type="button"
-            class="secondario"
+            class="bottone bottone--tenue"
             @click="alterna(u, 'is_admin')"
           >
             {{ u.is_admin ? t('utenti.togliAdmin') : t('utenti.rendiAdmin') }}
           </button>
           <button
             type="button"
-            class="secondario"
+            class="bottone bottone--tenue"
             @click="alterna(u, 'is_active')"
           >
             {{ u.is_active ? t('utenti.disattiva') : t('utenti.attiva') }}
           </button>
           <button
             type="button"
-            class="pericolo"
+            class="bottone bottone--pericolo"
             @click="daEliminare = u"
           >
             {{ t('comune.elimina') }}
@@ -291,12 +292,13 @@ function sonoIo(utente: Utente): boolean {
         <div class="pannello__azioni">
           <button
             type="button"
-            class="secondario"
+            class="bottone bottone--tenue"
             @click="nuovoAperto = false"
           >
             {{ t('comune.annulla') }}
           </button>
           <button
+            class="bottone bottone--principale"
             type="submit"
             :disabled="!puoCreare"
           >
@@ -323,14 +325,14 @@ function sonoIo(utente: Utente): boolean {
         <div class="pannello__azioni">
           <button
             type="button"
-            class="secondario"
+            class="bottone bottone--tenue"
             @click="daEliminare = null"
           >
             {{ t('comune.annulla') }}
           </button>
           <button
             type="button"
-            class="pericolo"
+            class="bottone bottone--pericolo"
             :disabled="inCorso"
             @click="elimina"
           >
@@ -343,15 +345,6 @@ function sonoIo(utente: Utente): boolean {
 </template>
 
 <style scoped>
-.pagina {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  width: min(880px, 100% - 2.5rem);
-  margin-inline: auto;
-  gap: 1.25rem;
-  padding-block: 1.5rem;
-}
 
 .testa {
   display: flex;
@@ -458,34 +451,9 @@ function sonoIo(utente: Utente): boolean {
   justify-content: flex-end;
 }
 
-button {
-  padding: 0.45rem 0.85rem;
-  border: none;
-  border-radius: var(--raggio);
-  background: var(--accento);
-  color: var(--accento-testo);
-  cursor: pointer;
-  font: inherit;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
 
-button:disabled {
-  cursor: default;
-  opacity: 0.55;
-}
 
-button.secondario {
-  border: 1px solid var(--bordo);
-  background: transparent;
-  color: var(--testo);
-}
 
-button.pericolo {
-  border: 1px solid var(--errore);
-  background: transparent;
-  color: var(--errore);
-}
 
 .velo {
   position: fixed;

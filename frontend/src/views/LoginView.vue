@@ -58,6 +58,7 @@ async function accedi(): Promise<void> {
       </p>
 
       <button
+        class="bottone bottone--principale"
         type="submit"
         :disabled="auth.inCorso"
       >
@@ -75,12 +76,6 @@ async function accedi(): Promise<void> {
 </template>
 
 <style scoped>
-.pagina {
-  flex: 1;
-  display: grid;
-  place-items: center;
-  padding: 2rem 1.25rem;
-}
 
 .riquadro {
   width: min(380px, 100%);
@@ -115,21 +110,7 @@ h1 {
   border-radius: var(--raggio);
 }
 
-button {
-  padding: 0.65rem 1rem;
-  font: inherit;
-  font-weight: 500;
-  color: var(--accento-testo);
-  background: var(--accento);
-  border: none;
-  border-radius: var(--raggio);
-  cursor: pointer;
-}
 
-button:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
 
 .errore {
   margin: 0;

@@ -6,9 +6,10 @@
  * diversa — cosa pubblico, chi può accedere, come sta il sistema — e tenerle
  * separate è ciò che rende il menu leggibile quando le voci cresceranno.
  *
- * Le voci non ancora realizzate restano visibili ma disattivate, con
- * l'indicazione della fase: mostrare la struttura completa aiuta a capire il
- * pannello, fingere che siano pronte no.
+ * Non ci sono piu' voci disattivate «in arrivo»: annunciavano come future
+ * funzioni che nel frattempo erano state realizzate, ed erano la prima cosa
+ * che si leggeva aprendo il menu. Una voce che non porta da nessuna parte e'
+ * peggio di una voce assente.
  */
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -17,16 +18,15 @@ import { RouterLink } from 'vue-router'
 import SelettoreLingua from '@/components/SelettoreLingua.vue'
 import SelettoreTema from '@/components/SelettoreTema.vue'
 import { useAppStore } from '@/stores/app'
+import { useSharesStore } from '@/stores/shares'
 import { useImpostazioniStore } from '@/stores/impostazioni'
 import { useAuthStore } from '@/stores/auth'
 
 interface Voce {
   etichetta: string
-  a?: string
+  a: string
   tinta: string
   icona: string
-  /** Numero della fase in cui la voce diventerà disponibile. */
-  fase?: number
 }
 
 interface Categoria {
@@ -40,6 +40,11 @@ const emit = defineEmits<{ naviga: []; esci: [] }>()
 const app = useAppStore()
 const impostazioni = useImpostazioniStore()
 const auth = useAuthStore()
+const shares = useSharesStore()
+
+// L'archivio si apre sempre su una pubblicazione: se non ce ne sono, la voce
+// porta all'elenco delle pubblicazioni, che e' il posto da cui si comincia.
+const primaPubblicazione = computed(() => shares.elenco[0]?.slug)
 const { t } = useI18n()
 
 // Tracciati delle icone: linee semplici, disegnate sulla stessa griglia 24×24
@@ -72,7 +77,15 @@ const categorie = computed<Categoria[]>(() => [
         tinta: 'var(--tinta-pubblicazioni)',
         icona: ICONE.globo,
       },
-      { etichetta: t('menu.file'), tinta: 'var(--tinta-file)', icona: ICONE.documento, fase: 3 },
+      // L'archivio si apre da una pubblicazione, perche' e' la pubblicazione a
+      // decidere cosa si vede: una voce di menu slegata dovrebbe chiedere
+      // "quale?" prima di mostrare qualcosa.
+      {
+        etichetta: t('menu.file'),
+        a: primaPubblicazione.value ? `/archivio/${primaPubblicazione.value}` : '/pubblicazioni',
+        tinta: 'var(--tinta-file)',
+        icona: ICONE.documento,
+      },
     ],
   },
   {
@@ -84,9 +97,6 @@ const categorie = computed<Categoria[]>(() => [
         tinta: 'var(--tinta-utenti)',
         icona: ICONE.persone,
       },
-      // I link si creano dentro la pubblicazione a cui appartengono. Questa
-      // voce e' la pagina che li raccoglie tutti, che non esiste ancora.
-      { etichetta: t('menu.link'), tinta: 'var(--tinta-link)', icona: ICONE.catena, fase: 4 },
     ],
   },
   {
@@ -154,7 +164,6 @@ const categorie = computed<Categoria[]>(() => [
             :key="v.etichetta"
           >
             <RouterLink
-              v-if="v.a"
               :to="v.a"
               class="voce"
               @click="emit('naviga')"
@@ -177,31 +186,6 @@ const categorie = computed<Categoria[]>(() => [
               </span>
               <span class="voce__testo">{{ v.etichetta }}</span>
             </RouterLink>
-
-            <span
-              v-else
-              class="voce voce--attesa"
-              :title="t('menu.inArrivo', { fase: t('menu.fase', { n: v.fase }) })"
-            >
-              <span
-                class="pastiglia"
-                :style="{ '--tinta': v.tinta }"
-                aria-hidden="true"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.7"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path :d="v.icona" />
-                </svg>
-              </span>
-              <span class="voce__testo">{{ v.etichetta }}</span>
-              <span class="badge">{{ t('menu.fase', { n: v.fase }) }}</span>
-            </span>
           </li>
         </ul>
       </section>
@@ -350,10 +334,6 @@ a.voce.router-link-exact-active {
   font-weight: 600;
 }
 
-.voce--attesa {
-  opacity: 0.5;
-  cursor: default;
-}
 
 .voce__testo {
   flex: 1;
@@ -391,15 +371,6 @@ a.voce.router-link-exact-active {
   block-size: 16px;
 }
 
-.badge {
-  flex: none;
-  padding: 0.1rem 0.4rem;
-  font-size: 0.62rem;
-  letter-spacing: 0.03em;
-  border-radius: 999px;
-  color: var(--testo-tenue);
-  border: 1px solid var(--bordo);
-}
 
 /* --- fondo: lingua e utente --- */
 

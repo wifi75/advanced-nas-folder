@@ -110,6 +110,7 @@ async function salva(): Promise<void> {
               @keydown.enter.prevent="scopri"
             >
             <button
+              class="bottone bottone--principale"
               type="button"
               :disabled="!server || scopertaInCorso"
               @click="scopri"
@@ -233,12 +234,13 @@ async function salva(): Promise<void> {
       <footer class="azioni">
         <button
           type="button"
-          class="secondario"
+          class="bottone bottone--tenue"
           @click="emit('chiudi')"
         >
           {{ t('comune.annulla') }}
         </button>
         <button
+          class="bottone bottone--principale"
           type="button"
           :disabled="!puoSalvare || salvataggio"
           @click="salva"
@@ -318,28 +320,8 @@ select {
   border-radius: var(--raggio);
 }
 
-button {
-  padding: 0.55rem 0.95rem;
-  font: inherit;
-  font-weight: 500;
-  color: var(--accento-testo);
-  background: var(--accento);
-  border: none;
-  border-radius: var(--raggio);
-  cursor: pointer;
-  white-space: nowrap;
-}
 
-button:disabled {
-  opacity: 0.55;
-  cursor: default;
-}
 
-button.secondario {
-  color: var(--testo);
-  background: transparent;
-  border: 1px solid var(--bordo);
-}
 
 .esportazioni {
   list-style: none;

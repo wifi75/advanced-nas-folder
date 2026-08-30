@@ -75,6 +75,7 @@ function creato(): void {
         </p>
       </div>
       <button
+        class="bottone bottone--principale"
         type="button"
         @click="nuovoAperto = true"
       >
@@ -194,7 +195,7 @@ function creato(): void {
         <div class="azioni">
           <button
             type="button"
-            class="secondario"
+            class="bottone bottone--tenue"
             :disabled="mounts.inCorso.has(m.id)"
             @click="mounts.dettaglio(m.id)"
           >
@@ -202,6 +203,7 @@ function creato(): void {
           </button>
           <button
             v-if="m.state !== 'montato'"
+            class="bottone bottone--principale"
             type="button"
             :disabled="mounts.inCorso.has(m.id)"
             @click="mounts.avvia(m.id)"
@@ -211,7 +213,7 @@ function creato(): void {
           <button
             v-else
             type="button"
-            class="secondario"
+            class="bottone bottone--tenue"
             :disabled="mounts.inCorso.has(m.id)"
             @click="mounts.ferma(m.id)"
           >
@@ -219,7 +221,7 @@ function creato(): void {
           </button>
           <button
             type="button"
-            class="pericolo"
+            class="bottone bottone--pericolo"
             :disabled="mounts.inCorso.has(m.id)"
             @click="daEliminare = m"
           >
@@ -249,14 +251,14 @@ function creato(): void {
         <div class="azioni">
           <button
             type="button"
-            class="secondario"
+            class="bottone bottone--tenue"
             @click="daEliminare = null"
           >
             {{ t('comune.annulla') }}
           </button>
           <button
             type="button"
-            class="pericolo"
+            class="bottone bottone--pericolo"
             @click="conferma"
           >
             {{ t('comune.elimina') }}
@@ -268,15 +270,6 @@ function creato(): void {
 </template>
 
 <style scoped>
-.pagina {
-  flex: 1;
-  width: min(880px, 100% - 2.5rem);
-  margin-inline: auto;
-  padding-block: 2.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
 
 .testata {
   display: flex;
@@ -405,44 +398,10 @@ h1 {
   gap: 0.5rem;
 }
 
-button {
-  padding: 0.45rem 0.85rem;
-  font: inherit;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--accento-testo);
-  background: var(--accento);
-  border: none;
-  border-radius: var(--raggio);
-  cursor: pointer;
-}
 
-button:disabled {
-  opacity: 0.55;
-  cursor: default;
-}
 
-button.secondario {
-  color: var(--testo);
-  background: transparent;
-  border: 1px solid var(--bordo);
-}
 
-button.pericolo {
-  color: var(--errore);
-  background: transparent;
-  border: 1px solid var(--errore);
-}
 
-.vuoto {
-  margin: 0;
-  padding: 2rem 1.25rem;
-  text-align: center;
-  color: var(--testo-tenue);
-  background: var(--superficie);
-  border: 1px dashed var(--bordo);
-  border-radius: var(--raggio);
-}
 
 .errore {
   margin: 0;

@@ -444,21 +444,7 @@ async function calcolaImpronta(): Promise<void> {
   user-select: all;
 }
 
-.bottone {
-  padding: 0.4rem 0.75rem;
-  border: 1px solid var(--bordo);
-  border-radius: var(--raggio);
-  background: transparent;
-  color: var(--testo);
-  cursor: pointer;
-  font: inherit;
-  font-size: 0.85rem;
-}
 
-.bottone:disabled {
-  cursor: default;
-  opacity: 0.55;
-}
 .codice {
   margin: 0;
   padding: 0.9rem;

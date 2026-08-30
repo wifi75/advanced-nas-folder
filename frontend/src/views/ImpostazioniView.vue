@@ -139,7 +139,10 @@ function usato(disco: SpazioDisco): number | null {
       </p>
 
       <div class="azioni">
-        <button type="submit">
+        <button
+          class="bottone bottone--principale"
+          type="submit"
+        >
           {{ t('comune.salva') }}
         </button>
         <span
@@ -205,15 +208,6 @@ function usato(disco: SpazioDisco): number | null {
 </template>
 
 <style scoped>
-.pagina {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  width: min(760px, 100% - 2.5rem);
-  margin-inline: auto;
-  gap: 1.25rem;
-  padding-block: 1.5rem;
-}
 
 h1 {
   margin: 0;
@@ -276,17 +270,6 @@ h2 {
   gap: 0.75rem;
 }
 
-button {
-  padding: 0.45rem 0.85rem;
-  border: none;
-  border-radius: var(--raggio);
-  background: var(--accento);
-  color: var(--accento-testo);
-  cursor: pointer;
-  font: inherit;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
 
 .fatto {
   color: var(--ok);

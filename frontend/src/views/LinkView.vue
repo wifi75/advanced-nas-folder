@@ -313,28 +313,8 @@ function dimensione(byte: number | null): string {
   font: inherit;
 }
 
-.bottone {
-  padding: 0.45rem 0.85rem;
-  border: none;
-  border-radius: var(--raggio);
-  background: var(--accento);
-  color: var(--accento-testo);
-  cursor: pointer;
-  font: inherit;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
 
-.bottone--tenue {
-  border: 1px solid var(--bordo);
-  background: transparent;
-  color: var(--testo);
-}
 
-.bottone:disabled {
-  cursor: default;
-  opacity: 0.55;
-}
 
 .password {
   display: flex;
