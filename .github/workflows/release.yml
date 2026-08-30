@@ -41,7 +41,7 @@ jobs:
           cp -r frontend/dist pacchetto/frontend/dist
           tar -czf advanced-nas-folder.tar.gz -C pacchetto .
           sha256sum advanced-nas-folder.tar.gz > advanced-nas-folder.tar.gz.sha256
-          cp deploy/install.sh . 2>/dev/null || true
+          cp deploy/install.sh deploy/update.sh deploy/uninstall.sh . 2>/dev/null || true
 
       - name: Pubblica la release
         uses: softprops/action-gh-release@v2
@@ -50,4 +50,6 @@ jobs:
             advanced-nas-folder.tar.gz
             advanced-nas-folder.tar.gz.sha256
             install.sh
+            update.sh
+            uninstall.sh
           generate_release_notes: true

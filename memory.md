@@ -12,46 +12,41 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.5.0
+- Versione corrente: 0.6.0
 
-## Stato alla v0.5.0 — 29 agosto 2026
+## Stato alla v0.6.0 — 30 agosto 2026
+
+Il pannello fa tutto quello per cui era stato pensato. **375 test**, gate verde su
+ruff, mypy `strict`, ESLint, vue-tsc e build; la CI li esegue a ogni push.
 
 **Fatto e verificato eseguendo, non solo leggendo:**
 
-- Backend FastAPI su Python 3.14 con configurazione, SQLite in WAL, otto modelli e
-  prima migrazione Alembic (`upgrade`, `downgrade`, risalita, nessuna differenza
-  residua).
-- Autenticazione: Argon2id, JWT, guardia sulle rotte, utente `admin` creato al primo
-  avvio con avviso sulla password iniziale.
-- Frontend Vue 3 + TypeScript: accesso, tema chiaro/scuro, piede di pagina che legge
-  versione e autore dall'API. Build, typecheck ed ESLint puliti.
-- **Agent privilegiato completo**, provato contro un NAS Synology reale: scoperta
-  condivisioni, creazione, montaggio, stato con prova di scrittura sul campo,
-  smontaggio, rimozione. Tentativi di violazione (slug con `..`, opzioni fuori
-  whitelist, comandi iniettati nell'indirizzo) tutti respinti.
+- **Agent privilegiato** provato contro un NAS Synology reale: scoperta, creazione,
+  montaggio, stato con prova di scrittura sul campo, smontaggio. Tentativi di
+  violazione (slug con `..`, opzioni fuori whitelist, comandi iniettati
+  nell'indirizzo) tutti respinti.
+- **Mount, pubblicazioni e permessi** end-to-end su Linux, pannello → API → agent →
+  NAS reale, compresa la verifica dell'accesso che dice quale regola ha deciso.
+- **Consegna dei file** con ripresa: verificato `206 Partial Content` e blocco delle
+  risalite; su Windows con un file da 9 MB il caricamento interrotto e ripreso ha
+  prodotto uno **sha256 identico all'originale**.
+- **Link di condivisione**: limite di scaricamenti rispettato, ramo non valicabile,
+  divieto esplicito non superabile.
+- **Operazioni sui file, ricerca, ZIP, selezione multipla, anteprime, checksum,
+  editor di testo, utenti, impostazioni**: tutti provati sul filesystem vero, non
+  solo nei test.
+- **Import da `/etc/fstab`** e **pubblicazione sul web server dal pannello**, con
+  `configtest` e ripristino della configurazione precedente se il test fallisce.
+- **Monitoraggio dei trasferimenti** dal vivo via SSE, con lettura dell'access log.
+- `install.sh`, `update.sh` e `uninstall.sh`, tutti bilingui e con `--dry-run`.
+- Documentazione completa in due lingue, guida all'uso compresa.
 
-- **Endpoint e interfaccia dei mount** completi: scoperta delle condivisioni del NAS,
-  creazione, montaggio, stato, eliminazione. Verificato end-to-end su Linux, pannello
-  → API → agent → NAS reale.
-- **Interfaccia bilingue** italiano/inglese e tema chiaro/scuro/automatico.
-- Fase 2 iniziata: risoluzione sicura dei percorsi e permessi per sottocartella.
+**Sul server non è ancora stato pubblicato nulla.** È sempre stata la scelta di farlo
+a progetto completo: ora si può.
 
-- **`install.sh`** pronto: bilingue, idempotente, con `--dry-run` e `--uninstall`.
-  Verificato con shellcheck e prova a vuoto su server reale.
-- **Permessi per singolo utente**: quale utente accede a quale cartella, o a tutte.
-- Documentazione per chi installa disponibile in italiano e in inglese.
-
-**Sul server non è ancora stato pubblicato nulla.** L'installazione vera si fa alla
-fine dello sviluppo.
-
-- **Pubblicazioni complete**: endpoint e interfaccia per cartelle pubblicate, regole
-  di visibilità per prefisso e permessi per singolo utente, con una verifica
-  dell'accesso che dice quale regola ha deciso.
-- **Applicazione installabile (PWA)**: manifest, icone, service worker con l'API
-  sempre esclusa dalla cache e aggiornamento non automatico.
-
-**Da fare subito dopo:** consegna dei download (`X-Sendfile` / `X-Accel-Redirect`),
-che è il pezzo che rende la fase 2 usabile davvero. Vedere [TODO.md](TODO.md).
+**Da fare prima della pubblicazione:** provare l'agent end-to-end su Linux con le
+funzioni aggiunte dopo la v0.5.0 (vhost, fstab), che sulla macchina di sviluppo
+Windows non sono verificabili perché i socket Unix non esistono.
 
 ## Ambiente di sviluppo
 
@@ -64,8 +59,8 @@ richieste che arrivano da un indirizzo IP: senza, risponde «host non consentito
 
 Ogni documento rivolto a chi usa o installa il progetto esiste in **due lingue**:
 il file italiano senza suffisso, l'inglese con `.en.md`, e in cima a entrambi il
-collegamento all'altra versione. I documenti interni di sviluppo (`PIANO.md`,
-`VERSIONI.md`, `agent/README.md`) sono per ora solo in italiano.
+collegamento all'altra versione. Vale anche per i documenti interni
+(`PIANO.md`, `VERSIONI.md`, `agent/README.md`), tradotti dalla v0.6.0.
 
 ## Convenzioni dell'interfaccia
 
@@ -76,7 +71,9 @@ collegamento all'altra versione. I documenti interni di sviluppo (`PIANO.md`,
   `assets/main.css`, definite per il tema chiaro e ridefinite in *due* blocchi scuri
   (`prefers-color-scheme` e `[data-tema='scuro']`).
 - Il menu è raggruppato per categoria; le voci non ancora realizzate restano visibili
-  ma disattivate, con la fase indicata.
+  ma disattivate, con la fase indicata. Alla v0.6.0 resta disattivata solo la pagina
+  che raccoglie i link di tutte le pubblicazioni: i link si gestiscono dentro la
+  pubblicazione a cui appartengono.
 - `npm run typecheck` usa `vue-tsc --build`: la variante `--noEmit` non controllava i
   progetti referenziati e lasciava passare errori che il build trovava.
 - **Il pannello vive sotto `/pannello/`**, in sviluppo come in produzione: la `base`
@@ -110,6 +107,24 @@ Opzioni di mount adottate come predefinite, validate sul campo:
 gigabyte in Python satura i worker, e il resume (Range/206) funziona già in modo
 nativo nel web server. Misurato: 206 a ~207 MB/s.
 
+**Il monitoraggio dichiara ciò che non sa.** Il registro sa che un download è stato
+autorizzato, quando, per quale file e da quale indirizzo; **non sa** quanti byte siano
+arrivati, perché la consegna è delegata al web server. Quel numero arriva dal suo
+access log, se `ANF_ACCESS_LOG` è configurato, e finché non arriva resta vuoto: un
+numero inventato sarebbe peggio di uno assente.
+
+**`X-Forwarded-For` letto solo dai proxy fidati** (`ANF_TRUSTED_PROXIES`): quella
+intestazione la può scrivere chiunque.
+
+**Lo stato della ripresa di un caricamento è il file parziale stesso**, non una riga
+in un database: la sua dimensione dice quanti byte sono arrivati. Sta nella cartella
+di destinazione, nascosto, così il completamento è una rinomina atomica invece di una
+seconda copia sulla rete.
+
+**Apertura in linea solo per i tipi mostrabili** (immagini, video, audio, PDF, testo).
+HTML e SVG restano allegati: serviti con il loro tipo reale sarebbero codice altrui
+eseguito nel contesto del pannello.
+
 **Scrittura disattivata di default.** Ogni mount nasce in sola lettura. La scrittura è
 un interruttore esplicito con avviso, e richiede anche la regola corrispondente lato
 NAS: il pannello mostra sempre stato richiesto *e* stato effettivo.
@@ -121,8 +136,8 @@ su un pannello esposto a Internet.
 
 ## Vincoli noti dell'ambiente di destinazione
 
-- Dietro un reverse proxy con TLS: serve `mod_remoteip` + `X-Forwarded-For`, altrimenti
-  il monitoraggio dei download vede un solo IP per tutti.
+- Dietro un reverse proxy con TLS: il proxy va elencato in `ANF_TRUSTED_PROXIES`,
+  altrimenti il monitoraggio vede un solo indirizzo per tutti.
 - Il NAS di riferimento espone **solo NFSv2/v3**, non NFSv4: `vers=3` non è una scelta
   di ripiego ma un requisito verificato con `rpcinfo`.
 - Il frontend non si compila sul server: `dist/` arriva già pronto dalla CI.

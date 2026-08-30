@@ -65,10 +65,13 @@ nessuna dipende da quelle successive.
       controllo degli accessi, e download delegato al web server con
       `X-Sendfile` o `X-Accel-Redirect`
 - [x] Verifica del resume (Range, `If-Range`, ETag, 206)
-- [ ] Barra di avanzamento del download lato utente
+- [ ] Barra di avanzamento del download lato utente *(il browser mostra già la
+      propria; una barra nel pannello richiede di non delegare la consegna, e
+      perderebbe la ripresa nativa — vedere la nota in fondo)*
 - [x] **Gestione vhost dal pannello**, con anteprima, `configtest` e ripristino
       automatico della configurazione precedente
-- [ ] Rimozione dell'alias pubblico preesistente
+- [ ] Rimozione dell'alias pubblico preesistente *(si fa sul server, alla
+      pubblicazione)*
 
 ## Fase 3 — Gestione file completa
 
@@ -126,21 +129,37 @@ Richieste del 2026-08-29 rimaste aperte alla chiusura della v0.3.0:
       blocca — verificato che fallisca anche con un service worker di una riga.
       Tutto il resto (manifest, icone, contenuto della precache, esclusione
       dell'API, colori della barra) è stato controllato sul build.
-- [ ] **Pubblicazione sul server, alla fine dello sviluppo.** Sul server non è
-      ancora stato pubblicato nulla. Dalla v0.4.0 il comando documentato nel
-      README funziona davvero: verificato scaricando `install.sh` e il pacchetto
-      dalla release, checksum confermato e `dist/` compilato dalla CI presente.
-      Da eseguire con `--dry-run` prima, poi per davvero.
+- [ ] **Pubblicazione sul server.** Era la scelta di farla a sviluppo concluso, e
+      con la v0.6.0 lo è. Il comando documentato nel README funziona: verificato
+      scaricando `install.sh` e il pacchetto dalla release, checksum confermato e
+      `dist/` compilato dalla CI presente. Da eseguire con `--dry-run` prima, poi
+      per davvero. **Prima di pubblicare** vedere la voce sui test dell'agent
+      qui sotto: vhost e fstab non sono mai stati provati su Linux.
 
 ## Emerso durante i rilasci
 
-- [ ] **Test end-to-end dell'agent su Linux.** I test attuali sono unitari e coprono
-      i validatori; il ciclo completo (creazione, montaggio, stato, rimozione) è stato
-      provato a mano contro un NAS reale, ma non è automatizzato. Serve un ambiente di
-      prova con systemd.
+- [ ] **Test end-to-end dell'agent su Linux.** I test sono unitari e coprono
+      validatori, generazione dei vhost e lettura di fstab; il ciclo dei mount è stato
+      provato a mano contro un NAS reale, ma **vhost e fstab non sono mai stati
+      eseguiti su Linux**, perché sulla macchina di sviluppo Windows i socket Unix
+      non esistono. È la prima cosa da verificare al momento della pubblicazione.
 - [x] Riferimenti a strumenti di terze parti nei piè di firma dei commit: rimossi
       riscrivendo la cronologia. Verificato che l'API di GitHub riporti un solo
       contributore.
+
+## Limiti dichiarati, non difetti
+
+- **L'avanzamento reale di un download non è visibile al pannello.** La consegna è
+  delegata al web server, e da quel momento l'applicazione è uscita di scena. Il
+  numero dei byte arriva dal suo access log a trasferimento concluso. Mostrare una
+  percentuale richiederebbe di far passare i byte da Python, cioè rinunciare alla
+  ripresa nativa e saturare i worker: non vale lo scambio.
+- **Lo ZIP di una cartella non ha una percentuale**, perché viene prodotto mentre lo si
+  invia e la dimensione totale non è nota in anticipo. L'alternativa sarebbe costruirlo
+  prima su disco, e una cartella del NAS può pesare più dello spazio libero.
+- **Due download dello stesso file dallo stesso indirizzo nello stesso istante** non si
+  distinguono nel registro: l'access log non contiene un identificativo del
+  trasferimento. È accettabile per un contatore.
 
 ## Non in programma, per scelta
 
