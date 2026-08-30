@@ -8,13 +8,16 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     name: 'home',
     component: () => import('@/views/HomeView.vue'),
+    // Non riservata: e' il posto in cui si atterra dopo l'accesso, e chiuderla
+    // rimanderebbe chi non amministra a una pagina di errore appena entrato.
+    // La vista mostra contenuti diversi a seconda di chi guarda.
     meta: { titolo: 'menu.stato' },
   },
   {
     path: '/condivisioni',
     name: 'mounts',
     component: () => import('@/views/MountsView.vue'),
-    meta: { titolo: 'menu.condivisioni' },
+    meta: { titolo: 'menu.condivisioni', admin: true },
   },
   {
     // Il dettaglio sta su una rotta propria e non in un pannello a comparsa:
@@ -23,19 +26,19 @@ const routes: RouteRecordRaw[] = [
     path: '/condivisioni/:id',
     name: 'condivisione',
     component: () => import('@/views/CondivisioneView.vue'),
-    meta: { titolo: 'menu.condivisioni' },
+    meta: { titolo: 'menu.condivisioni', admin: true },
   },
   {
     path: '/pubblicazioni',
     name: 'shares',
     component: () => import('@/views/SharesView.vue'),
-    meta: { titolo: 'menu.pubblicazioni' },
+    meta: { titolo: 'menu.pubblicazioni', admin: true },
   },
   {
     path: '/pubblicazioni/:id',
     name: 'pubblicazione',
     component: () => import('@/views/PubblicazioneView.vue'),
-    meta: { titolo: 'menu.pubblicazioni' },
+    meta: { titolo: 'menu.pubblicazioni', admin: true },
   },
   {
     // Pubblica per scelta: chi riceve il collegamento a una cartella aperta a
@@ -50,25 +53,25 @@ const routes: RouteRecordRaw[] = [
     path: '/impostazioni',
     name: 'impostazioni',
     component: () => import('@/views/ImpostazioniView.vue'),
-    meta: { titolo: 'menu.impostazioni' },
+    meta: { titolo: 'menu.impostazioni', admin: true },
   },
   {
     path: '/trasferimenti',
     name: 'trasferimenti',
     component: () => import('@/views/TrasferimentiView.vue'),
-    meta: { titolo: 'menu.trasferimenti' },
+    meta: { titolo: 'menu.trasferimenti', admin: true },
   },
   {
     path: '/utenti',
     name: 'utenti',
     component: () => import('@/views/UtentiView.vue'),
-    meta: { titolo: 'menu.utenti' },
+    meta: { titolo: 'menu.utenti', admin: true },
   },
   {
     path: '/webserver',
     name: 'webserver',
     component: () => import('@/views/WebServerView.vue'),
-    meta: { titolo: 'menu.webserver' },
+    meta: { titolo: 'menu.webserver', admin: true },
   },
   {
     // Indirizzo corto di proposito: e' quello che si incolla in un messaggio.
@@ -108,6 +111,12 @@ router.beforeEach((to) => {
   }
   if (to.name === 'login' && auth.autenticato) {
     return { name: 'home' }
+  }
+  // Le pagine di amministrazione sono gia' rifiutate dall'API, ma senza
+  // questo controllo restavano raggiungibili scrivendo l'indirizzo, e chi ci
+  // arrivava trovava una pagina rotta invece di una porta chiusa.
+  if (to.meta.admin && !auth.utente?.is_admin) {
+    return { name: 'nonTrovata', params: { pathMatch: to.path.slice(1).split('/') } }
   }
   return true
 })

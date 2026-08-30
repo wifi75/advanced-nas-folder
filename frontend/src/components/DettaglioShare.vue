@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ScegliCartella from '@/components/ScegliCartella.vue'
 import Schede from '@/components/Schede.vue'
 /**
  * Regole, permessi e verifica di una pubblicazione.
@@ -382,11 +383,10 @@ const chiHaDeciso = computed(() => {
                 {{ utenti.length ? t('permessi.notaMultipla') : t('permessi.nessunUtente') }}
               </span>
             </label>
-            <input
+            <ScegliCartella
               v-model="permessoPercorso"
-              type="text"
-              :placeholder="t('permessi.cartella')"
-            >
+              :slug="share.slug"
+            />
             <select v-model="permessoLivello">
               <option
                 v-for="l in LIVELLI"

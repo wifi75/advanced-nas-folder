@@ -31,6 +31,8 @@ export default {
     pubblicazioni: 'Pubblicazioni',
     file: 'File',
     utenti: 'Utenti',
+    leMieCartelle: 'Le mie cartelle',
+    nessunaMiaCartella: 'Nessuna cartella assegnata. Chiedi a chi amministra il pannello.',
     link: 'Link di condivisione',
     stato: 'Stato',
     webserver: 'Web server',
@@ -235,6 +237,13 @@ export default {
     password: 'Password',
     protetta: 'protetta da password',
     nessuna: 'Nessuna regola: vale la scelta predefinita della pubblicazione.',
+  },
+
+  scegliCartella: {
+    risali: 'Sali di un livello',
+    scendi: 'Entra in una sottocartella…',
+    nessuna: 'Nessuna sottocartella qui',
+    nonLeggibile: 'Cartella non leggibile',
   },
 
   permessi: {

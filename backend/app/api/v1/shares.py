@@ -8,7 +8,7 @@ from fastapi import APIRouter, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
-from app.api.deps import Amministratore, Sessione
+from app.api.deps import Amministratore, Sessione, UtenteCorrente
 from app.core.security import hash_password
 from app.models import AccessRule, Mount, PermessoUtente, Share, ShareLink, User
 from app.models.enums import Visibilita
@@ -78,6 +78,37 @@ def _regola_out(regola: AccessRule) -> RegolaOut:
 async def elenca(sessione: Sessione, _: Amministratore) -> list[Share]:
     risultato = await sessione.execute(select(Share).order_by(Share.label))
     return list(risultato.scalars().all())
+
+
+@router.get("/mie", response_model=list[ShareOut])
+async def le_mie(sessione: Sessione, utente: UtenteCorrente) -> list[Share]:
+    """Le pubblicazioni che *chi sta chiedendo* puo' aprire.
+
+    Serve al menu di chi non amministra: l'elenco completo e' riservato agli
+    amministratori, e senza questo un utente normale si trovava una barra
+    laterale piena di pagine che l'API gli rifiuta — o vuota, che e' peggio,
+    perche' non gli dice come raggiungere le cartelle a cui ha diritto.
+
+    Si valuta la **radice** di ogni pubblicazione: se non e' raggiungibile
+    nemmeno quella, non c'e' niente da mostrare. Il caso opposto — radice
+    negata ma una sottocartella concessa — resta accessibile per indirizzo
+    diretto, e comparira' qui solo quando la radice lo consente.
+    """
+    if utente.is_admin:
+        risultato = await sessione.execute(select(Share).order_by(Share.label))
+        return list(risultato.scalars().all())
+
+    risultato = await sessione.execute(
+        select(Share).where(Share.is_enabled.is_(True)).order_by(Share.label)
+    )
+    tutte = list(risultato.scalars().all())
+
+    visibili: list[Share] = []
+    for share in tutte:
+        permessi = [p for p in await _permessi(sessione, share.id) if p.user_id == utente.id]
+        if acl.valuta(share, "", utente, permessi=permessi).consentito:
+            visibili.append(share)
+    return visibili
 
 
 @router.post("", response_model=ShareOut, status_code=status.HTTP_201_CREATED)

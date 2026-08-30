@@ -10,6 +10,27 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.27.0] - 2026-08-30
+
+### Aggiunto
+
+- **La cartella si sceglie, non si scrive.** Il percorso di un permesso
+  andava scritto a mano: chi assegna non ha in testa l'albero del NAS, e un
+  percorso sbagliato non da' errore — crea un permesso su una cartella che
+  non esiste, che semplicemente non fa niente. Il difetto si scopriva quando
+  qualcuno diceva di non vedere la cartella. Ora si scende un livello per
+  volta fra le sottocartelle vere.
+- **Chi non amministra vede «Le mie cartelle»**: l'elenco delle
+  pubblicazioni che puo' davvero aprire, calcolato con le stesse regole di
+  accesso. Nuovo endpoint `GET /shares/mie`.
+
+### Corretto
+
+- **Il menu non mostra piu' pagine da amministratore a chi non lo e'.** Un
+  utente normale vedeva Utenti, Stato, Web server, Trasferimenti e
+  Impostazioni: cinque voci che l'API gli rifiuta. Ora sono nascoste, e le
+  rotte corrispondenti sono chiuse anche scrivendo l'indirizzo a mano.
+
 ## [0.26.2] - 2026-08-30
 
 ### Aggiunto

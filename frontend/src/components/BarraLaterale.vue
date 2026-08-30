@@ -11,12 +11,13 @@
  * che si leggeva aprendo il menu. Una voce che non porta da nessuna parte e'
  * peggio di una voce assente.
  */
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RouterLink, useRoute } from 'vue-router'
 
 import SelettoreLingua from '@/components/SelettoreLingua.vue'
 import SelettoreTema from '@/components/SelettoreTema.vue'
+import { sharesApi, type Share } from '@/api/shares'
 import { useAppStore } from '@/stores/app'
 import { useMountsStore } from '@/stores/mounts'
 import { useSharesStore } from '@/stores/shares'
@@ -58,10 +59,27 @@ const route = useRoute()
 // nell'archivio nessuno lo faceva, e l'albero delle condivisioni compariva
 // vuoto proprio dove serve di piu' per tornare indietro.
 onMounted(() => {
-  if (!auth.utente?.is_admin) return
-  if (mounts.elenco.length === 0) void mounts.carica()
-  if (shares.elenco.length === 0) void shares.carica()
+  if (auth.utente?.is_admin) {
+    if (mounts.elenco.length === 0) void mounts.carica()
+    if (shares.elenco.length === 0) void shares.carica()
+    return
+  }
+  // Chi non amministra non puo' chiedere l'elenco completo — l'API glielo
+  // rifiuta — ma un menu vuoto sarebbe peggio: non gli direbbe come arrivare
+  // alle cartelle a cui ha diritto. Si chiedono quelle, e solo quelle.
+  void caricaLeMie()
 })
+
+/** Le pubblicazioni raggiungibili da chi non e' amministratore. */
+const leMie = ref<Share[]>([])
+
+async function caricaLeMie(): Promise<void> {
+  try {
+    leMie.value = await sharesApi.mie()
+  } catch {
+    leMie.value = []
+  }
+}
 
 const albero = computed(() =>
   mounts.elenco.map((m) => ({
@@ -92,7 +110,13 @@ const ICONE = {
     'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z M19.4 14.5a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2v.1a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-2.9-1.1l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.1-2.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 2.9-1.2V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 2.9 1.1l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0 1.2 2.9h.1a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.5 1.2Z',
 } as const
 
-const categorie = computed<Categoria[]>(() => [
+// Tutte queste pagine sono riservate all'amministratore: l'API le rifiuta a
+// chiunque altro. Mostrarle a un utente normale non gli da' un permesso in
+// piu', gli da' solo cinque modi di sbattere contro un errore.
+const categorie = computed<Categoria[]>(() =>
+  !auth.utente?.is_admin
+    ? []
+    : [
   {
     titolo: t('menu.accessi'),
     voci: [
@@ -128,7 +152,8 @@ const categorie = computed<Categoria[]>(() => [
       },
     ],
   },
-])
+      ],
+)
 </script>
 
 <template>
@@ -155,6 +180,57 @@ const categorie = computed<Categoria[]>(() => [
     </div>
 
     <nav class="menu">
+      <!-- Chi non amministra vede solo le proprie cartelle: e' tutto cio' che
+           il pannello ha da offrirgli, e senza questo elenco non avrebbe alcun
+           modo di raggiungerle se non conoscendone l'indirizzo a memoria. -->
+      <section
+        v-if="!auth.utente?.is_admin"
+        class="categoria"
+      >
+        <h2 class="categoria__titolo">
+          {{ t('menu.leMieCartelle') }}
+        </h2>
+        <ul
+          v-if="leMie.length"
+          class="voci"
+        >
+          <li
+            v-for="s in leMie"
+            :key="s.id"
+          >
+            <RouterLink
+              :to="`/archivio/${s.slug}`"
+              class="voce"
+              @click="emit('naviga')"
+            >
+              <span
+                class="pastiglia"
+                :style="{ '--tinta': 'var(--tinta-pubblicazioni)' }"
+                aria-hidden="true"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path :d="ICONE.globo" />
+                </svg>
+              </span>
+              <span class="voce__testo">{{ s.label }}</span>
+            </RouterLink>
+          </li>
+        </ul>
+        <p
+          v-else
+          class="niente"
+        >
+          {{ t('menu.nessunaMiaCartella') }}
+        </p>
+      </section>
+
       <section
         v-if="auth.utente?.is_admin"
         class="categoria"
@@ -386,6 +462,15 @@ const categorie = computed<Categoria[]>(() => [
   display: flex;
   flex-direction: column;
   gap: 1.4rem;
+}
+
+/* Un utente senza permessi deve capire che il pannello funziona e che il
+   vuoto e' una scelta di chi amministra, non un guasto. */
+.niente {
+  margin: 0;
+  padding: 0.5rem 0.15rem;
+  font-size: 0.8125rem;
+  color: var(--testo-tenue);
 }
 
 .categoria__titolo {

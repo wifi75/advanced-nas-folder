@@ -93,6 +93,9 @@ export interface NuovoLink {
 
 export const sharesApi = {
   elenca: () => api.get<Share[]>('/shares'),
+
+  /** Le pubblicazioni che l'utente collegato puo' davvero aprire. */
+  mie: () => api.get<Share[]>('/shares/mie'),
   dettaglio: (id: number) => api.get<ShareDettaglio>(`/shares/${id}`),
   crea: (dati: NuovaShare) => api.post<Share>('/shares', dati),
   modifica: (id: number, dati: Partial<NuovaShare>) => api.patch<Share>(`/shares/${id}`, dati),

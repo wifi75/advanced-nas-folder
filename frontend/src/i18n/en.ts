@@ -31,6 +31,8 @@ export default {
     pubblicazioni: 'Published folders',
     file: 'Files',
     utenti: 'Users',
+    leMieCartelle: 'My folders',
+    nessunaMiaCartella: 'No folders assigned. Ask whoever administers the panel.',
     link: 'Share links',
     stato: 'Status',
     webserver: 'Web server',
@@ -232,6 +234,13 @@ export default {
     password: 'Password',
     protetta: 'password protected',
     nessuna: 'No rule: the publication default applies.',
+  },
+
+  scegliCartella: {
+    risali: 'Go up one level',
+    scendi: 'Open a subfolder…',
+    nessuna: 'No subfolders here',
+    nonLeggibile: 'Folder not readable',
   },
 
   permessi: {
