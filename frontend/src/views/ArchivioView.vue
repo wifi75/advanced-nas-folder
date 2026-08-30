@@ -122,8 +122,13 @@ function cambiaVista(nuova: Vista): void {
   }
 }
 
-/** Solo le immagini hanno una miniatura da mostrare. */
+/** Immagini e video: entrambi hanno una miniatura, prodotta dal server. */
 function haMiniatura(voce: Voce): boolean {
+  return !voce.cartella && /\.(jpe?g|png|gif|webp|avif|bmp|mp4|m4v|mov|mkv|webm|avi)$/i.test(voce.nome)
+}
+
+/** Le sole immagini: la presentazione e i dati di scatto valgono per quelle. */
+function eImmagine(voce: Voce): boolean {
   return !voce.cartella && /\.(jpe?g|png|gif|webp|avif|bmp)$/i.test(voce.nome)
 }
 
@@ -154,7 +159,7 @@ function chiudiMenu(): void {
 const inAnteprima = ref<Voce | null>(null)
 
 /** Le sole immagini della cartella, nell'ordine in cui si vedono. */
-const immagini = computed(() => voci.value.filter(haMiniatura))
+const immagini = computed(() => voci.value.filter(eImmagine))
 
 const posizione = computed(() => {
   if (!inAnteprima.value) return 0

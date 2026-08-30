@@ -152,7 +152,9 @@ configuration, which stay consistent with each other.
 ## What the installer does, step by step
 
 1. **Checks prerequisites**: root, Linux, systemd.
-2. **Installs missing packages**: `curl`, `nfs-common`, `openssl`.
+2. **Installs missing packages**: `curl`, `nfs-common`, `openssl`, `ffmpeg`.
+   The last one is only for video thumbnails: without it videos keep the type
+   icon and everything else works the same.
 3. **Installs Python 3.14** from the `deadsnakes` PPA if missing. It is installed
    **alongside** the system interpreter, which is left untouched: moving `python3`
    would break the operating system and the other applications on the machine.
@@ -238,6 +240,31 @@ curl -fsS http://127.0.0.1:$(grep -oP '^ANF_PORT=\K\d+' /var/www/advanced-nas-fo
 ```
 
 ---
+
+## Transferred bytes, and why they sometimes do not show up
+
+The panel knows **when** a download was authorised, but not how many bytes
+arrived: from that moment the web server sends the file. It writes the real
+number into its own access log, and that is where the panel reads it.
+
+Two things are needed, both handled by the installer:
+
+1. **The `anf` user must be able to read the log.** On Debian and Ubuntu access
+   logs belong to `root`, group `adm`, unreadable by others: the installer adds
+   `anf` to that group.
+2. **The `CustomLog` line must sit inside the VirtualHost** serving the panel.
+   A `CustomLog` in the server configuration only applies to requests that do
+   *not* end up in a vhost, and vhosts do not inherit it.
+
+Without the second, the log file stays empty and every row in **Transfers**
+remains «in progress» forever. The line to copy into the vhost is:
+
+```apache
+CustomLog /var/log/apache2/anf_access.log anf
+```
+
+`LogFormat` is global instead: defining it once is enough, and `anf.conf`
+already does.
 
 ## Short addresses for published folders
 

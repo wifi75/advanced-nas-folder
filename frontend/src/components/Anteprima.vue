@@ -180,6 +180,37 @@ function alternaPresentazione(): void {
   }, intervallo.value * 1000)
 }
 
+// --- comandi che si tolgono di mezzo ---
+//
+// A schermo intero, o mentre scorre una presentazione, l'immagine e' l'unica
+// cosa che conta: i comandi restano finche' ci si muove e poi spariscono. Li
+// riporta un movimento del mouse o un tocco, cioe' esattamente il gesto che si
+// fa quando si vuole di nuovo comandare qualcosa.
+const comandiVisibili = ref(true)
+let attesaComandi: ReturnType<typeof setTimeout> | null = null
+
+/** Solo dove l'ingombro dei comandi e' un problema. */
+const comandiNascondibili = computed(() => aSchermoIntero.value || inPresentazione.value)
+
+function risvegliaComandi(): void {
+  comandiVisibili.value = true
+  if (attesaComandi) clearTimeout(attesaComandi)
+  if (!comandiNascondibili.value) return
+  attesaComandi = setTimeout(() => {
+    comandiVisibili.value = false
+  }, 2500)
+}
+
+// Uscendo dallo schermo intero o fermando la presentazione devono tornare
+// subito: altrimenti resterebbero nascosti senza piu' un motivo.
+watch(comandiNascondibili, (nascondibili) => {
+  if (nascondibili) risvegliaComandi()
+  else {
+    if (attesaComandi) clearTimeout(attesaComandi)
+    comandiVisibili.value = true
+  }
+})
+
 let partenzaX = 0
 
 function inizioTocco(evento: TouchEvent): void {
@@ -203,6 +234,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', daTastiera)
   document.removeEventListener('fullscreenchange', segnaSchermoIntero)
+  if (attesaComandi) clearTimeout(attesaComandi)
   fermaPresentazione()
   // Uscendo dall'anteprima mentre si e' a schermo intero, il browser
   // resterebbe cosi' su una pagina che non lo prevede.
@@ -407,9 +439,14 @@ watch(
     <section
       ref="finestra"
       class="finestra"
-      :class="{ 'finestra--intera': aSchermoIntero }"
+      :class="{
+        'finestra--intera': aSchermoIntero,
+        'finestra--sgombra': comandiNascondibili && !comandiVisibili,
+      }"
       role="dialog"
       :aria-label="voce.nome"
+      @mousemove="risvegliaComandi"
+      @touchstart.passive="risvegliaComandi"
     >
       <header class="testa">
         <span class="nome">{{ voce.nome }}</span>
@@ -732,6 +769,28 @@ watch(
 
 .finestra--intera .media {
   max-height: 88vh;
+}
+
+/* Non `display: none`: sparendo di colpo l'immagine salterebbe per riempire lo
+   spazio lasciato libero. Restano dove sono, semplicemente invisibili e non
+   piu' cliccabili. */
+.finestra--sgombra .testa,
+.finestra--sgombra .freccia,
+.finestra--sgombra .scatto,
+.finestra--sgombra .piede {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.finestra--sgombra {
+  cursor: none;
+}
+
+.testa,
+.freccia,
+.scatto,
+.piede {
+  transition: opacity 0.35s ease;
 }
 
 .media--ingrandita {

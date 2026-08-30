@@ -747,3 +747,32 @@ a {
   border-top: 1px solid var(--bordo);
   padding-top: 1.1rem;
 }
+
+/* --- riempimento automatico del browser ----------------------------------
+   Chrome dipinge i campi compilati da solo con un azzurro suo e ignora
+   `background`: nel tema scuro il testo diventa quasi illeggibile, e anche in
+   quello chiaro il campo stona con tutti gli altri.
+
+   L'unico modo di riprendersi quel fondo e' un'ombra interna piena — il
+   `background` viene sovrascritto, l'ombra no — e il colore del testo va
+   dichiarato con `-webkit-text-fill-color`, perche' `color` viene ignorato
+   allo stesso modo. */
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--testo);
+  caret-color: var(--testo);
+  box-shadow: inset 0 0 0 100px var(--sfondo);
+  /* Il ritardo tiene fermo il colore: senza, Chrome riapplica il proprio
+     azzurro con una transizione appena il campo perde il fuoco. */
+  transition: background-color 600000s 0s;
+}
+
+/* Firefox usa un meccanismo suo, piu' educato ma comunque con un fondo
+   proprio. */
+input:autofill {
+  background: var(--sfondo);
+  color: var(--testo);
+}

@@ -18,6 +18,41 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.21.0] - 2026-08-30
+
+### Corretto
+- **Ogni trasferimento restava «in corso» per sempre**, e i byte inviati non
+  comparivano mai. Tre cause diverse, tutte da correggere:
+
+  1. **L'analizzatore leggeva un formato che l'installer non scrive.** Era
+     scritto per il formato combinato (`ip - - [data]`), mentre l'installer
+     configura un formato proprio che dall'indirizzo va dritto alla data —
+     quei due campi sono sempre vuoti. Nessuna riga ha mai corrisposto. Ora ne
+     riconosce entrambi.
+  2. **Il servizio non poteva leggere l'access log.** Su Debian e Ubuntu e' di
+     `root`, gruppo `adm`, non leggibile da altri: l'installer aggiunge ora
+     `anf` a quel gruppo.
+  3. **La riga `CustomLog` stava fuori dal VirtualHost**, e i vhost non la
+     ereditano — quindi il file di log restava vuoto. E' lo stesso difetto gia'
+     trovato con `mod_rewrite` per le scorciatoie: in Apache alcune direttive
+     scendono nei vhost e altre no. Documentato nella guida all'installazione,
+     con la riga da copiare.
+
+### Aggiunto
+- **Miniature dei video**, un fotogramma estratto con `ffmpeg`, con un segno di
+  riproduzione sull'angolo per distinguerli dalle foto. Il fotogramma si prende
+  **a un decimo della durata**, non all'inizio: l'apertura di un video e' quasi
+  sempre nera. `ffmpeg` entra fra i pacchetti installati; senza, i video
+  restano con l'icona del tipo e tutto il resto funziona.
+- **I comandi si tolgono di mezzo** dopo due secondi e mezzo a schermo intero o
+  durante una presentazione, e tornano al primo movimento.
+
+### Corretto
+- **Il riempimento automatico del browser rendeva i campi illeggibili**: Chrome
+  dipinge i campi compilati con un azzurro suo e ignora `background` e `color`.
+  Ripreso con un'ombra interna piena e `-webkit-text-fill-color`, che sono le
+  uniche proprieta' che non sovrascrive.
+
 ## [0.20.0] - 2026-08-30
 
 Il pannello diventa un posto in cui **guardare** le foto, non solo scaricarle.

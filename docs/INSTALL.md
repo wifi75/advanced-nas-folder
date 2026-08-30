@@ -150,7 +150,9 @@ server, che restano coerenti fra loro.
 ## Cosa fa l'installer, passo per passo
 
 1. **Controlla i prerequisiti**: root, Linux, systemd.
-2. **Installa i pacchetti mancanti**: `curl`, `nfs-common`, `openssl`.
+2. **Installa i pacchetti mancanti**: `curl`, `nfs-common`, `openssl`, `ffmpeg`.
+   Quest'ultimo serve solo alle miniature dei video: senza, i video restano con
+   l'icona del tipo e tutto il resto funziona lo stesso.
 3. **Installa Python 3.14** dal PPA `deadsnakes`, se assente. Viene installato
    **accanto** all'interprete di sistema, che non viene toccato: spostare `python3`
    romperebbe il sistema operativo e le altre applicazioni della macchina.
@@ -235,6 +237,31 @@ curl -fsS http://127.0.0.1:$(grep -oP '^ANF_PORT=\K\d+' /var/www/advanced-nas-fo
 ```
 
 ---
+
+## I byte trasferiti, e perché a volte non compaiono
+
+Il pannello sa **quando** un download è stato autorizzato, ma non quanti byte
+sono arrivati: da quel momento il file lo invia il web server. Il numero vero
+lo scrive lui nel proprio access log, ed è da lì che il pannello lo legge.
+
+Perché possa farlo servono due cose, che l'installer sistema da sé:
+
+1. **L'utente `anf` deve poter leggere il log.** Su Debian e Ubuntu gli access
+   log sono di `root`, gruppo `adm`, non leggibili da altri: l'installer
+   aggiunge `anf` a quel gruppo.
+2. **La riga `CustomLog` deve stare dentro il VirtualHost** che serve il
+   pannello. Una `CustomLog` nella configurazione di server vale solo per le
+   richieste che *non* finiscono in un vhost, e i vhost non la ereditano.
+
+Se manca la seconda, il file di log resta vuoto e nella pagina **Trasferimenti**
+ogni riga rimane «in corso» per sempre. La riga da copiare nel vhost è:
+
+```apache
+CustomLog /var/log/apache2/anf_access.log anf
+```
+
+`LogFormat`, invece, è globale: basta definirlo una volta, e lo fa già
+`anf.conf`.
 
 ## Indirizzi corti delle cartelle pubblicate
 

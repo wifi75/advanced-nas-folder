@@ -27,9 +27,17 @@ from app.models.enums import StatoTrasferimento
 
 logger = logging.getLogger("anf.accesslog")
 
-#: Formato combinato, quello predefinito sia di Apache sia di Nginx.
+#: Due formati, non uno.
+#:
+#: Il combinato — quello predefinito di Apache e Nginx — mette due campi fra
+#: l'indirizzo e la data: `ip - - [data]`. Il formato che l'installer
+#: configura, invece, va dall'indirizzo direttamente alla data, perche' quei
+#: due campi sono sempre vuoti e occupano spazio nel log per niente.
+#:
+#: Riconoscerne uno solo significa non contare mai nulla: e' esattamente cosa
+#: succedeva, e ogni trasferimento restava «in corso» per sempre.
 _RIGA = re.compile(
-    r'^(?P<ip>\S+) \S+ \S+ \[[^\]]+\] "(?P<metodo>[A-Z]+) (?P<url>\S+) [^"]*" '
+    r'^(?P<ip>\S+) (?:\S+ \S+ )?\[[^\]]+\] "(?P<metodo>[A-Z]+) (?P<url>\S+) [^"]*" '
     r"(?P<stato>\d{3}) (?P<byte>\d+|-)"
 )
 

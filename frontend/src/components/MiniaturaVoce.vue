@@ -7,11 +7,15 @@
  * altrettante richieste all'apertura, per immagini che nessuno ha ancora
  * guardato. Il gettone viene chiesto quando la miniatura entra nello schermo.
  */
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import { indirizzoMiniatura } from '@/api/archivio'
 
 const props = defineProps<{ slug: string; percorso: string; nome: string }>()
+
+/** Un video ha la stessa miniatura di una foto: senza un segno, in una
+ *  cartella mista non si distinguono. */
+const eVideo = computed(() => /\.(mp4|m4v|mov|mkv|webm|avi)$/i.test(props.nome))
 
 const indirizzo = ref<string | null>(null)
 const fallito = ref(false)
@@ -67,6 +71,11 @@ onBeforeUnmount(() => osservatore?.disconnect())
       @error="fallito = true"
     >
     <slot v-else />
+    <span
+      v-if="eVideo && indirizzo && !fallito"
+      class="segno-video"
+      aria-hidden="true"
+    >▶</span>
   </span>
 </template>
 
@@ -79,6 +88,25 @@ onBeforeUnmount(() => osservatore?.disconnect())
   overflow: hidden;
   border-radius: 0.35rem;
   background: var(--sfondo);
+}
+
+.segno-video {
+  position: absolute;
+  right: 0.3rem;
+  bottom: 0.3rem;
+  display: grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 55%);
+  color: #fff;
+  font-size: 0.6rem;
+  line-height: 1;
+}
+
+.miniatura {
+  position: relative;
 }
 
 .miniatura img {

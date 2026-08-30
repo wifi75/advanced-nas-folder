@@ -16,6 +16,12 @@ RemoteIPTrustedProxy 127.0.0.1
 
 # Formato di log con l'indirizzo reale e i byte effettivamente inviati: è da
 # qui che il pannello ricava lo stato dei download.
+#
+# ATTENZIONE: `CustomLog` qui vale solo per le richieste che *non* finiscono in
+# un VirtualHost — e i vhost non la ereditano. Se il pannello è servito da un
+# vhost (il caso normale), questa riga va copiata **dentro** quel vhost,
+# altrimenti il file resta vuoto e nessun trasferimento si chiude mai.
+# `LogFormat` invece è globale e basta definirlo una volta, qui.
 LogFormat "%a %t \"%r\" %>s %O %D \"%{User-Agent}i\"" anf
 CustomLog /var/log/apache2/anf_access.log anf
 

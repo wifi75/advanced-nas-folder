@@ -233,3 +233,40 @@ async def test_il_log_chiude_il_trasferimento_con_i_byte_veri(
     elenco = (await admin.get("/api/v1/trasferimenti")).json()
     assert elenco[0]["status"] == "completato"
     assert elenco[0]["bytes_transferred"] == 11
+
+
+# --- formato dell'access log ------------------------------------------------
+
+
+def test_riconosce_il_formato_configurato_dallinstaller() -> None:
+    """L'installer scrive `%a %t "%r" %>s %O %D "%{User-Agent}i"`: dopo
+    l'indirizzo si va dritti alla data. L'analizzatore leggeva solo il formato
+    combinato, e nessuna riga corrispondeva: ogni trasferimento restava «in
+    corso» per sempre."""
+    riga = (
+        "192.168.1.2 [30/Aug/2026:17:21:33 +0000] "
+        '"GET /api/v1/archivio/foto/file?percorso=Panoramiche%2FAuronzo.jpg&g=xyz HTTP/1.1" '
+        '200 55743715 773863 "Mozilla/5.0"'
+    )
+
+    esito = accesslog.analizza(riga)
+
+    assert esito is not None
+    assert esito.ip == "192.168.1.2"
+    assert esito.percorso == "Panoramiche/Auronzo.jpg"
+    assert esito.byte == 55743715
+    assert esito.esito is StatoTrasferimento.COMPLETATO
+
+
+def test_riconosce_anche_il_formato_combinato() -> None:
+    """Chi ha configurato il log a mano usa quasi sempre quello."""
+    riga = (
+        "10.0.0.5 - - [30/Aug/2026:17:21:33 +0000] "
+        '"GET /api/v1/archivio/foto/file?percorso=x.jpg HTTP/1.1" 200 1234'
+    )
+
+    esito = accesslog.analizza(riga)
+
+    assert esito is not None
+    assert esito.ip == "10.0.0.5"
+    assert esito.byte == 1234

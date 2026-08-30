@@ -601,7 +601,11 @@ passo controlli
 export DEBIAN_FRONTEND=noninteractive
 
 mancanti=()
-for pacchetto in curl nfs-common openssl; do
+# `ffmpeg` serve alle miniature dei video: senza, i video restano con l'icona
+# del tipo e tutto il resto funziona lo stesso. Si installa comunque, perche'
+# scoprirlo mancante davanti a una cartella di filmati e' peggio dei pochi
+# megabyte che occupa.
+for pacchetto in curl nfs-common openssl ffmpeg; do
     dpkg -s "$pacchetto" >/dev/null 2>&1 || mancanti+=("$pacchetto")
 done
 if [ ${#mancanti[@]} -gt 0 ]; then
@@ -788,6 +792,11 @@ esegui env -C "$RADICE/backend" "$RADICE/venv/bin/alembic" upgrade head
 # in sola lettura e non partirebbe — dicendo «attempt to write a readonly
 # database», che non lascia capire che è un problema di proprietà.
 esegui chown -R "$UTENTE:$GRUPPO" "$DATI"
+
+# Gli access log su Debian e Ubuntu sono di root, gruppo `adm`, e non
+# leggibili da altri. Senza questo il pannello non sa mai quanti byte sono
+# stati davvero inviati, e ogni trasferimento resta «in corso» per sempre.
+esegui usermod -aG adm "$UTENTE"
 
 # ---------------------------------------------------------------------------
 # Servizi / Services

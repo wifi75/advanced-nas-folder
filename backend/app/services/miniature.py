@@ -51,6 +51,32 @@ def _nome_cache(percorso: Path, modificato: float, dimensione: int) -> str:
     return f"{impronta}.jpg"
 
 
+def produci_video(originale: Path, cache: Path) -> Path:
+    """La miniatura di un video: un fotogramma, con la stessa cache.
+
+    Vive qui e non in `fotogrammi` perche' la regola della cache — nome legato
+    a data e dimensione dell'originale — deve valere per tutti allo stesso
+    modo, altrimenti un video sostituito continuerebbe a mostrare il vecchio
+    fotogramma.
+    """
+    from app.services import fotogrammi
+
+    try:
+        info = originale.stat()
+    except OSError as errore:
+        raise NonUnImmagine("Il file non e' leggibile.") from errore
+
+    cache.mkdir(parents=True, exist_ok=True)
+    destinazione = cache / _nome_cache(originale, info.st_mtime, info.st_size)
+    if destinazione.exists():
+        return destinazione
+
+    try:
+        return fotogrammi.produci(originale, destinazione)
+    except fotogrammi.NonUnVideo as errore:
+        raise NonUnImmagine(str(errore)) from errore
+
+
 def produci(originale: Path, cache: Path) -> Path:
     """Restituisce la miniatura, generandola solo se non c'è già.
 

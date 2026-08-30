@@ -51,6 +51,7 @@ from app.services import (
     caricamento,
     consegna,
     exif,
+    fotogrammi,
     miniature,
     operazioni,
     ricerca,
@@ -731,10 +732,11 @@ async def miniatura(
         await _autorizza(sessione, share, percorso, utente)
 
     reale = await _reale(sessione, share, percorso)
+    # Immagini e video hanno la stessa cache e lo stesso indirizzo: per chi
+    # guarda una cartella e' sempre «la miniatura di quel file».
+    produci = miniature.produci_video if fotogrammi.e_video(reale.name) else miniature.produci
     try:
-        ridotta = await anyio.to_thread.run_sync(
-            miniature.produci, reale, get_settings().cartella_miniature
-        )
+        ridotta = await anyio.to_thread.run_sync(produci, reale, get_settings().cartella_miniature)
     except miniature.NonUnImmagine as errore:
         # 415 e non 404: il file esiste, semplicemente non se ne puo' fare una
         # miniatura. Chi chiama deve mostrare l'icona del tipo, non un errore.

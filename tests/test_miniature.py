@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from app.services import agent_client, exif, miniature
+from app.services import agent_client, exif, fotogrammi, miniature
 from httpx import AsyncClient
 from PIL import Image
 
@@ -213,3 +213,37 @@ async def test_lendpoint_restituisce_i_dati(
     assert risposta.status_code == 200
     assert risposta.json()["fotocamera"] == "Canon EOS 90D"
     assert risposta.json()["iso"] == 400
+
+
+# --- miniature dei video ----------------------------------------------------
+
+
+def test_riconosce_i_video_dal_nome() -> None:
+    assert fotogrammi.e_video("vacanza.MP4")
+    assert fotogrammi.e_video("clip.mkv")
+    assert not fotogrammi.e_video("foto.jpg")
+
+
+def test_un_file_che_non_e_video_viene_rifiutato(cartella: Path, cache: Path) -> None:
+    with pytest.raises(fotogrammi.NonUnVideo):
+        fotogrammi.produci(cartella / "foto.jpg", cache / "x.jpg")
+
+
+def test_un_video_illeggibile_non_blocca(cartella: Path, cache: Path) -> None:
+    """Un file con l'estensione giusta ma contenuto non valido: deve dare un
+    errore previsto, non far girare ffmpeg a vuoto."""
+    finto = cartella / "rotto.mp4"
+    finto.write_bytes(b"non sono un video")
+
+    with pytest.raises(fotogrammi.NonUnVideo):
+        fotogrammi.produci(finto, cache / "y.jpg")
+
+
+async def test_un_video_illeggibile_da_415(
+    admin: AsyncClient, share_id: int, cartella: Path
+) -> None:
+    (cartella / "rotto.mp4").write_bytes(b"non sono un video")
+
+    risposta = await admin.get("/api/v1/archivio/foto/miniatura", params={"percorso": "rotto.mp4"})
+
+    assert risposta.status_code == 415
