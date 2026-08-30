@@ -11,10 +11,14 @@ Complete guide to installing Advanced NAS Folder on a Linux server.
 | Required | Why |
 |---|---|
 | **Linux with systemd** | mounts and services are systemd units |
-| **Apache** with `mod_xsendfile`, **or Nginx** | they deliver files instead of the application |
+| **Apache** *or* **Nginx** | they deliver files instead of the application |
 | **Python 3.14 or newer** | the code uses syntax introduced in that version |
 | **`nfs-common`** | to mount the shares |
 | **root** access | the installer creates users, services and mount points |
+
+On Apache you also need **`mod_xsendfile`**, without which downloads come back
+empty: **the installer installs and enables it**, together with `mod_remoteip` and the
+proxy modules. There is nothing to prepare by hand.
 
 **Node.js is not needed on the server**: the frontend is built by CI and shipped
 ready-made in the release.
@@ -79,10 +83,32 @@ sudo bash install.sh --dry-run
 |---|---|
 | `--dry-run` | shows what it would do, applying nothing |
 | `--web apache` \| `nginx` | forces the web server instead of detecting it |
-| `--port 8100` | internal API port |
+| `--port 8110` | internal API port. Without it, the first free one from 8100 is picked |
 | `--lang en` \| `it` | message language |
 | `--source /path` | installs from a local directory instead of the release |
 | `--uninstall` | removes services and program |
+
+---
+
+### The port is not fixed
+
+The API listens on a local port, behind the web server. With no instructions
+the installer starts at **8100** and goes up until it finds a free one, saying
+which it picked:
+
+```
+==> Looking for a free port for the API
+  !  Port 8100 is already taken: using 8101 instead
+```
+
+On a machine already hosting other applications that is the normal case, not
+an exception. With `--port` you pick a specific one instead: if that one is
+taken the installer **stops** rather than moving on its own — whoever named it
+had a reason, and finding the panel somewhere else would be worse than an
+error.
+
+The chosen number goes into `.env` (`ANF_PORT`) and into the web server
+configuration, which stay consistent with each other.
 
 ---
 
@@ -154,7 +180,7 @@ systemctl status anf-agent anf-api
 ```
 
 ```bash
-curl -fsS http://127.0.0.1:8100/api/v1/health
+curl -fsS http://127.0.0.1:$(grep -oP '^ANF_PORT=\K\d+' /var/www/advanced-nas-folder/.env)/api/v1/health
 ```
 
 ---

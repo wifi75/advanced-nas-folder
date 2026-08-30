@@ -24,7 +24,9 @@ RADICE="/var/www/${APP}"
 DATI="/var/lib/anf"
 MOUNT_ROOT="/srv/nas"
 SOCKET_DIR="/run/anf"
-PORTA_API="8100"
+PORTA_API="auto"
+PORTA_PREDEFINITA="8100"
+PORTA_SCELTA_A_MANO=0
 PYTHON_MIN="3.14"
 REPO="wifi75/advanced-nas-folder"
 
@@ -63,6 +65,13 @@ m() {
         web_rilevato) testo="Web server rilevato: %s" ;;
         web_assente) testo="Nessun web server trovato. Installa Apache o Nginx, oppure indica quale usare con --web." ;;
         xsendfile) testo="Installo mod_xsendfile, necessario per la consegna dei download" ;;
+        moduli) testo="Abilito i moduli di Apache che servono al pannello" ;;
+        porta_cerco) testo="Cerco una porta libera per l'API" ;;
+        porta_ok) testo="Porta %s libera" ;;
+        porta_spostata) testo="La porta %s è già occupata: uso la %s" ;;
+        porta_occupata) testo="La porta %s è già occupata da un altro servizio. Indicane un'altra con --porta, oppure libera quella." ;;
+        porta_niente) testo="Nessuna porta libera fra %s e %s. Indicane una con --porta." ;;
+        porta_invalida) testo="Porta non valida: %s. Serve un numero fra 1024 e 65535." ;;
         utente_creo) testo="Creo l'utente di sistema %s" ;;
         utente_esiste) testo="Utente %s già presente" ;;
         cartelle) testo="Preparo le cartelle" ;;
@@ -101,6 +110,13 @@ m() {
         web_rilevato) testo="Web server detected: %s" ;;
         web_assente) testo="No web server found. Install Apache or Nginx, or pick one with --web." ;;
         xsendfile) testo="Installing mod_xsendfile, required to deliver downloads" ;;
+        moduli) testo="Enabling the Apache modules the panel needs" ;;
+        porta_cerco) testo="Looking for a free port for the API" ;;
+        porta_ok) testo="Port %s is free" ;;
+        porta_spostata) testo="Port %s is already taken: using %s instead" ;;
+        porta_occupata) testo="Port %s is already taken by another service. Pick another one with --port, or free it." ;;
+        porta_niente) testo="No free port between %s and %s. Pick one with --port." ;;
+        porta_invalida) testo="Invalid port: %s. A number between 1024 and 65535 is required." ;;
         utente_creo) testo="Creating system user %s" ;;
         utente_esiste) testo="User %s already exists" ;;
         cartelle) testo="Preparing directories" ;;
@@ -167,8 +183,8 @@ Advanced NAS Folder — installer
   --source <path>
 
   --web apache|nginx      Forza il web server invece di rilevarlo
-  --porta <numero>        Porta interna dell'API (predefinita 8100)
-  --port <number>
+  --porta <numero>        Porta interna dell'API. Senza questa opzione viene
+  --port <number>         scelta la prima libera a partire dalla 8100.
 
   --lingua it|en          Lingua dei messaggi (predefinita: dalla locale)
   --lang it|en
@@ -183,7 +199,7 @@ while [ $# -gt 0 ]; do
     case "$1" in
         --sorgente | --source) SORGENTE="$2"; shift 2 ;;
         --web) WEB="$2"; shift 2 ;;
-        --porta | --port) PORTA_API="$2"; shift 2 ;;
+        --porta | --port) PORTA_API="$2"; PORTA_SCELTA_A_MANO=1; shift 2 ;;
         --lingua | --lang) LINGUA="$2"; shift 2 ;;
         --dry-run) DRY_RUN=1; shift ;;
         --uninstall) DISINSTALLA=1; shift ;;
@@ -193,6 +209,66 @@ while [ $# -gt 0 ]; do
 done
 
 rileva_lingua
+
+# ---------------------------------------------------------------------------
+# Scelta della porta / Port selection
+# ---------------------------------------------------------------------------
+
+# Vero se qualcosa sta già ascoltando su quella porta.
+#
+# Si guarda l'ascolto reale con `ss`, non un file di configurazione: la porta
+# può essere occupata da un servizio che il pannello non conosce, ed è
+# esattamente il caso che rompe l'installazione.
+porta_occupata() {
+    local porta="$1"
+    if command -v ss >/dev/null 2>&1; then
+        ss -tln 2>/dev/null | awk '{print $4}' | grep -qE "[:.]${porta}$"
+    elif command -v netstat >/dev/null 2>&1; then
+        netstat -tln 2>/dev/null | awk '{print $4}' | grep -qE "[:.]${porta}$"
+    else
+        # Senza strumenti per guardare, si prova ad aprirla: se la connessione
+        # riesce, qualcuno risponde.
+        (exec 3<>"/dev/tcp/127.0.0.1/${porta}") 2>/dev/null && { exec 3<&-; return 0; }
+        return 1
+    fi
+}
+
+scegli_porta() {
+    # Porta chiesta esplicitamente: se e occupata ci si ferma, non si cambia
+    # di nascosto. Chi ha scritto --porta 8110 ha un motivo, e trovarsi il
+    # pannello su un'altra porta sarebbe peggio di un errore.
+    if [ "$PORTA_SCELTA_A_MANO" = 1 ]; then
+        case "$PORTA_API" in
+        '' | *[!0-9]*) errore porta_invalida "$PORTA_API" ;;
+        esac
+        [ "$PORTA_API" -ge 1024 ] && [ "$PORTA_API" -le 65535 ] ||
+            errore porta_invalida "$PORTA_API"
+        if porta_occupata "$PORTA_API"; then
+            errore porta_occupata "$PORTA_API"
+        fi
+        ok porta_ok "$PORTA_API"
+        return
+    fi
+
+    # Nessuna indicazione: si parte dalla predefinita e si sale finche non se
+    # ne trova una libera.
+    passo porta_cerco
+    local candidata="$PORTA_PREDEFINITA"
+    local ultima=$((PORTA_PREDEFINITA + 50))
+    while [ "$candidata" -le "$ultima" ]; do
+        if ! porta_occupata "$candidata"; then
+            if [ "$candidata" = "$PORTA_PREDEFINITA" ]; then
+                ok porta_ok "$candidata"
+            else
+                avviso porta_spostata "$PORTA_PREDEFINITA" "$candidata"
+            fi
+            PORTA_API="$candidata"
+            return
+        fi
+        candidata=$((candidata + 1))
+    done
+    errore porta_niente "$PORTA_PREDEFINITA" "$ultima"
+}
 
 # ---------------------------------------------------------------------------
 # Disinstallazione / Uninstall
@@ -267,12 +343,30 @@ if [ "$WEB" = "auto" ]; then
 fi
 ok web_rilevato "$WEB"
 
-if [ "$WEB" = "apache" ] && ! dpkg -s libapache2-mod-xsendfile >/dev/null 2>&1; then
-    passo xsendfile
-    esegui apt-get install -y -qq libapache2-mod-xsendfile
-    esegui a2enmod xsendfile
-    esegui a2enmod remoteip
-    esegui a2enmod proxy proxy_http headers
+# La porta si sceglie qui: serve al file .env, al vhost e al controllo finale,
+# e va decisa prima di tutti e tre.
+scegli_porta
+
+if [ "$WEB" = "apache" ]; then
+    # Il pacchetto e il modulo sono due cose diverse: il pacchetto può essere
+    # installato senza che il modulo sia attivo, e in quel caso i download
+    # rispondono vuoti senza dire perche. Si verificano separatamente.
+    if ! dpkg -s libapache2-mod-xsendfile >/dev/null 2>&1; then
+        passo xsendfile
+        esegui apt-get install -y -qq libapache2-mod-xsendfile
+    fi
+
+    # `remoteip` serve agli indirizzi reali dietro un reverse proxy, `headers`
+    # alle intestazioni di ripresa, `proxy_http` a inoltrare all'API.
+    mancanti_mod=""
+    for mod in xsendfile remoteip headers proxy proxy_http; do
+        apache2ctl -M 2>/dev/null | grep -q "${mod}_module" || mancanti_mod="$mancanti_mod $mod"
+    done
+    if [ -n "$mancanti_mod" ]; then
+        passo moduli
+        # shellcheck disable=SC2086
+        esegui a2enmod $mancanti_mod
+    fi
 fi
 
 # ---------------------------------------------------------------------------
