@@ -601,20 +601,10 @@ a {
   color: var(--testo-tenue);
 }
 
-/* Ogni campo e' una scheda con lo stesso materiale delle voci di menu: vetro
-   traslucido, raggio 11px, filo di luce in alto. Prima erano rettangoli grigi
-   dentro un pannello piatto, e la pagina non somigliava al menu accanto. */
-.campo {
-  padding: 0.6rem 0.75rem;
-  border-radius: 11px;
-  background: var(--vetro-sfondo);
-  border: 1px solid var(--vetro-bordo);
-  backdrop-filter: blur(14px) saturate(180%);
-  -webkit-backdrop-filter: blur(14px) saturate(180%);
-  box-shadow:
-    inset 0 1px 0 var(--vetro-luce),
-    var(--vetro-ombra);
-}
+/* Un campo non e' una scheda: e' un'etichetta e un valore. Prima ogni campo
+   aveva il suo riquadro dentro il riquadro del gruppo dentro quello della
+   pagina — tre livelli, disegnati in modi diversi, ed e' il motivo per cui la
+   stessa pagina sembrava fatta da due mani. Un solo riquadro: la testata. */
 
 .campo input[type='text'],
 .campo input[type='password'],
@@ -708,4 +698,52 @@ a {
 .campo.interruttore,
 .campo:has(textarea) {
   grid-column: 1 / -1;
+}
+
+/* --- testata di una pagina di dettaglio ----------------------------------
+   L'unico riquadro della pagina. Contiene identita', indirizzo e sottomenu:
+   sono le cose che si guardano sempre, e tenerle insieme evita di disegnare
+   un secondo riquadro piu' sotto per l'indirizzo. */
+
+.testata-tinta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: 1rem 1.1rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--tinta) 35%, var(--vetro-bordo));
+  background:
+    linear-gradient(
+      158deg,
+      color-mix(in srgb, var(--tinta) 20%, var(--superficie)),
+      color-mix(in srgb, var(--tinta) 6%, var(--superficie))
+    );
+  box-shadow:
+    inset 0 1px 0 var(--vetro-luce),
+    var(--vetro-ombra);
+}
+
+.testata-tinta__riga {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.testata-tinta h1 {
+  margin: 0;
+  font-size: clamp(1.35rem, 3vw, 1.75rem);
+  letter-spacing: -.02em;
+}
+
+.testata-tinta__nota {
+  margin: 0;
+  color: var(--testo-tenue);
+  font-size: 0.875rem;
+}
+
+/* Le sezioni si separano con una linea, non con un riquadro ciascuna. */
+.sezione + .sezione {
+  border-top: 1px solid var(--bordo);
+  padding-top: 1.1rem;
 }

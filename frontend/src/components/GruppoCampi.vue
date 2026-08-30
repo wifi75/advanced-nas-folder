@@ -14,7 +14,7 @@ defineProps<{ titolo: string; descrizione?: string; tinta?: string; icona?: stri
 </script>
 
 <template>
-  <fieldset class="gruppo">
+  <fieldset class="gruppo sezione">
     <legend class="gruppo__testa">
       <span
         v-if="icona"
@@ -104,15 +104,9 @@ defineProps<{ titolo: string; descrizione?: string; tinta?: string; icona?: stri
 }
 
 .gruppo__campi {
-  /* In griglia, non impilati: un campo per il nome non deve essere largo
-     quanto la pagina. I campi corti stanno affiancati, quelli che hanno
-     bisogno di spazio lo chiedono con `.campo--largo`. */
   display: grid;
-  /* `auto-fill` e non `auto-fit`: con `auto-fit` le colonne vuote collassano e
-     un gruppo con un solo campo lo allarga per tutta la pagina — che e'
-     esattamente il difetto che si voleva togliere. */
-  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
-  gap: 0.55rem;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 0.75rem 1rem;
   align-items: start;
 }
 </style>

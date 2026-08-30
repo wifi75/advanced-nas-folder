@@ -10,7 +10,11 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-const props = defineProps<{ slug: string }>()
+const props = defineProps<{
+  slug: string
+  /** Senza riquadro proprio: sta gia' dentro la testata della pagina. */
+  nudo?: boolean
+}>()
 const { t } = useI18n()
 
 /** Indirizzo corto, sulla radice del sito: `https://sito/documenti`. */
@@ -40,7 +44,10 @@ async function copia(quale: string, testo: string): Promise<void> {
 </script>
 
 <template>
-  <div class="indirizzi">
+  <div
+    class="indirizzi"
+    :class="{ 'indirizzi--nudo': nudo }"
+  >
     <p class="titolo">
       {{ t('share.daCondividere') }}
     </p>
@@ -88,7 +95,18 @@ async function copia(quale: string, testo: string): Promise<void> {
   gap: 0.35rem;
   padding: 0.75rem 0.9rem;
   border: 1px solid var(--bordo);
-  border-radius: 0.5rem;
+  border-radius: 11px;
+}
+
+/* Dentro la testata non serve un secondo riquadro: sarebbe un riquadro dentro
+   un riquadro, che e' esattamente cio' che si voleva togliere. */
+.indirizzi--nudo {
+  padding: 0;
+  border: 0;
+}
+
+.indirizzi--nudo .titolo {
+  display: none;
 }
 
 .titolo {

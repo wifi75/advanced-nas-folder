@@ -102,11 +102,16 @@ async function elimina(): Promise<void> {
       <span>{{ share?.label ?? '...' }}</span>
     </p>
 
-    <header class="testata">
-      <div class="identita">
+    <!-- L'unico riquadro della pagina: identita', indirizzo e sottomenu. Sono
+         le cose che si guardano sempre, e tenerle insieme evita di disegnare un
+         secondo riquadro piu' sotto per il solo indirizzo. -->
+    <header
+      class="testata-tinta"
+      :style="{ '--tinta': 'var(--tinta-pubblicazioni)' }"
+    >
+      <div class="testata-tinta__riga">
         <span
           class="pastiglia-titolo"
-          :style="{ '--tinta': 'var(--tinta-pubblicazioni)' }"
           aria-hidden="true"
         >
           <svg
@@ -120,17 +125,22 @@ async function elimina(): Promise<void> {
             <path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z M3 12h18 M12 3c2.5 2.7 2.5 15.3 0 18 M12 3c-2.5 2.7-2.5 15.3 0 18" />
           </svg>
         </span>
-        <div>
-          <h1>{{ share?.label ?? t('comune.carico') }}</h1>
-          <p v-if="share">
-            {{ t(`visibilita.${share.default_visibility}`) }}
-          </p>
-        </div>
+        <h1>{{ share?.label ?? t('comune.carico') }}</h1>
+        <span
+          v-if="share"
+          class="etichetta-visibilita"
+        >{{ t(`visibilita.breve_${share.default_visibility}`) }}</span>
+        <span
+          v-if="share && !share.is_enabled"
+          class="spenta"
+        >{{ t('share.disattivata') }}</span>
       </div>
-      <span
-        v-if="share && !share.is_enabled"
-        class="spenta"
-      >{{ t('share.disattivata') }}</span>
+
+      <IndirizziPubblicazione
+        v-if="share"
+        :slug="share.slug"
+        nudo
+      />
     </header>
 
     <p
@@ -148,8 +158,6 @@ async function elimina(): Promise<void> {
     >
       <!-- indirizzo e identità -->
       <template v-if="attiva === 'indirizzo'">
-        <IndirizziPubblicazione :slug="share.slug" />
-
         <GruppoCampi
           :titolo="t('share.gruppoNome')"
           tinta="var(--tinta-pubblicazioni)"
@@ -361,10 +369,15 @@ async function elimina(): Promise<void> {
 </template>
 
 <style scoped>
-.identita {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+.etichetta-visibilita {
+  margin-left: auto;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--tinta-pubblicazioni) 45%, transparent);
+  background: var(--superficie);
+  font-size: 0.8rem;
+  color: var(--tinta-pubblicazioni);
+  white-space: nowrap;
 }
 
 .briciole {

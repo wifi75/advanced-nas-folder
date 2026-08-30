@@ -18,6 +18,25 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.17.0] - 2026-08-30
+
+Impaginazione scelta fra cinque proposte: **un solo riquadro per pagina**.
+
+### Modificato
+- **La testata e' l'unico riquadro**, tinto del colore della cosa che descrive:
+  azzurro per una condivisione, verde per una cartella pubblicata. Contiene
+  identita', stato o visibilita', e — per una pubblicazione — l'indirizzo da
+  condividere.
+
+  Prima l'indirizzo aveva un riquadro suo, disegnato in un modo, e i gruppi di
+  campi ne avevano un altro, disegnato diversamente: la stessa pagina sembrava
+  fatta da due mani. Con un solo riquadro il difetto non puo' ripresentarsi,
+  invece di doverne tenere allineati due a mano.
+- **Un campo non e' piu' una scheda**: e' un'etichetta e un valore. Ogni campo
+  aveva il proprio riquadro, dentro quello del gruppo, dentro quello della
+  pagina — tre livelli.
+- **Le sezioni si separano con una linea**, non con un riquadro ciascuna.
+
 ## [0.16.0] - 2026-08-30
 
 ### Corretto

@@ -80,11 +80,11 @@ const etichettaStato = computed(() => {
 const classeStato = computed(() => {
   switch (mount.value?.state) {
     case 'montato':
-      return 'dato-stato--ok'
+      return 'stato-pillola--ok'
     case 'errore':
-      return 'dato-stato--errore'
+      return 'stato-pillola--errore'
     default:
-      return 'dato-stato--attesa'
+      return 'stato-pillola--attesa'
   }
 })
 
@@ -105,11 +105,13 @@ async function elimina(): Promise<void> {
       <span>{{ mount?.label ?? '...' }}</span>
     </p>
 
-    <header class="testata">
-      <div class="identita">
+    <header
+      class="testata-tinta"
+      :style="{ '--tinta': 'var(--tinta-nfs)' }"
+    >
+      <div class="testata-tinta__riga">
         <span
           class="pastiglia-titolo"
-          :style="{ '--tinta': 'var(--tinta-nfs)' }"
           aria-hidden="true"
         >
           <svg
@@ -123,13 +125,19 @@ async function elimina(): Promise<void> {
             <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z M12 11v3 M9 17h6" />
           </svg>
         </span>
-        <div>
-          <h1>{{ mount?.label ?? t('comune.carico') }}</h1>
-          <p v-if="mount">
-            {{ mount.server }}:{{ mount.export_path }}
-          </p>
-        </div>
+        <h1>{{ mount?.label ?? t('comune.carico') }}</h1>
+        <span
+          v-if="mount"
+          class="stato-pillola"
+          :class="classeStato"
+        >{{ etichettaStato }}</span>
       </div>
+      <p
+        v-if="mount"
+        class="testata-tinta__nota mono"
+      >
+        {{ mount.server }}:{{ mount.export_path }}
+      </p>
     </header>
 
     <p
@@ -147,13 +155,6 @@ async function elimina(): Promise<void> {
     >
       <template v-if="attiva === 'panoramica'">
         <dl class="dati">
-          <div
-            class="dato-stato"
-            :class="classeStato"
-          >
-            <dt>{{ t('mount.stato') }}</dt>
-            <dd>{{ etichettaStato }}</dd>
-          </div>
           <div>
             <dt>{{ t('mount.percorso') }}</dt>
             <dd><code class="percorso">{{ mount.mountpoint }}</code></dd>
@@ -452,6 +453,11 @@ async function elimina(): Promise<void> {
 
 .dato-stato--errore dd {
   color: var(--errore);
+}
+
+.stato-pillola {
+  margin-left: auto;
+  background: var(--superficie);
 }
 
 .identita {
