@@ -10,6 +10,24 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.27.4] - 2026-08-30
+
+Solo documentazione: il codice e' quello della 0.27.3.
+
+### Modificato
+
+- **`memory.md` allineato allo stato reale.** Diceva «versione corrente 0.6.6»
+  e «sul server non e' ancora stato pubblicato nulla», mentre il pannello e'
+  in produzione: e' il documento da cui riparte una sessione nuova, e la
+  faceva ripartire da informazioni false. Aggiunta una sezione sulle trappole
+  trovate sul campo, che nessun controllo automatico segnala.
+- **Le guide** spiegano come dare una cartella a una persona sola, compreso il
+  passaggio che si dimentica — la visibilita' su «Solo gli utenti
+  autorizzati», senza la quale il permesso personale non restringe niente — e
+  cosa vede chi non amministra. Corretto il percorso dei link, che puntava a
+  una scheda con il nome vecchio.
+- README nelle due lingue: permessi per singola persona e menu ridotto.
+
 ## [0.27.3] - 2026-08-30
 
 ### Corretto
