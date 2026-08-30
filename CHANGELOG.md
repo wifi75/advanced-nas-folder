@@ -10,6 +10,22 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.7.2] - 2026-08-30
+
+### Corretto
+- **Le scorciatoie rispondevano 404.** Erano generate come regole di
+  `mod_rewrite`, che i VirtualHost **non** ereditano dalla configurazione di
+  server — quindi non si applicavano a nessun sito servito da un vhost, cioè a
+  tutti. Ora sono `RedirectMatch`, di `mod_alias`, che invece viene ereditato.
+  L'`Alias` del pannello funzionava proprio per questo, e la differenza non era
+  visibile dal test di sintassi: la configurazione era valida, semplicemente non
+  si applicava.
+- **`update.sh` poteva installare in silenzio la versione precedente.** Usava
+  `/releases/latest/download/`, che GitHub serve da una cache: subito dopo una
+  pubblicazione quell'indirizzo restituisce ancora il pacchetto di prima, e
+  l'aggiornamento riusciva senza aggiornare nulla. Ora risolve il tag vero
+  dall'API prima di scaricare.
+
 ## [0.7.1] - 2026-08-30
 
 ### Corretto

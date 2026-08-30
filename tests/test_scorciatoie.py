@@ -15,6 +15,16 @@ def test_una_regola_per_pubblicazione() -> None:
     assert "^/(.*)" not in regole
 
 
+def test_si_usa_mod_alias_e_non_mod_rewrite() -> None:
+    """Il file sta fuori dai VirtualHost, e le regole di mod_rewrite non vengono
+    ereditate dai VirtualHost mentre quelle di mod_alias si: con RewriteRule le
+    scorciatoie rispondevano 404 su ogni sito servito da un vhost, cioe sempre."""
+    regole = webserver._regole_apache("/", "documenti")
+
+    assert "RedirectMatch" in regole
+    assert "RewriteRule" not in regole
+
+
 def test_la_destinazione_passa_dal_pannello() -> None:
     assert "/pannello/archivio/documenti" in webserver._regole_apache("/", "documenti")
 

@@ -323,19 +323,21 @@ _SCORCIATOIE_APACHE = """{marcatore}
 # funziona da subito — nei link, nei preferiti, scritto a mano — e il browser
 # prosegue su quello lungo.
 #
+# Si usa RedirectMatch e non RewriteRule: questo file sta fuori dai
+# VirtualHost, e le regole di mod_rewrite **non** vengono ereditate dai
+# VirtualHost, mentre quelle di mod_alias si. Con RewriteRule le scorciatoie
+# rispondevano 404 su ogni sito servito da un vhost, cioe sempre.
+#
 # Viene generata una regola per ogni pubblicazione, mai una regola che cattura
 # tutto: cosi nessun altro contenuto di questo sito viene oscurato per sbaglio.
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-{regole}</IfModule>
-"""
+{regole}"""
 
 
 def _regole_apache(prefisso: str, slug: str) -> str:
     destinazione = f"{prefisso}pannello/archivio/{slug}"
     return (
-        f"    RewriteRule ^/{slug}$ {destinazione} [R=302,L]\n"
-        f"    RewriteRule ^/{slug}/(.*)$ {destinazione}/$1 [R=302,L]\n"
+        f"RedirectMatch 302 ^/{slug}$ {destinazione}\n"
+        f"RedirectMatch 302 ^/{slug}/(.*)$ {destinazione}/$1\n"
     )
 
 

@@ -4,7 +4,7 @@
 
 [![Release](https://img.shields.io/github/v/release/wifi75/advanced-nas-folder?label=Release&color=2B7489&logo=github)](https://github.com/wifi75/advanced-nas-folder/releases/latest)
 [![Checks](https://img.shields.io/github/actions/workflow/status/wifi75/advanced-nas-folder/controlli.yml?branch=main&label=Checks&logo=githubactions&logoColor=white)](https://github.com/wifi75/advanced-nas-folder/actions/workflows/controlli.yml)
-[![Tests](https://img.shields.io/badge/Tests-388-6E9F18?logo=pytest&logoColor=white)](tests)
+[![Tests](https://img.shields.io/badge/Tests-389-6E9F18?logo=pytest&logoColor=white)](tests)
 [![Platform](https://img.shields.io/badge/Platform-Linux%20%2B%20systemd-FCC624?logo=linux&logoColor=black)](https://systemd.io)
 [![Backend](https://img.shields.io/badge/Backend-FastAPI%200.141-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![Python](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white)](https://www.python.org)

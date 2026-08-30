@@ -74,7 +74,15 @@ TEMPORANEA="$(mktemp -d)"
 trap 'rm -rf "$TEMPORANEA"' EXIT
 
 if [ "$VERSIONE" = "ultima" ]; then
-    URL="https://github.com/${REPO}/releases/latest/download/${APP}.tar.gz"
+    # Si risolve il tag vero invece di usare /releases/latest/download/, che
+    # GitHub serve da una cache: subito dopo una pubblicazione quell'indirizzo
+    # restituisce ancora il pacchetto precedente, e l'aggiornamento riesce
+    # installando in silenzio la versione di prima.
+    TAG="$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" |
+        grep -m1 '"tag_name"' | cut -d'"' -f4)"
+    [ -n "$TAG" ] ||
+        errore "$(msg 'Non riesco a sapere qual e l ultima versione.'                        'Cannot determine the latest version.')"
+    URL="https://github.com/${REPO}/releases/download/${TAG}/${APP}.tar.gz"
 else
     URL="https://github.com/${REPO}/releases/download/${VERSIONE}/${APP}.tar.gz"
 fi
