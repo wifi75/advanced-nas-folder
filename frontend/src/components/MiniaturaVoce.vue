@@ -9,7 +9,7 @@
  */
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 
-import { indirizzoDownload } from '@/api/archivio'
+import { indirizzoMiniatura } from '@/api/archivio'
 
 const props = defineProps<{ slug: string; percorso: string; nome: string }>()
 
@@ -20,7 +20,9 @@ let osservatore: IntersectionObserver | null = null
 
 async function chiedi(): Promise<void> {
   try {
-    indirizzo.value = await indirizzoDownload(props.slug, props.percorso, undefined, true)
+    // La miniatura e non l'originale: una cartella di foto pesa gigabyte, e
+    // scaricarle intere per mostrarle a 150 pixel satura la rete.
+    indirizzo.value = await indirizzoMiniatura(props.slug, props.percorso)
   } catch {
     // Una miniatura che non arriva non è un errore da mostrare: resta
     // l'icona del tipo di file, che è già un'informazione.

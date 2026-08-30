@@ -159,6 +159,27 @@ I pulsanti di modifica compaiono solo dove si può scrivere davvero.
 
 ---
 
+### Guardare le foto
+
+Tre modi di vedere la stessa cartella, dal selettore in alto:
+
+| | Quando serve |
+|---|---|
+| **Elenco** | file di ogni tipo: nome, dimensione e data incolonnati |
+| **Griglia** | schede con miniatura, nome e comandi |
+| **Galleria** | miniature grandi, per riconoscere le foto a colpo d'occhio |
+
+La scelta resta nel tuo browser: è una preferenza di lettura, non una proprietà
+della cartella, e non cambia quello che vedono gli altri.
+
+**Le miniature le prepara il server**, una volta sola per foto, e le tiene in
+`/var/lib/anf/miniature` — non sul NAS. Vengono chieste solo quando entrano
+nello schermo: in una cartella con centinaia di scatti, generarle tutte
+all'apertura significherebbe attendere per immagini che non guarderai.
+
+Se una foto viene sostituita con un'altra dello stesso nome, la miniatura si
+rifà da sola: dipende anche da data e dimensione del file.
+
 ## Condividere con chi non ha un account
 
 **Pubblicazioni → Regole per cartella → Link di condivisione.**

@@ -17,6 +17,7 @@ from fastapi import APIRouter, HTTPException, Query, Request, Response, status
 from fastapi.responses import FileResponse, StreamingResponse
 
 from app.api.deps import Sessione, UtenteFacoltativo
+from app.core.config import get_settings
 from app.core.security import (
     crea_gettone_percorso,
     verifica_gettone_percorso,
@@ -48,6 +49,7 @@ from app.services import (
     archivio_zip,
     caricamento,
     consegna,
+    miniature,
     operazioni,
     ricerca,
     trasferimenti,
@@ -701,3 +703,46 @@ async def salva_testo(
         ) from exc
 
     return TestoOut(percorso=percorso, contenuto=dati.contenuto)
+
+
+@router.get("/{slug}/miniatura")
+async def miniatura(
+    slug: str,
+    sessione: Sessione,
+    utente: UtenteFacoltativo,
+    percorso: str = Query(max_length=1024),
+    g: str | None = Query(default=None, description="Gettone rilasciato da /gettone"),
+) -> Response:
+    """Versione ridotta di un'immagine, per griglia e galleria.
+
+    Non passa dal web server come il download: il file consegnato non e'
+    quello del NAS ma una copia ridotta che abbiamo generato noi, e sta gia'
+    sul disco locale. Delegarlo non porterebbe alcun vantaggio, e ripresa e
+    `Range` su un'immagine da qualche decina di kilobyte non servono.
+    """
+    share = await _pubblicazione(sessione, slug)
+    percorso = _normalizza(percorso)
+    if not percorso:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Indicare l'immagine.")
+
+    if g is None or not verifica_gettone_percorso(g, share.id, percorso):
+        await _autorizza(sessione, share, percorso, utente)
+
+    reale = await _reale(sessione, share, percorso)
+    try:
+        ridotta = await anyio.to_thread.run_sync(
+            miniature.produci, reale, get_settings().cartella_miniature
+        )
+    except miniature.NonUnImmagine as errore:
+        # 415 e non 404: il file esiste, semplicemente non se ne puo' fare una
+        # miniatura. Chi chiama deve mostrare l'icona del tipo, non un errore.
+        raise HTTPException(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, str(errore)) from errore
+
+    return FileResponse(
+        ridotta,
+        media_type="image/jpeg",
+        # Il nome del file in cache contiene gia' data e dimensione
+        # dell'originale: se la foto cambia, cambia l'indirizzo, e la cache del
+        # browser non puo' restituire quella vecchia.
+        headers={"Cache-Control": "private, max-age=604800, immutable"},
+    )

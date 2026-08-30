@@ -123,6 +123,19 @@ export const archivioApi = {
  * trasferimento interrotto. Una navigazione però non porta intestazioni, e
  * quindi nemmeno il token di sessione: da qui il gettone a vita breve.
  */
+/**
+ * Indirizzo della miniatura di un'immagine.
+ *
+ * Come il download chiede un gettone valido per quel solo percorso: le
+ * miniature seguono gli stessi permessi del file da cui vengono, altrimenti
+ * basterebbe la galleria per vedere cosa c'e' in una cartella vietata.
+ */
+export async function indirizzoMiniatura(slug: string, percorso: string): Promise<string> {
+  const { gettone } = await archivioApi.gettone(slug, percorso)
+  const q = new URLSearchParams({ percorso, g: gettone })
+  return `${BASE}/archivio/${encodeURIComponent(slug)}/miniatura?${q}`
+}
+
 export async function indirizzoDownload(
   slug: string,
   percorso: string,

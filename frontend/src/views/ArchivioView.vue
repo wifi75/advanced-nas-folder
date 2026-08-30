@@ -612,7 +612,7 @@ function quando(iso: string | null): string {
           @click="inAnteprima = voce"
         >
           <MiniaturaVoce
-            v-if="vista === 'galleria' && haMiniatura(voce)"
+            v-if="vista !== 'elenco' && haMiniatura(voce)"
             :slug="slug"
             :percorso="voce.percorso"
             :nome="voce.nome"
@@ -1035,6 +1035,13 @@ function quando(iso: string | null): string {
   align-items: flex-start;
   gap: 0.4rem;
   text-align: left;
+}
+
+/* In griglia la miniatura non riempie la scheda: accanto al nome ci deve
+   stare anche il resto, e una foto quadrata a tutta larghezza spingerebbe il
+   nome fuori dallo schermo su una colonna stretta. */
+.voci--griglia .miniatura {
+  aspect-ratio: 4 / 3;
 }
 
 .voci--griglia .voce__nome,

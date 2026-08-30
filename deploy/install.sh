@@ -21,6 +21,9 @@ APP="advanced-nas-folder"
 UTENTE="anf"
 GRUPPO="anf"
 RADICE="/var/www/${APP}"
+# Database e miniature delle immagini. Le miniature stanno qui e non nel
+# mount: scriverle sul NAS sporcherebbe le cartelle condivise e richiederebbe
+# un permesso di scrittura che di norma non c'e'.
 DATI="/var/lib/anf"
 MOUNT_ROOT="/srv/nas"
 SOCKET_DIR="/run/anf"

@@ -84,6 +84,17 @@ class Settings(BaseSettings):
         return self
 
     @property
+    def cartella_miniature(self) -> Path:
+        """Dove finiscono le miniature generate.
+
+        Accanto al database e non dentro il mount: le miniature sono roba
+        nostra, e scriverle sul NAS significherebbe sporcare le cartelle di chi
+        le ha condivise — oltre a richiedere il permesso di scrittura, che di
+        norma non c'e'.
+        """
+        return self.db_path.parent / "miniature"
+
+    @property
     def database_url(self) -> str:
         return f"sqlite+aiosqlite:///{self.db_path}"
 

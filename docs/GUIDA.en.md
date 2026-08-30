@@ -158,6 +158,27 @@ Editing buttons appear only where you can actually write.
 
 ---
 
+### Looking at photos
+
+Three ways of seeing the same folder, from the switcher at the top:
+
+| | When it helps |
+|---|---|
+| **List** | files of any kind: name, size and date in columns |
+| **Grid** | cards with a thumbnail, the name and the commands |
+| **Gallery** | large thumbnails, to recognise photos at a glance |
+
+The choice stays in your browser: it is a reading preference, not a property of
+the folder, and does not change what others see.
+
+**Thumbnails are produced by the server**, once per photo, and kept in
+`/var/lib/anf/miniature` — not on the NAS. They are requested only when they
+scroll into view: in a folder with hundreds of shots, generating them all on
+open would mean waiting for images you will not look at.
+
+If a photo is replaced by another with the same name the thumbnail is redone on
+its own: it depends on the file's date and size too.
+
 ## Sharing with people who have no account
 
 **Publications → Folder rules → Share links.**

@@ -138,6 +138,11 @@ Richieste del 2026-08-29 rimaste aperte alla chiusura della v0.3.0:
 
 ### Richieste del 2026-08-30
 
+- [x] **Miniature vere per le foto**: prodotte dal server con Pillow, chieste
+      solo quando entrano nello schermo, in cache accanto al database e non sul
+      NAS. Prima la galleria scaricava ogni scatto per intero per mostrarlo a
+      150 pixel.
+
 - [x] **Indirizzi corti** per le cartelle pubblicate: `sito/documenti` invece di
       `sito/pannello/archivio/documenti`. Fatto nella v0.7.0, solo su Apache.
 - [ ] **Indirizzi corti su Nginx.** Richiedono di rigenerare il vhost, perché le

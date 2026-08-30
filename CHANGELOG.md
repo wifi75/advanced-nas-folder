@@ -18,6 +18,40 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.18.0] - 2026-08-30
+
+### Aggiunto
+- **Miniature vere per le immagini**, prodotte dal server con Pillow 12.3.0.
+  Prima la galleria scaricava ogni foto **per intero** e la rimpiccioliva nel
+  browser: su una cartella del NAS sono centinaia di megabyte per vedere delle
+  anteprime.
+
+  Dettagli che contano:
+  - Le miniature compaiono ora **anche in griglia**, non solo in galleria.
+  - Vengono chieste **solo quando entrano nello schermo**: in una cartella con
+    centinaia di scatti, generarle tutte all'apertura significherebbe attendere
+    per immagini che nessuno guardera'.
+  - Il nome in cache dipende **da data e dimensione dell'originale**: se una
+    foto viene sostituita con un'altra dello stesso nome, la miniatura si rifa'
+    da sola invece di restare a mostrare quella di prima.
+  - **L'orientamento EXIF viene applicato**: senza, le foto scattate in
+    verticale escono coricate, ed e' il difetto piu' evidente di una galleria.
+  - La cache sta in `/var/lib/anf/miniature`, **non sul NAS**: scriverla nel
+    mount sporcherebbe le cartelle condivise e richiederebbe un permesso di
+    scrittura che di norma non c'e'.
+  - Le miniature seguono **gli stessi permessi** del file da cui vengono:
+    altrimenti basterebbe la galleria per vedere cosa contiene una cartella
+    vietata.
+
+  Sul server non serve alcun pacchetto di sistema in piu': la distribuzione di
+  Pillow per Linux include gia' le librerie di compressione. Verificato
+  sull'installazione reale.
+
+### Documentazione
+- Guida utente: sezione sui tre modi di guardare una cartella e su come
+  funzionano le miniature, nelle due lingue.
+- Guida all'installazione: la cartella dei dati contiene anche le miniature.
+
 ## [0.17.0] - 2026-08-30
 
 Impaginazione scelta fra cinque proposte: **un solo riquadro per pagina**.

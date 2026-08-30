@@ -14,6 +14,13 @@ Guida completa all'installazione di Advanced NAS Folder su un server Linux.
 | **Apache** *oppure* **Nginx** | consegnano i file al posto dell'applicazione |
 | **Python 3.14 o superiore** | il codice usa sintassi introdotta in quella versione |
 | **`nfs-common`** | per montare le condivisioni |
+
+Le miniature delle immagini le produce **Pillow**, installata con le altre
+dipendenze Python: la sua distribuzione per Linux include già le librerie di
+compressione, quindi non serve nessun pacchetto di sistema in più. Le miniature
+finiscono in `/var/lib/anf/miniature`, **non sul NAS**: scriverle nel mount
+sporcherebbe le cartelle condivise, e richiederebbe un permesso di scrittura
+che di norma non c'è.
 | accesso **root** | l'installer crea utenti, servizi e mount |
 
 Su Apache serve anche **`mod_xsendfile`**, senza il quale i download rispondono
@@ -155,7 +162,7 @@ server, che restano coerenti fra loro.
    | Percorso | Contenuto |
    |---|---|
    | `/var/www/advanced-nas-folder` | programma |
-   | `/var/lib/anf` | database SQLite |
+   | `/var/lib/anf` | database SQLite e miniature delle immagini |
    | `/srv/nas` | punti di montaggio |
    | `/run/anf` | socket dell'agent |
 
