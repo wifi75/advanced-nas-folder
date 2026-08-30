@@ -157,3 +157,34 @@ async def test_spazio_del_disco_del_pannello(admin: AsyncClient) -> None:
     risposta = await admin.get("/api/v1/impostazioni/spazio/pannello")
     assert risposta.status_code == 200
     assert risposta.json()["totale"] > 0
+
+
+# --- percorso del file .env ------------------------------------------------
+
+
+def test_il_file_env_si_cerca_in_percorsi_assoluti() -> None:
+    """Un percorso relativo verrebbe risolto dalla cartella corrente.
+
+    L'applicazione, alembic e l'installer partono da cartelle diverse: cercare
+    `.env` relativo al punto di lancio lo faceva trovare solo per caso. In
+    produzione le migrazioni fallivano con «secret_key: Field required», e il
+    messaggio non lasciava capire che era un problema di percorso.
+    """
+    from pathlib import Path
+
+    from app.core.config import _FILE_ENV
+
+    assert _FILE_ENV, "nessun percorso configurato per il file .env"
+    for percorso in _FILE_ENV:
+        assert Path(percorso).is_absolute(), f"{percorso} non è assoluto"
+
+
+def test_si_cerca_sia_nella_radice_sia_in_backend() -> None:
+    """In produzione il file sta nella radice dell'installazione, in sviluppo
+    dentro `backend/`: vanno guardati entrambi."""
+    from pathlib import Path
+
+    from app.core.config import _FILE_ENV
+
+    nomi = {Path(p).parent.name for p in _FILE_ENV}
+    assert "backend" in nomi

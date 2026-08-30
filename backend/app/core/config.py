@@ -10,11 +10,24 @@ from typing import Literal
 from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+#: Dove cercare il file `.env`, in percorsi **assoluti**.
+#:
+#: Un percorso relativo verrebbe risolto dalla cartella corrente, che non è la
+#: stessa per tutti: l'applicazione gira da `backend/`, alembic anche, ma in
+#: produzione il file sta nella radice dell'installazione. Cercarlo lì e basta
+#: faceva fallire le migrazioni con «secret_key: Field required», senza che il
+#: messaggio lasciasse capire che era un problema di percorso.
+#:
+#: L'ordine conta: pydantic legge i file in sequenza e gli ultimi vincono.
+_BACKEND = Path(__file__).resolve().parents[2]
+_RADICE = _BACKEND.parent
+_FILE_ENV = (_RADICE / ".env", _BACKEND / ".env")
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_prefix="ANF_",
-        env_file=".env",
+        env_file=_FILE_ENV,
         env_file_encoding="utf-8",
         extra="ignore",
     )
