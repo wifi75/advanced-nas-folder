@@ -321,7 +321,7 @@ async function elimina(): Promise<void> {
               </RouterLink>
               <RouterLink
                 class="bottone bottone--tenue"
-                to="/pubblicazioni"
+                :to="`/pubblicazioni/${p.id}`"
               >
                 {{ t('condivisione.gestisci') }}
               </RouterLink>
@@ -330,9 +330,13 @@ async function elimina(): Promise<void> {
         </ul>
 
         <div class="azioni">
+          <!-- `?nuova=` apre direttamente la creazione con questa condivisione
+               gia' scelta. Portare all'elenco faceva ricomparire un secondo
+               pulsante «Nuova pubblicazione» da premere di nuovo, e
+               ricominciare da capo la scelta dell'origine. -->
           <RouterLink
             class="bottone bottone--principale"
-            to="/pubblicazioni"
+            :to="`/pubblicazioni?nuova=${mount.id}`"
           >
             {{ t('share.nuova') }}
           </RouterLink>

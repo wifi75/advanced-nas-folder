@@ -274,15 +274,43 @@ a {
 
 /* L'azione principale della pagina: una sola per schermata, altrimenti non e'
    piu' principale. */
+/* L'azione principale usa la stessa sfumatura delle pastiglie del menu — non
+   un colore piatto — con il filo di luce in alto e l'alone della propria
+   tinta sotto: e' cio' che la fa sembrare premibile invece che disegnata. */
 .bottone--principale {
-  background: var(--accento);
-  border-color: var(--accento);
-  color: var(--accento-testo);
+  border-color: transparent;
+  color: #fff;
+  background:
+    linear-gradient(
+      165deg,
+      color-mix(in srgb, var(--accento) 100%, white 16%),
+      color-mix(in srgb, var(--accento) 82%, black 18%)
+    );
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 38%),
+    0 2px 6px -1px color-mix(in srgb, var(--accento) 45%, transparent);
 }
 
 .bottone--principale:hover {
-  background: var(--accento);
-  filter: brightness(1.08);
+  filter: brightness(1.06);
+}
+
+.bottone--principale:active {
+  filter: brightness(0.96);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 18%);
+}
+
+/* Le azioni distruttive prendono lo stesso trattamento, con la propria tinta:
+   un contorno rosso e' facile da non vedere in una fila di pulsanti. */
+.bottone--pericolo:hover {
+  color: #fff;
+  border-color: transparent;
+  background:
+    linear-gradient(
+      165deg,
+      color-mix(in srgb, var(--errore) 100%, white 14%),
+      color-mix(in srgb, var(--errore) 82%, black 18%)
+    );
 }
 
 .bottone--tenue {
@@ -371,9 +399,10 @@ a {
 
 .vuoto {
   margin: 0;
-  padding: 1.5rem;
-  border: 1px dashed var(--bordo);
-  border-radius: var(--raggio);
+  padding: 1.75rem 1.5rem;
+  border: 1px dashed var(--vetro-bordo);
+  border-radius: 11px;
+  background: var(--vetro-sfondo);
   color: var(--testo-tenue);
   text-align: center;
 }
@@ -511,4 +540,96 @@ a {
 /* I pulsanti prendono lo stesso raggio delle voci di menu. */
 .bottone {
   border-radius: 9px;
+}
+
+/* --- campi di un modulo ---------------------------------------------------
+   Erano definiti nel foglio *scoped* di una vista sola: usare `class="campo"`
+   altrove dava un'etichetta incollata a un campo di sistema, senza spaziatura
+   ne' bordi. Stanno qui perche' un campo deve avere lo stesso aspetto in ogni
+   pagina. */
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  min-width: 0;
+}
+
+.campo > span:first-child {
+  font-weight: 500;
+  color: var(--testo-tenue);
+}
+
+.campo input[type='text'],
+.campo input[type='password'],
+.campo input[type='number'],
+.campo input[type='url'],
+.campo select,
+.campo textarea {
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  font: inherit;
+  color: var(--testo);
+  background: var(--superficie);
+  border: 1px solid var(--bordo);
+  border-radius: 9px;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.campo input:focus-visible,
+.campo select:focus-visible,
+.campo textarea:focus-visible {
+  outline: none;
+  border-color: var(--accento);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accento) 22%, transparent);
+}
+
+.campo input::placeholder,
+.campo textarea::placeholder {
+  color: var(--testo-tenue);
+}
+
+/* Un interruttore e' una riga cliccabile, non un quadratino con del testo
+   accanto: la casella e il suo significato devono stare sulla stessa riga e
+   avere entrambi un'area su cui premere. */
+.campo.interruttore {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--bordo);
+  border-radius: 9px;
+  background: var(--superficie);
+  cursor: pointer;
+}
+
+.campo.interruttore input[type='checkbox'] {
+  flex: none;
+  width: 1.05rem;
+  height: 1.05rem;
+  margin-top: 0.15rem;
+  accent-color: var(--accento);
+  cursor: pointer;
+}
+
+.campo.interruttore > span {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-weight: 400;
+  color: var(--testo);
+}
+
+.campo.interruttore em {
+  font-style: normal;
+  font-size: 0.82rem;
+  color: var(--testo-tenue);
+}
+
+/* Un'opzione che espone il NAS a scritture non deve sembrare una preferenza
+   qualunque. */
+.campo.rischio {
+  border-color: color-mix(in srgb, var(--attenzione) 45%, var(--bordo));
+  background: color-mix(in srgb, var(--attenzione) 7%, var(--superficie));
 }

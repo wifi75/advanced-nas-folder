@@ -18,6 +18,26 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.14.4] - 2026-08-30
+
+### Corretto
+- **I campi delle pagine nuove erano senza stile.** L'etichetta risultava
+  incollata al campo, i menu a tendina e le caselle erano quelli di sistema:
+  gli stili esistevano, ma nel foglio *scoped* di una sola vista, e usare
+  `class="campo"` altrove non li applicava. Ora sono globali, con lo stesso
+  aspetto in ogni pagina.
+- **«Nuova pubblicazione» dentro una condivisione portava all'elenco**, dove
+  bisognava premere un secondo pulsante uguale e riscegliere l'origine da capo.
+  Ora apre direttamente la creazione con quella condivisione gia' scelta.
+- **«Permessi e link» portava all'elenco** invece che alla pubblicazione.
+
+### Modificato
+- **L'azione principale usa la sfumatura delle pastiglie del menu**, non un
+  colore piatto: filo di luce in alto e alone della propria tinta sotto.
+- Gli interruttori sono righe cliccabili con un riquadro proprio, e
+  «Consenti la scrittura» ha la tinta dell'attenzione: espone il NAS a
+  scritture, non e' una preferenza qualunque.
+
 ## [0.14.3] - 2026-08-30
 
 ### Corretto
