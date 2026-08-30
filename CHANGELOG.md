@@ -18,6 +18,14 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.14.6] - 2026-08-30
+
+### Modificato
+- **I pulsanti secondari erano bianchi pieni con il testo grigio**: sparivano
+  nella pagina e sembravano disattivati. Ora usano lo stesso vetro delle voci di
+  menu, e il testo resta leggibile come quello del pulsante principale —
+  «secondario» non deve voler dire «spento».
+
 ## [0.14.5] - 2026-08-30
 
 ### Corretto
