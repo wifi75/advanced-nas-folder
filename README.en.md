@@ -160,7 +160,7 @@ cd backend && python3.14 -m venv .venv && .venv/bin/pip install -e ".[dev]" && c
 
 Copy `.env.example` to `.env`, set `ANF_ENV=development` and generate the key with
 `openssl rand -hex 32`. In development the tables create themselves and an **`admin`**
-user with password **`admin`** is created, flagged by the panel until it changes.
+user with password **`Admin1234`** is created, flagged by the panel until it changes.
 
 On Windows a single script starts both services and prints the addresses:
 
@@ -187,7 +187,7 @@ server puts it in production: keeping it at the site root during development wou
 make paths work locally that break once installed.
 
 > **Careful:** that makes the panel reachable by anyone on the same network, and in
-> development the initial credentials are `admin`/`admin`.
+> the initial credentials are `admin`/`Admin1234`.
 
 ## Useful commands
 

@@ -1,5 +1,6 @@
 """Test degli endpoint di stato e autenticazione."""
 
+from app.api.v1.auth import PASSWORD_INIZIALE
 from httpx import AsyncClient
 
 
@@ -20,7 +21,7 @@ async def test_health_ready_verifica_il_database(client: AsyncClient) -> None:
 
 async def test_accesso_con_utente_iniziale(client: AsyncClient) -> None:
     risposta = await client.post(
-        "/api/v1/auth/login", json={"username": "admin", "password": "admin"}
+        "/api/v1/auth/login", json={"username": "admin", "password": PASSWORD_INIZIALE}
     )
     assert risposta.status_code == 200
     corpo = risposta.json()
@@ -60,7 +61,7 @@ async def test_endpoint_protetto_con_token_falso(client: AsyncClient) -> None:
 
 async def test_endpoint_protetto_con_token_valido(client: AsyncClient) -> None:
     accesso = await client.post(
-        "/api/v1/auth/login", json={"username": "admin", "password": "admin"}
+        "/api/v1/auth/login", json={"username": "admin", "password": PASSWORD_INIZIALE}
     )
     token = accesso.json()["access_token"]
     risposta = await client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {token}"})

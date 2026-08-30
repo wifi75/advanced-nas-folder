@@ -14,7 +14,7 @@ router = APIRouter(prefix="/auth", tags=["autenticazione"])
 
 #: Password iniziale dell'amministratore creato dall'installazione. Serve solo
 #: a segnalare nel pannello che va cambiata, non a consentire l'accesso.
-PASSWORD_INIZIALE = "admin"  # noqa: S105
+PASSWORD_INIZIALE = "Admin1234"  # noqa: S105
 
 _CREDENZIALI_ERRATE = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,

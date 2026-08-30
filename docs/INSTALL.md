@@ -176,11 +176,28 @@ server, che restano coerenti fra loro.
 
 ### Primo accesso
 
-Il pannello risponde su `/pannello` del web server. Al primo avvio viene creato
-l'utente **`admin`** con password **`admin`**, e il pannello mostra un avviso in
-evidenza finché resta quella.
+Il pannello risponde su `/pannello` del web server: dall'indirizzo di rete
+della macchina, non solo da `localhost`. Per esempio
+`http://192.168.1.106/pannello/`.
 
-> **Cambiala prima di rendere il pannello raggiungibile da Internet.**
+La porta che l'installer ti ha chiesto **non c'entra con questo indirizzo**: è
+il canale interno fra il web server e l'applicazione, in ascolto solo su
+`127.0.0.1`. Puntarci il browser da un'altra macchina dà connessione rifiutata,
+ed è voluto. Se pubblichi il pannello attraverso un firewall o un reverse proxy,
+inoltra la **80/443**, mai quella porta.
+
+Al primo avvio viene creato l'utente amministratore:
+
+| | |
+|---|---|
+| **Utente** | `admin` |
+| **Password** | `Admin1234` |
+
+Il pannello mostra un avviso in evidenza finché la password resta questa.
+
+> **Cambiala prima di rendere il pannello raggiungibile da Internet.** È scritta
+> qui in chiaro apposta — è pubblica per chiunque legga questa pagina, quindi
+> non protegge nulla: serve solo a farti entrare la prima volta.
 
 ### Indirizzi reali dei visitatori
 

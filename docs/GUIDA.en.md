@@ -23,7 +23,7 @@ attached.
 
 ## First sign-in
 
-The installation creates a single user, `admin`, with password `admin`. The
+The installation creates a single user, `admin`, with password `Admin1234`. The
 panel says so at every sign-in until it is changed: **Users → your own name →
 change password**, or from the sign-in page.
 

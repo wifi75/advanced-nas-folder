@@ -179,11 +179,28 @@ configuration, which stay consistent with each other.
 
 ### First sign-in
 
-The panel answers at `/pannello` on the web server. On first start the **`admin`**
-user is created with password **`admin`**, and the panel shows a prominent warning for
-as long as it stays that way.
+The panel answers at `/pannello` on the web server, reachable at the machine's
+network address and not only from `localhost` — for example
+`http://192.168.1.106/pannello/`.
 
-> **Change it before exposing the panel to the internet.**
+The port the installer asked about **is not part of that address**: it is the
+internal channel between the web server and the application, listening on
+`127.0.0.1` only. Pointing a browser at it from another machine gives connection
+refused, and that is deliberate. When publishing the panel through a firewall or
+a reverse proxy, forward **80/443**, never that port.
+
+On first start the administrator account is created:
+
+| | |
+|---|---|
+| **User** | `admin` |
+| **Password** | `Admin1234` |
+
+The panel shows a prominent warning for as long as the password stays this one.
+
+> **Change it before exposing the panel to the internet.** It is written here in
+> the clear on purpose — it is public to anyone reading this page, so it protects
+> nothing: it only exists to let you in the first time.
 
 ### Real visitor addresses
 

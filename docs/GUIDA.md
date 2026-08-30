@@ -23,7 +23,7 @@ dice nulla su *come* il NAS è collegato.
 
 ## Primo accesso
 
-L'installazione crea un solo utente, `admin`, con password `admin`. Il pannello
+L'installazione crea un solo utente, `admin`, con password `Admin1234`. Il pannello
 lo dice a ogni accesso finché non la si cambia: **Utenti → il proprio nome →
 cambia password**, oppure dalla pagina di accesso.
 

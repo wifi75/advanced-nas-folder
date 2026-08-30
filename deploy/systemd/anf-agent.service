@@ -1,28 +1,47 @@
 [Unit]
 Description=Advanced NAS Folder - agent privilegiato
 Documentation=https://github.com/wifi75/advanced-nas-folder
-After=network.target
+After=network-online.target
+Wants=network-online.target
 
 [Service]
-Type=notify
-# Gira da root perche monta filesystem e ricarica il web server.
-# Per questo motivo e un processo separato, minimale e senza dipendenze esterne:
-# l'applicazione web non gira MAI con questi privilegi.
+# `simple` e non `notify`: l'agent non manda a systemd il segnale di pronto, e
+# dichiarare `notify` lo farebbe attendere un messaggio che non arriva mai.
+Type=simple
+
+# Gira da root perche monta filesystem e ricarica il web server. Per questo e
+# un processo separato, minimale e senza dipendenze esterne: l'applicazione web
+# non gira MAI con questi privilegi.
 User=root
-Group=root
+
+# Il gruppo serve alla cartella del socket, non ai privilegi: l'agent resta
+# root. Senza, systemd la crea root:root 0750 e l'utente `anf` non riesce
+# nemmeno ad attraversarla: il socket c'e, ha i permessi giusti, e l'API lo
+# vede comunque come irraggiungibile.
+Group=@@GRUPPO@@
 RuntimeDirectory=anf
 RuntimeDirectoryMode=0750
-ExecStart=/var/www/advanced-nas-folder/venv/bin/python -m anf_agent
+
+# L'agent non e installato nel venv di proposito: non ha dipendenze, e
+# aggiungerlo la lo legherebbe al ciclo di vita del backend. Basta dire a
+# Python dove trovarlo.
+Environment=PYTHONPATH=@@RADICE@@/agent
+Environment=ANF_AGENT_SOCKET=@@SOCKET@@
+Environment=ANF_MOUNT_ROOT=@@MOUNT_ROOT@@
+Environment=ANF_AGENT_GROUP=@@GRUPPO@@
+ExecStart=@@RADICE@@/venv/bin/python -m anf_agent
+
 Restart=on-failure
 RestartSec=5
 
-# Riduzione della superficie: l'agent non ha bisogno di rete.
-PrivateNetwork=yes
+# Riduzione della superficie. Attenzione: NON si puo usare PrivateNetwork, che
+# isolerebbe l'agent in uno spazio di rete con la sola interfaccia di loopback:
+# i mount NFS avvengono nello spazio di rete di chi li chiede, e da li il NAS
+# sarebbe irraggiungibile.
 PrivateTmp=yes
 ProtectHome=yes
 ProtectControlGroups=yes
 ProtectKernelLogs=yes
-ProtectKernelTunables=yes
 RestrictRealtime=yes
 RestrictSUIDSGID=yes
 NoNewPrivileges=no

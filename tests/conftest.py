@@ -41,8 +41,14 @@ async def client() -> AsyncGenerator:
 @pytest.fixture
 async def admin(client):  # noqa: ANN001, ANN201 - tipo fornito dalla fixture client
     """Client gia autenticato come amministratore."""
+    # L'import sta qui e non in cima: la configurazione si legge una volta
+    # sola, e importare l'applicazione prima che le variabili d'ambiente
+    # siano impostate la fisserebbe sui valori sbagliati.
+    from app.api.v1.auth import PASSWORD_INIZIALE
+
     risposta = await client.post(
-        "/api/v1/auth/login", json={"username": "admin", "password": "admin"}
+        "/api/v1/auth/login",
+        json={"username": "admin", "password": PASSWORD_INIZIALE},
     )
     token = risposta.json()["access_token"]
     client.headers["Authorization"] = f"Bearer {token}"

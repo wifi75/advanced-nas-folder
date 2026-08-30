@@ -6,6 +6,7 @@ da soli, e l'ultimo amministratore non si tocca.
 """
 
 import pytest
+from app.api.v1.auth import PASSWORD_INIZIALE
 from httpx import AsyncClient
 
 
@@ -29,7 +30,7 @@ async def database_pulito():  # noqa: ANN201
             sessione.add(
                 User(
                     username="admin",
-                    password_hash=hash_password("admin"),
+                    password_hash=hash_password(PASSWORD_INIZIALE),
                     is_admin=True,
                     is_active=True,
                 )
@@ -38,7 +39,7 @@ async def database_pulito():  # noqa: ANN201
             await sessione.execute(
                 update(User)
                 .where(User.username == "admin")
-                .values(is_admin=True, is_active=True, password_hash=hash_password("admin"))
+                .values(is_admin=True, is_active=True, password_hash=hash_password(PASSWORD_INIZIALE))
             )
         await sessione.commit()
 
@@ -211,7 +212,7 @@ async def test_cambio_password_richiede_quella_attuale(admin: AsyncClient) -> No
     assert sbagliata.status_code == 400
 
     giusta = await admin.post(
-        "/api/v1/utenti/me/password", json={"attuale": "admin", "nuova": "una-password-nuova"}
+        "/api/v1/utenti/me/password", json={"attuale": PASSWORD_INIZIALE, "nuova": "una-password-nuova"}
     )
     assert giusta.status_code == 204
 
@@ -221,7 +222,7 @@ async def test_cambio_password_richiede_quella_attuale(admin: AsyncClient) -> No
     )
     admin.headers["Authorization"] = f"Bearer {accesso.json()['access_token']}"
     await admin.post(
-        "/api/v1/utenti/me/password", json={"attuale": "una-password-nuova", "nuova": "admin"}
+        "/api/v1/utenti/me/password", json={"attuale": "una-password-nuova", "nuova": PASSWORD_INIZIALE}
     )
 
 

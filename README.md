@@ -159,7 +159,7 @@ cd backend && python3.14 -m venv .venv && .venv/bin/pip install -e ".[dev]" && c
 
 Copia `.env.example` in `.env`, imposta `ANF_ENV=development` e genera la chiave con
 `openssl rand -hex 32`. In sviluppo le tabelle si creano da sole e viene creato
-l'utente **`admin`** con password **`admin`**, segnalata dal pannello finché resta
+l'utente **`admin`** con password **`Admin1234`**, segnalata dal pannello finché resta
 quella.
 
 ### Su Windows
@@ -196,7 +196,7 @@ lo serve in produzione: tenerlo alla radice in sviluppo farebbe funzionare in lo
 percorsi che poi non funzionano installati.
 
 > **Attenzione:** così il pannello è raggiungibile da chiunque sia nella stessa rete,
-> e in sviluppo le credenziali iniziali sono `admin`/`admin`. Usa `-SoloLocale`
+> e le credenziali iniziali sono `admin`/`Admin1234`. Usa `-SoloLocale`
 > (oppure `--host 127.0.0.1`) quando non ti serve.
 
 ## Comandi utili

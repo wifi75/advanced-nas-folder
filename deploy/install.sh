@@ -27,6 +27,8 @@ SOCKET_DIR="/run/anf"
 PORTA_API="auto"
 PORTA_PREDEFINITA="8100"
 PORTA_SCELTA_A_MANO=0
+# In prova a vuoto non si verifica nulla: si considera riuscita.
+INSTALLAZIONE_OK=1
 PYTHON_MIN="3.14"
 REPO="wifi75/advanced-nas-folder"
 
@@ -95,7 +97,14 @@ m() {
         verifica_ok) testo="L'API risponde correttamente" ;;
         verifica_ko) testo="L'API non risponde. Controlla i log con: journalctl -u anf-api -n 50" ;;
         fatto) testo="Installazione completata" ;;
-        credenziali) testo="Al primo accesso: utente admin, password admin. CAMBIALA subito." ;;
+        fatto_a_meta) testo="Installazione incompleta: i servizi non rispondono" ;;
+        v_indirizzo) testo="Indirizzo del pannello" ;;
+        v_porta_api) testo="Porta dell'API" ;;
+        v_solo_locale) testo="(solo in locale, dietro il web server)" ;;
+        v_utente) testo="Utente" ;;
+        v_password) testo="Password" ;;
+        come_indagare) testo="Per capire cosa non va: journalctl -u anf-agent -n 50 e journalctl -u anf-api -n 50" ;;
+        credenziali) testo="Cambia la password al primo accesso: il pannello te lo ricorda finché non lo fai." ;;
         raggiungibile) testo="Il pannello risponde su http://localhost:%s dietro il web server." ;;
         disinstallo) testo="Rimuovo Advanced NAS Folder" ;;
         disinstalla_dati) testo="I dati in %s e i mount in %s NON vengono toccati." ;;
@@ -169,7 +178,14 @@ m() {
         verifica_ok) testo="The API answers correctly" ;;
         verifica_ko) testo="The API does not answer. Check the logs with: journalctl -u anf-api -n 50" ;;
         fatto) testo="Installation complete" ;;
-        credenziali) testo="First sign-in: user admin, password admin. CHANGE IT right away." ;;
+        fatto_a_meta) testo="Installation incomplete: the services are not answering" ;;
+        v_indirizzo) testo="Panel address" ;;
+        v_porta_api) testo="API port" ;;
+        v_solo_locale) testo="(local only, behind the web server)" ;;
+        v_utente) testo="User" ;;
+        v_password) testo="Password" ;;
+        come_indagare) testo="To find out what is wrong: journalctl -u anf-agent -n 50 and journalctl -u anf-api -n 50" ;;
+        credenziali) testo="Change the password on first sign-in: the panel keeps reminding you until you do." ;;
         raggiungibile) testo="The panel answers on http://localhost:%s behind the web server." ;;
         disinstallo) testo="Removing Advanced NAS Folder" ;;
         disinstalla_dati) testo="Data in %s and mounts in %s are NOT touched." ;;
@@ -764,13 +780,27 @@ fi
 passo migrazioni
 esegui env -C "$RADICE/backend" "$RADICE/venv/bin/alembic" upgrade head
 
+# Le migrazioni girano da root e creano il database di sua proprietà: senza
+# questo passaggio l'API, che gira come utente non privilegiato, lo troverebbe
+# in sola lettura e non partirebbe — dicendo «attempt to write a readonly
+# database», che non lascia capire che è un problema di proprietà.
+esegui chown -R "$UTENTE:$GRUPPO" "$DATI"
+
 # ---------------------------------------------------------------------------
 # Servizi / Services
 # ---------------------------------------------------------------------------
 
 passo unit
 for s in anf-agent anf-api; do
-    esegui install -m 0644 "$RADICE/deploy/systemd/${s}.service" "/etc/systemd/system/${s}.service"
+    # I percorsi nelle unit non possono essere fissi: le cartelle si scelgono
+    # durante l'installazione, e una unit che punta altrove non parte.
+    if [ "$DRY_RUN" = 0 ]; then
+        sed -e "s|@@RADICE@@|$RADICE|g" -e "s|@@DATI@@|$DATI|g"             -e "s|@@MOUNT_ROOT@@|$MOUNT_ROOT|g" -e "s|@@SOCKET@@|$SOCKET_DIR/agent.sock|g"             -e "s|@@UTENTE@@|$UTENTE|g" -e "s|@@GRUPPO@@|$GRUPPO|g"             "$RADICE/deploy/systemd/${s}.service" >"/etc/systemd/system/${s}.service"
+        chmod 0644 "/etc/systemd/system/${s}.service"
+    else
+        printf '       %s
+' "installa /etc/systemd/system/${s}.service"
+    fi
 done
 esegui systemctl daemon-reload
 
@@ -834,8 +864,12 @@ if [ "$DRY_RUN" = 0 ]; then
     done
     if [ -n "$risposta" ]; then
         ok verifica_ok
+        INSTALLAZIONE_OK=1
     else
         avviso verifica_ko
+        # Dire "completata" quando i servizi non partono manda a cercare il
+        # problema nel posto sbagliato, cioè da nessuna parte.
+        INSTALLAZIONE_OK=0
     fi
 fi
 
@@ -843,6 +877,41 @@ fi
 # Riepilogo / Summary
 # ---------------------------------------------------------------------------
 
-printf '\n%s%s%s\n\n' "$C_OK" "$(m fatto)" "$C_FINE"
-printf '  %s\n' "$(m raggiungibile "$PORTA_API")"
-printf '  %s%s%s\n\n' "$C_WARN" "$(m credenziali)" "$C_FINE"
+# L'indirizzo su cui il pannello si raggiunge davvero: quello della macchina in
+# rete, non "localhost", che dal computer di chi installa non porta da nessuna
+# parte. E non la porta dell'API, che ascolta solo in locale dietro il web
+# server: scriverla come indirizzo manda a sbattere contro una connessione
+# rifiutata.
+IP_RETE="$(hostname -I 2>/dev/null | awk '{print $1}')"
+[ -n "$IP_RETE" ] || IP_RETE="$(hostname 2>/dev/null || echo localhost)"
+
+printf '
+'
+riga
+if [ "$INSTALLAZIONE_OK" = 1 ]; then
+    printf '  %s%s %s%s
+' "$C_OK" "$S_OK" "$(m fatto)" "$C_FINE"
+else
+    printf '  %s%s %s%s
+' "$C_WARN" "$S_WARN" "$(m fatto_a_meta)" "$C_FINE"
+fi
+riga
+printf '
+'
+
+voce "$(m v_indirizzo)" "http://${IP_RETE}/pannello/"
+voce "$(m v_porta_api)" "${PORTA_API} $(m v_solo_locale)"
+printf '
+'
+voce "$(m v_utente)"   "admin"
+voce "$(m v_password)" "${C_GRA}Admin1234${C_FINE}"
+printf '
+  %s%s%s
+
+' "$C_WARN" "$(m credenziali)" "$C_FINE"
+
+if [ "$INSTALLAZIONE_OK" != 1 ]; then
+    printf '  %s
+
+' "$(m come_indagare)"
+fi

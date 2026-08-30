@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from app.api.v1.auth import PASSWORD_INIZIALE
 from app.core.config import get_settings
 from app.services import agent_client
 from httpx import AsyncClient
@@ -105,7 +106,7 @@ async def test_un_link_apre_una_cartella_riservata(admin: AsyncClient, share_id:
 
     # Il client è ormai anonimo: per creare il link serve di nuovo l'admin.
     accesso = await admin.post(
-        "/api/v1/auth/login", json={"username": "admin", "password": "admin"}
+        "/api/v1/auth/login", json={"username": "admin", "password": PASSWORD_INIZIALE}
     )
     admin.headers["Authorization"] = f"Bearer {accesso.json()['access_token']}"
 
@@ -209,7 +210,7 @@ async def test_la_revoca_chiude_il_link_ma_ne_conserva_il_conteggio(
     await anonimo.get(f"/api/v1/link/{creato['token']}/file", params={"percorso": "pubblico.txt"})
 
     accesso = await admin.post(
-        "/api/v1/auth/login", json={"username": "admin", "password": "admin"}
+        "/api/v1/auth/login", json={"username": "admin", "password": PASSWORD_INIZIALE}
     )
     admin.headers["Authorization"] = f"Bearer {accesso.json()['access_token']}"
 

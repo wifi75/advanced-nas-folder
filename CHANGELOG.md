@@ -10,6 +10,46 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.6.7] - 2026-08-30
+
+Prima installazione su un server reale. Tutto quello che segue è emerso lì: sono
+errori che nessun test poteva cogliere, perché riguardano il modo in cui systemd
+crea le cartelle e il punto da cui viene letta la configurazione.
+
+### Corretto
+- **L'agent risultava irraggiungibile pur essendo in esecuzione.** Il socket aveva
+  i permessi giusti (`root:anf`, `0660`), ma la cartella che lo contiene veniva
+  creata da systemd come `root:root 0750`: l'utente `anf` non poteva nemmeno
+  attraversarla. Il pannello rispondeva «Agent non raggiungibile su
+  /run/anf/agent.sock» mentre il file era lì, visibile e apparentemente corretto.
+  L'unit dell'agent dichiara ora il gruppo, che serve alla cartella e non ai
+  privilegi: l'agent resta root.
+- **L'agent non partiva**: `No module named anf_agent`. Mancavano il percorso del
+  modulo e il tipo di servizio, e `PrivateNetwork` gli impediva di montare — i
+  mount NFS avvengono nello spazio di rete di chi li chiede.
+- **Le migrazioni fallivano con «secret_key: Field required».** Il file `.env`
+  veniva cercato con un percorso relativo, risolto quindi dalla cartella corrente:
+  applicazione, alembic e installer partono da cartelle diverse, e lo trovavano
+  solo per caso. Ora si cerca in percorsi assoluti, sia nella radice
+  dell'installazione sia in `backend/`.
+- La cartella dei dati restava di root dopo le migrazioni, e il servizio non
+  riusciva a scrivere il database.
+
+### Modificato
+- **Il riepilogo finale dice dove andare davvero.** Prima indicava
+  `http://localhost:PORTA`, che è l'unico indirizzo su cui il pannello *non*
+  risponde da un'altra macchina: quella porta ascolta solo in locale, dietro il web
+  server. Ora mostra l'indirizzo di rete della macchina, la porta interna
+  dichiarata come tale, utente e password. E se i servizi non hanno risposto non
+  dichiara più «installazione completata», ma dice che è incompleta e con quali
+  comandi guardare.
+- **Password iniziale `Admin1234` invece di `admin`.** È scritta in chiaro anche
+  nella documentazione, di proposito: essendo pubblica non protegge nulla, e
+  serve solo a far entrare la prima volta. Il pannello continua a segnalarla
+  finché non viene cambiata.
+- Documentato in `INSTALL.md` che la porta chiesta dall'installer non è
+  l'indirizzo del pannello, e che dietro un firewall va inoltrata la 80/443.
+
 ## [0.6.4] - 2026-08-30
 
 ### Corretto

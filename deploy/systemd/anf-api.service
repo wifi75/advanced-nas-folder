@@ -7,12 +7,11 @@ Requires=anf-agent.service
 [Service]
 Type=exec
 # Utente non privilegiato: questa applicazione non deve poter toccare il sistema.
-User=anf
-Group=anf
-WorkingDirectory=/var/www/advanced-nas-folder/backend
-EnvironmentFile=/var/www/advanced-nas-folder/.env
-ExecStart=/var/www/advanced-nas-folder/venv/bin/uvicorn app.main:app \
-    --host ${ANF_HOST} --port ${ANF_PORT} --proxy-headers
+User=@@UTENTE@@
+Group=@@GRUPPO@@
+WorkingDirectory=@@RADICE@@/backend
+EnvironmentFile=@@RADICE@@/.env
+ExecStart=@@RADICE@@/venv/bin/uvicorn app.main:app     --host ${ANF_HOST} --port ${ANF_PORT} --proxy-headers
 Restart=on-failure
 RestartSec=5
 
@@ -27,7 +26,7 @@ ProtectControlGroups=yes
 RestrictSUIDSGID=yes
 RestrictRealtime=yes
 LockPersonality=yes
-ReadWritePaths=/var/www/advanced-nas-folder /var/lib/anf /srv/nas
+ReadWritePaths=@@RADICE@@ @@DATI@@ @@MOUNT_ROOT@@
 StateDirectory=anf
 StateDirectoryMode=0750
 
