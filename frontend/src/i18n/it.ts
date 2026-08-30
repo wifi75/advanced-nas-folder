@@ -396,6 +396,13 @@ export default {
   },
 
   archivio: {
+    apriCartella: 'Apri',
+    vediAnteprima: 'Anteprima',
+    vista: 'Vista',
+    vistaElenco: 'Elenco',
+    vistaGriglia: 'Griglia',
+    vistaGalleria: 'Galleria',
+    azioniSu: 'Azioni su {nome}',
     titolo: 'Archivio',
     apri: 'Sfoglia',
     percorso: 'Percorso',

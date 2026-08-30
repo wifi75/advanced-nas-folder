@@ -20,6 +20,7 @@ import {
 } from '@/api/archivio'
 import { ApiError, tokenCorrente } from '@/api/client'
 import Anteprima from '@/components/Anteprima.vue'
+import MiniaturaVoce from '@/components/MiniaturaVoce.vue'
 import Caricamenti from '@/components/Caricamenti.vue'
 
 const route = useRoute()
@@ -90,6 +91,63 @@ async function scarica(voce: Voce): Promise<void> {
   } finally {
     inPreparazione.value = null
   }
+}
+
+// --- vista ---
+//
+// La scelta resta nel browser di chi guarda: e una preferenza di lettura, non
+// una proprieta della cartella, e imporla a tutti sarebbe sbagliato.
+type Vista = 'elenco' | 'griglia' | 'galleria'
+const VISTE: Vista[] = ['elenco', 'griglia', 'galleria']
+const CHIAVE_VISTA = 'anf.archivio.vista'
+
+function vistaSalvata(): Vista {
+  try {
+    const letta = localStorage.getItem(CHIAVE_VISTA)
+    if (letta && (VISTE as string[]).includes(letta)) return letta as Vista
+  } catch {
+    // Finestra privata, dati del sito bloccati: si riparte dall'elenco.
+  }
+  return 'elenco'
+}
+
+const vista = ref<Vista>(vistaSalvata())
+
+function cambiaVista(nuova: Vista): void {
+  vista.value = nuova
+  try {
+    localStorage.setItem(CHIAVE_VISTA, nuova)
+  } catch {
+    // La vista funziona lo stesso, semplicemente non viene ricordata.
+  }
+}
+
+/** Solo le immagini hanno una miniatura da mostrare. */
+function haMiniatura(voce: Voce): boolean {
+  return !voce.cartella && /\.(jpe?g|png|gif|webp|avif|bmp)$/i.test(voce.nome)
+}
+
+// --- menu contestuale ---
+//
+// Le stesse azioni della riga, raggiungibili col tasto destro. Nelle viste a
+// griglia e galleria i pulsanti per esteso non ci stanno, e senza il menu
+// quelle viste sarebbero di sola lettura.
+const menu = ref<{ voce: Voce; x: number; y: number } | null>(null)
+
+function apriMenu(voce: Voce, evento: MouseEvent): void {
+  // Si tiene il menu dentro la finestra: aperto a filo del bordo destro
+  // finirebbe fuori schermo, e sui telefoni non ci sarebbe modo di tornarci.
+  const larghezza = 200
+  const altezza = 190
+  menu.value = {
+    voce,
+    x: Math.min(evento.clientX, window.innerWidth - larghezza),
+    y: Math.min(evento.clientY, window.innerHeight - altezza),
+  }
+}
+
+function chiudiMenu(): void {
+  menu.value = null
 }
 
 // --- anteprima ---
@@ -492,14 +550,35 @@ function quando(iso: string | null): string {
       </button>
     </div>
 
+    <div
+      v-if="contenuto && voci.length"
+      class="viste"
+      role="group"
+      :aria-label="t('archivio.vista')"
+    >
+      <button
+        v-for="v in VISTE"
+        :key="v"
+        type="button"
+        class="vista"
+        :class="{ 'vista--scelta': vista === v }"
+        :aria-pressed="vista === v"
+        @click="cambiaVista(v)"
+      >
+        {{ t(`archivio.vista${v.charAt(0).toUpperCase() + v.slice(1)}`) }}
+      </button>
+    </div>
+
     <ul
       v-if="contenuto && voci.length"
       class="voci"
+      :class="`voci--${vista}`"
     >
       <li
         v-for="voce in voci"
         :key="voce.percorso"
         class="voce"
+        @contextmenu.prevent="apriMenu(voce, $event)"
       >
         <input
           type="checkbox"
@@ -532,7 +611,23 @@ function quando(iso: string | null): string {
           class="voce__apri"
           @click="inAnteprima = voce"
         >
+          <MiniaturaVoce
+            v-if="vista === 'galleria' && haMiniatura(voce)"
+            :slug="slug"
+            :percorso="voce.percorso"
+            :nome="voce.nome"
+          >
+            <svg
+              class="voce__icona"
+              :class="`voce__icona--${famiglia(voce)}`"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path :d="TRACCIATI[famiglia(voce)]" />
+            </svg>
+          </MiniaturaVoce>
           <svg
+            v-else
             class="voce__icona"
             :class="`voce__icona--${famiglia(voce)}`"
             viewBox="0 0 24 24"
@@ -582,6 +677,69 @@ function quando(iso: string | null): string {
         </div>
       </li>
     </ul>
+
+    <div
+      v-if="menu"
+      class="menu-velo"
+      @click="chiudiMenu"
+      @contextmenu.prevent="chiudiMenu"
+    >
+      <div
+        class="menu"
+        :style="{ left: `${menu.x}px`, top: `${menu.y}px` }"
+        role="menu"
+        :aria-label="t('archivio.azioniSu', { nome: menu.voce.nome })"
+      >
+        <button
+          v-if="menu.voce.cartella"
+          type="button"
+          role="menuitem"
+          @click="apri(menu.voce), chiudiMenu()"
+        >
+          {{ t('archivio.apriCartella') }}
+        </button>
+        <template v-else>
+          <button
+            type="button"
+            role="menuitem"
+            @click="inAnteprima = menu.voce, chiudiMenu()"
+          >
+            {{ t('archivio.vediAnteprima') }}
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            @click="scarica(menu.voce), chiudiMenu()"
+          >
+            {{ t('archivio.scarica') }}
+          </button>
+        </template>
+        <template v-if="puoScrivere">
+          <button
+            type="button"
+            role="menuitem"
+            @click="apriRinomina(menu.voce), chiudiMenu()"
+          >
+            {{ t('operazioni.rinomina') }}
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            @click="apriSposta(menu.voce), chiudiMenu()"
+          >
+            {{ t('operazioni.sposta') }}
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            class="menu__pericolo"
+            @click="daEliminare = menu.voce, chiudiMenu()"
+          >
+            {{ t('comune.elimina') }}
+          </button>
+        </template>
+      </div>
+    </div>
 
     <Anteprima
       v-if="inAnteprima"
@@ -765,6 +923,124 @@ function quando(iso: string | null): string {
 
 .briciole__separatore {
   color: var(--testo-tenue);
+}
+
+/* Il velo copre la pagina per intercettare il clic che chiude il menu, ovunque
+   cada: senza, il menu resterebbe aperto cliccando su un'altra riga. */
+.menu-velo {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+}
+
+.menu {
+  position: fixed;
+  min-width: 11rem;
+  display: flex;
+  flex-direction: column;
+  padding: 0.25rem;
+  border: 1px solid var(--bordo);
+  border-radius: var(--raggio);
+  background: var(--superficie);
+  box-shadow: 0 0.5rem 1.5rem rgb(0 0 0 / 0.18);
+}
+
+.menu button {
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--raggio);
+  cursor: pointer;
+}
+
+.menu button:hover {
+  background: var(--superficie-alt);
+}
+
+.menu__pericolo {
+  color: var(--errore);
+}
+
+.viste {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 0.6rem;
+}
+
+.vista {
+  border: 1px solid var(--bordo);
+  border-radius: var(--raggio);
+  background: none;
+  color: var(--testo-tenue);
+  padding: 0.2rem 0.6rem;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.vista--scelta {
+  color: var(--testo);
+  background: var(--superficie-alt);
+}
+
+/* Griglia e galleria: le stesse voci disposte in schede invece che in righe.
+   Dimensione e data restano fuori — in una scheda stretta finirebbero a capo
+   e renderebbero le colonne irregolari, che e proprio cio che una griglia
+   dovrebbe evitare. */
+.voci--griglia,
+.voci--galleria {
+  display: grid;
+  gap: 0.6rem;
+  background: none;
+  border: 0;
+  overflow: visible;
+}
+
+.voci--griglia {
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+}
+
+.voci--galleria {
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+}
+
+.voci--griglia .voce,
+.voci--galleria .voce {
+  grid-template-columns: 1fr;
+  align-content: start;
+  gap: 0.4rem;
+  padding: 0.6rem;
+  border: 1px solid var(--bordo);
+  border-radius: var(--raggio);
+}
+
+.voci--griglia .voce__apri,
+.voci--galleria .voce__apri {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+  text-align: left;
+}
+
+.voci--griglia .voce__nome,
+.voci--galleria .voce__nome {
+  overflow-wrap: anywhere;
+}
+
+.voci--griglia .voce__data,
+.voci--galleria .voce__data,
+.voci--galleria .voce__dimensione {
+  display: none;
+}
+
+/* La casella di selezione sta sopra la miniatura invece che accanto: in una
+   scheda stretta rubberebbe larghezza al nome. */
+.voci--griglia .voce__scelta,
+.voci--galleria .voce__scelta {
+  justify-self: start;
 }
 
 .voci {

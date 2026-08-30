@@ -8,6 +8,17 @@
  * pannello sarebbero codice altrui — quindi questo elenco non è la difesa, è
  * solo il modo di non proporre un'anteprima che non arriverebbe.
  */
+import hljs from 'highlight.js/lib/core'
+import bash from 'highlight.js/lib/languages/bash'
+import css from 'highlight.js/lib/languages/css'
+import ini from 'highlight.js/lib/languages/ini'
+import javascript from 'highlight.js/lib/languages/javascript'
+import json from 'highlight.js/lib/languages/json'
+import python from 'highlight.js/lib/languages/python'
+import sql from 'highlight.js/lib/languages/sql'
+import typescript from 'highlight.js/lib/languages/typescript'
+import xml from 'highlight.js/lib/languages/xml'
+import yaml from 'highlight.js/lib/languages/yaml'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -17,6 +28,21 @@ const props = defineProps<{ slug: string; voce: Voce; modificabile?: boolean }>(
 const emit = defineEmits<{ chiudi: []; salvato: [] }>()
 
 const { t } = useI18n()
+
+for (const [nome, definizione] of Object.entries({
+  bash,
+  css,
+  ini,
+  javascript,
+  json,
+  python,
+  sql,
+  typescript,
+  xml,
+  yaml,
+})) {
+  hljs.registerLanguage(nome, definizione)
+}
 
 const indirizzo = ref<string | null>(null)
 const errore = ref<string | null>(null)
@@ -30,8 +56,52 @@ const genere = computed(() => {
   if (/\.(mp3|ogg|wav|m4a|opus|flac)$/.test(nome)) return 'audio'
   if (nome.endsWith('.pdf')) return 'pdf'
   if (/\.(txt|md|log|csv)$/.test(nome)) return 'testo'
+  if (LINGUAGGI[estensione(nome)]) return 'codice'
   return 'nessuno'
 })
+
+/**
+ * Il linguaggio da usare per l'evidenziazione, per estensione.
+ *
+ * Si dichiarano uno per uno invece di caricare highlight.js per intero: la
+ * libreria completa pesa piu di un megabyte, e finirebbe tutta nella precache
+ * della PWA per evidenziare cinque tipi di file.
+ */
+const LINGUAGGI: Record<string, string> = {
+  ts: 'typescript',
+  js: 'javascript',
+  mjs: 'javascript',
+  json: 'json',
+  py: 'python',
+  sh: 'bash',
+  bash: 'bash',
+  yml: 'yaml',
+  yaml: 'yaml',
+  toml: 'ini',
+  ini: 'ini',
+  conf: 'ini',
+  sql: 'sql',
+  css: 'css',
+  html: 'xml',
+  htm: 'xml',
+  xml: 'xml',
+  vue: 'xml',
+}
+
+function estensione(nome: string): string {
+  return nome.split('.').pop()?.toLowerCase() ?? ''
+}
+
+/** Il contenuto evidenziato, gia trasformato in HTML da highlight.js. */
+const evidenziato = computed(() => {
+  if (testo.value === null) return ''
+  const linguaggio = LINGUAGGI[estensione(props.voce.nome)]
+  if (!linguaggio) return hljs.highlightAuto(testo.value).value
+  return hljs.highlight(testo.value, { language: linguaggio, ignoreIllegals: true }).value
+})
+
+/** In sola lettura si evidenzia; modificando no: servirebbe un editor vero. */
+const inModifica = ref(false)
 
 async function prepara(): Promise<void> {
   indirizzo.value = null
@@ -40,6 +110,12 @@ async function prepara(): Promise<void> {
   testo.value = null
   salvato.value = false
   if (genere.value === 'nessuno') return
+  // Il codice non si consegna come file da mostrare nel riquadro: si legge il
+  // testo e lo si evidenzia qui.
+  if (genere.value === 'codice') {
+    void mostraTesto()
+    return
+  }
 
   try {
     indirizzo.value = await indirizzoDownload(props.slug, props.voce.percorso, undefined, true)
@@ -58,7 +134,20 @@ const troncato = ref(false)
 const salvando = ref(false)
 const salvato = ref(false)
 
+/** Carica il contenuto per la sola lettura, senza aprire l'editor. */
+async function mostraTesto(): Promise<void> {
+  inModifica.value = false
+  try {
+    const letto = await archivioApi.leggiTesto(props.slug, props.voce.percorso)
+    testo.value = letto.contenuto
+    troncato.value = letto.troncato
+  } catch (e) {
+    errore.value = e instanceof Error ? e.message : t('errori.generico')
+  }
+}
+
 async function apriEditor(): Promise<void> {
+  inModifica.value = true
   errore.value = null
   salvato.value = false
   try {
@@ -138,11 +227,23 @@ async function calcolaImpronta(): Promise<void> {
 
         <template v-if="testo !== null">
           <textarea
+            v-if="inModifica"
             v-model="testo"
             class="editor"
             spellcheck="false"
             :aria-label="voce.nome"
           />
+          <!-- L'HTML qui dentro lo produce highlight.js dal testo del file, non
+               il file stesso: la libreria sostituisce i caratteri speciali
+               prima di aggiungere i propri tag, quindi un file che contiene
+               markup resta testo e non diventa codice eseguito. Il testo
+               arriva dall'API di lettura, che serve solo file di testo. -->
+          <!-- eslint-disable vue/no-v-html -->
+          <pre
+            v-else
+            class="codice hljs"
+          ><code v-html="evidenziato" /></pre>
+          <!-- eslint-enable vue/no-v-html -->
         </template>
 
         <template v-else-if="indirizzo">
@@ -182,14 +283,14 @@ async function calcolaImpronta(): Promise<void> {
 
       <footer class="piede">
         <button
-          v-if="modificabile && genere === 'testo' && testo === null"
+          v-if="modificabile && (genere === 'testo' || genere === 'codice') && !inModifica"
           type="button"
           class="bottone"
           @click="apriEditor"
         >
           {{ t('anteprima.modifica') }}
         </button>
-        <template v-if="testo !== null">
+        <template v-if="inModifica">
           <button
             type="button"
             class="bottone"
@@ -357,5 +458,16 @@ async function calcolaImpronta(): Promise<void> {
 .bottone:disabled {
   cursor: default;
   opacity: 0.55;
+}
+.codice {
+  margin: 0;
+  padding: 0.9rem;
+  overflow: auto;
+  max-height: 60vh;
+  border-radius: var(--raggio);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  tab-size: 2;
 }
 </style>

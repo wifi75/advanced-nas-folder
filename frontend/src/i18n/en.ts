@@ -390,6 +390,13 @@ export default {
   },
 
   archivio: {
+    apriCartella: 'Open',
+    vediAnteprima: 'Preview',
+    vista: 'View',
+    vistaElenco: 'List',
+    vistaGriglia: 'Grid',
+    vistaGalleria: 'Gallery',
+    azioniSu: 'Actions on {nome}',
     titolo: 'Files',
     apri: 'Browse',
     percorso: 'Path',

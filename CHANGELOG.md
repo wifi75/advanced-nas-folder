@@ -10,6 +10,36 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.9.0] - 2026-08-30
+
+Chiude le tre voci rimaste della gestione file.
+
+### Aggiunto
+- **Viste a griglia e galleria** nell'archivio, oltre all'elenco. La scelta
+  resta nel browser di chi guarda: è una preferenza di lettura, non una
+  proprietà della cartella. In galleria le miniature vengono chieste **solo
+  quando entrano nello schermo** — ogni miniatura richiede un gettone all'API, e
+  una cartella con qualche centinaio di foto ne genererebbe altrettante
+  richieste all'apertura, per immagini che nessuno ha ancora guardato.
+- **Menu contestuale** col tasto destro, con le stesse azioni della riga. Serve
+  soprattutto alle viste a griglia e galleria, dove i pulsanti per esteso non
+  ci stanno: senza, quelle viste sarebbero di sola lettura.
+- **Evidenziazione della sintassi in lettura**, con `highlight.js` 11.12.0.
+  L'anteprima ora **apre anche i file di codice**, che prima finivano fra i «non
+  mostrabili» e non si potevano vedere affatto. I linguaggi si dichiarano uno
+  per uno invece di caricare la libreria intera: quella completa supera il
+  megabyte e finirebbe tutta nella precache della PWA. Il costo effettivo è di
+  circa 75 KB.
+
+  I colori dell'evidenziazione sono **variabili del tema**, non un foglio di
+  stile esterno: seguono chiaro e scuro come tutto il resto, invece di restare
+  fissi su una delle due varianti.
+
+### Limite dichiarato
+- L'evidenziazione vale **in lettura, non mentre si scrive**: modificando si
+  torna al testo semplice. Evidenziare dentro un campo modificabile richiede un
+  editor vero, che è lavoro di un altro ordine di grandezza.
+
 ## [0.8.0] - 2026-08-30
 
 Il pannello faceva tutto, ma non spiegava **in che ordine**. Chi montava una

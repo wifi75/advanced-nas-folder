@@ -76,9 +76,9 @@ nessuna dipende da quelle successive.
 ## Fase 3 — Gestione file completa
 
 - [x] **Icone per tipo di file**, una tinta per famiglia
-- [ ] Viste a griglia e galleria
+- [x] Viste a griglia e galleria *(la galleria chiede le miniature solo quando entrano nello schermo: una cartella con centinaia di foto genererebbe altrettante richieste all'apertura)*
 - [x] **Selezione multipla** con archivio dei soli elementi scelti
-- [ ] Menu contestuale
+- [x] Menu contestuale *(col tasto destro; nelle viste a griglia e galleria i pulsanti per esteso non ci stanno, e senza sarebbero di sola lettura)*
 - [x] **Crea, rinomina, sposta, copia, elimina, nuova cartella**, con conferma
       esplicita per le cartelle non vuote e permesso di scrittura richiesto su
       origine e destinazione
@@ -97,7 +97,8 @@ nessuna dipende da quelle successive.
 - [x] **Cruscotto dei trasferimenti dal vivo** via SSE: file, indirizzo, byte, esito
 - [ ] Avanzamento lato visitatore con pausa e ripresa *(vedi nota sui limiti)*
 - [x] **Editor di testo**, con scrittura atomica
-- [ ] Evidenziazione della sintassi nell'editor
+- [x] Evidenziazione della sintassi **in lettura**, con `highlight.js` e i colori del tema. L'anteprima ora apre anche i file di codice, che prima cadevano fra i «non mostrabili».
+- [ ] Evidenziazione **mentre si scrive**: richiede un editor vero (area di testo e strato evidenziato sovrapposti, o una libreria come CodeMirror). Oggi modificando si torna al testo semplice.
 - [x] **Anteprime**: immagini, video, audio, PDF e testo semplice
 - [x] **Checksum SHA-256** calcolato su richiesta e mostrato nell'anteprima
 
