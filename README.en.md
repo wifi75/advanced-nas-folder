@@ -182,6 +182,7 @@ in `.env` and in the database.
 
 ## Documentation
 
+- [User guide](docs/GUIDA.en.md) — how to use it, from first sign-in to share links
 - [Installation](docs/INSTALL.en.md) — complete guide and troubleshooting
 - [NFS write access on Synology](docs/synology-nfs-scrittura.en.md)
 - [Technical plan](docs/PIANO.md) *(Italian)* — architecture, data model, rationale

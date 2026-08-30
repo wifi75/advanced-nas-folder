@@ -1,5 +1,7 @@
 # Piano tecnico
 
+*[English version](PIANO.en.md)*
+
 Documento di riferimento dell'architettura. Le decisioni qui dentro sono state prese
 prima di scrivere codice e non vanno cambiate senza aggiornare anche `memory.md`.
 

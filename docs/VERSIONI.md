@@ -1,5 +1,7 @@
 # Versioni delle dipendenze
 
+*[English version](VERSIONI.en.md)*
+
 Regola del progetto: **si usano sempre le ultime versioni stabili.** Niente di vecchio,
 niente `latest` non verificato, niente numeri scritti a memoria.
 
@@ -45,6 +47,7 @@ Per i pacchetti con scope, codificare i caratteri speciali:
 | argon2-cffi | 25.1.0 |
 | pyjwt | 2.13.0 |
 | python-multipart | 0.0.32 |
+| zipstream-ng | 1.9.3 |
 | pytest | 9.1.1 |
 | pytest-asyncio | 1.4.0 |
 | httpx | 0.28.1 |
@@ -67,6 +70,7 @@ Per i pacchetti con scope, codificare i caratteri speciali:
 | @eslint/js | 10.0.1 |
 | eslint-plugin-vue | 10.10.0 |
 | typescript-eslint | 8.68.0 |
+| globals | 17.11.0 |
 | jiti | 2.7.0 |
 
 ### L'unica eccezione: TypeScript resta alla 6.0.3

@@ -1,5 +1,7 @@
 # anf-agent — agent privilegiato
 
+*[English version](README.en.md)*
+
 Questo è l'unico componente che gira da **root**. Per questo motivo è tenuto
 deliberatamente minimale: nessuna dipendenza esterna, solo la libreria standard di
 Python.

@@ -104,8 +104,8 @@ nessuna dipende da quelle successive.
 - [x] Multilingua italiano e inglese *(anticipato su richiesta)*
 - [x] **Marchio**: titolo, sottotitolo e logo personalizzabili
 - [x] **Spazio sui dischi** e scelta se mostrare i file nascosti
-- [ ] `update.sh` e `uninstall.sh`
-- [ ] Documentazione utente completa
+- [x] **`update.sh` e `uninstall.sh`**
+- [x] **Guida all'uso**, bilingue
 - [ ] *(opzionale)* Integrazione API HAProxy per creare i sottodomini end-to-end
 
 ---
@@ -117,9 +117,8 @@ Richieste del 2026-08-29 rimaste aperte alla chiusura della v0.3.0:
 - [x] **Documentazione bilingue, parte rivolta a chi usa il progetto**: `README.en.md`,
       `docs/INSTALL.md` e `.en.md`, guida NFS Synology nelle due lingue, con i
       collegamenti fra le versioni.
-- [ ] **Documenti interni ancora solo in italiano**: `docs/PIANO.md`,
-      `docs/VERSIONI.md` e `agent/README.md`. Sono documenti di sviluppo, non
-      di installazione: tradurli ha meno urgenza ma resta da fare.
+- [x] **Documenti interni tradotti**: `docs/PIANO.en.md`, `docs/VERSIONI.en.md`
+      e `agent/README.en.md`.
 - [x] **PWA**: manifest, icone (comprese quelle ritagliabili), service worker con
       precache e API sempre escluse dalla cache, avviso di aggiornamento.
 - [ ] **Da confermare su un browser vero**: la registrazione del service worker non

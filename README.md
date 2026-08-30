@@ -190,6 +190,7 @@ nomi delle condivisioni vivono in `.env` e nel database.
 
 ## Documentazione
 
+- [Guida all'uso](docs/GUIDA.md) — come si usa, dal primo accesso ai link di condivisione
 - [Installazione](docs/INSTALL.md) — guida completa e risoluzione dei problemi
 - [Piano tecnico](docs/PIANO.md) — architettura, modello dei dati, scelte motivate
 - [Versioni delle dipendenze](docs/VERSIONI.md) — stato attuale e come verificarle

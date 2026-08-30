@@ -163,7 +163,7 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
   scrive un file accanto e poi lo rinomina al posto dell'originale: se la scrittura si
   interrompe a metà, il file di partenza è ancora quello di prima.
 - **Caricamento di cartelle intere**, ricostruendo l'albero dall'altra parte.
-- 199 test nuovi. Suite complessiva a **378 test**.
+- 196 test nuovi. Suite complessiva a **375 test**.
 
 ### Modificato
 - In sviluppo la consegna passa da sola a `stream`: senza un web server davanti,
