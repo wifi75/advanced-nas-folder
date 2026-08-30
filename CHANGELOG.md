@@ -7,6 +7,15 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non rilasciato]
 
+### Da fare
+Vedere [TODO.md](TODO.md).
+
+## [0.6.0] - 2026-08-30
+
+Il pannello fa tutto quello per cui era stato pensato: i file si scaricano, si
+caricano, si cercano e si modificano; gli utenti si creano; i trasferimenti si
+vedono mentre succedono.
+
 ### Aggiunto
 - **Consegna dei file**: le cartelle pubblicate si sfogliano e i file si scaricano.
   Il download lo esegue il web server, non l'applicazione: Python autorizza e passa
@@ -170,9 +179,6 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
   `X-Sendfile` produce risposte vuote che sembrano un difetto del codice.
 - `ruff` non analizza più le migrazioni di alembic: sono generate, e riformattarle le
   farebbe divergere da ciò che il comando rigenera.
-
-### Da fare
-Vedere [TODO.md](TODO.md).
 
 ## [0.5.0] - 2026-08-29
 
