@@ -216,6 +216,8 @@ const chiHaDeciso = computed(() => {
     <Schede
       v-slot="{ attiva }"
       :schede="schede"
+      nome="sezione"
+      livello="interno"
     >
       <template v-if="attiva === 'regole'">
         <!-- regole per cartella -->

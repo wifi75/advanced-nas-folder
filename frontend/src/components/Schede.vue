@@ -8,20 +8,39 @@
  * finisce un argomento e comincia il successivo, ed e' il motivo per cui il
  * pannello risultava confuso.
  *
- * La scheda scelta resta nell'indirizzo (`?scheda=`): ricaricando la pagina si
- * torna dove si era, e un collegamento a una scheda precisa si puo' mandare a
- * qualcuno.
+ * La scheda scelta resta nell'indirizzo: ricaricando la pagina si torna dove
+ * si era, e un collegamento a una scheda precisa si puo' mandare a qualcuno.
+ *
+ * **Ogni gruppo di schede ha il proprio parametro** (`nome`). Con due gruppi
+ * annidati — le sezioni di una pubblicazione, e dentro «Chi accede» le sue
+ * quattro schede — un parametro solo li faceva litigare: cliccare una scheda
+ * interna riscriveva quello che leggeva anche la barra esterna, che non
+ * riconosceva il valore e ripiegava sulla prima scheda. Il risultato era che
+ * un clic su «Permessi per utente» buttava fuori dalla sezione.
+ *
+ * Il gruppo annidato si dichiara anche `livello: 'interno'`: due barre
+ * identiche una dentro l'altra sembrano allo stesso livello, e non si capisce
+ * piu' quale comanda quale.
  */
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-const props = defineProps<{ schede: { chiave: string; etichetta: string }[] }>()
+const props = withDefaults(
+  defineProps<{
+    schede: { chiave: string; etichetta: string }[]
+    /** Il parametro nell'indirizzo. Va cambiato per ogni gruppo annidato. */
+    nome?: string
+    /** `interno`: gruppo dentro un altro, disegnato piu' sottomesso. */
+    livello?: 'principale' | 'interno'
+  }>(),
+  { nome: 'scheda', livello: 'principale' },
+)
 
 const route = useRoute()
 const router = useRouter()
 
 const attiva = computed(() => {
-  const richiesta = route.query.scheda
+  const richiesta = route.query[props.nome]
   const valida = props.schede.some((s) => s.chiave === richiesta)
   return valida ? String(richiesta) : (props.schede[0]?.chiave ?? '')
 })
@@ -30,7 +49,7 @@ function scegli(chiave: string): void {
   // `replace` e non `push`: le schede non sono passi di navigazione, e
   // riempire la cronologia costringerebbe a premere «indietro» una volta per
   // ogni scheda guardata per uscire dalla pagina.
-  void router.replace({ query: { ...route.query, scheda: chiave } })
+  void router.replace({ query: { ...route.query, [props.nome]: chiave } })
 }
 
 defineExpose({ attiva })
@@ -40,6 +59,7 @@ defineExpose({ attiva })
   <div class="schede">
     <div
       class="schede__barra"
+      :class="{ 'schede__barra--interna': livello === 'interno' }"
       role="tablist"
     >
       <button
@@ -48,7 +68,10 @@ defineExpose({ attiva })
         type="button"
         role="tab"
         class="scheda-voce"
-        :class="{ 'scheda-voce--attiva': attiva === s.chiave }"
+        :class="{
+          'scheda-voce--attiva': attiva === s.chiave,
+          'scheda-voce--interna': livello === 'interno',
+        }"
         :aria-selected="attiva === s.chiave"
         @click="scegli(s.chiave)"
       >
@@ -121,6 +144,38 @@ defineExpose({ attiva })
   box-shadow:
     inset 0 1px 0 var(--vetro-luce),
     var(--vetro-ombra);
+}
+
+/* Il gruppo annidato non e' una barra: sono linguette sottolineate, piu'
+   piccole e senza fondo proprio. Cosi' si legge come «dentro» la scheda
+   aperta invece che come una seconda navigazione allo stesso livello. */
+.schede__barra--interna {
+  gap: 0.35rem;
+  padding: 0;
+  border: 0;
+  border-block-end: 1px solid var(--bordo);
+  border-radius: 0;
+  background: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+  align-self: stretch;
+}
+
+.scheda-voce--interna {
+  border-radius: 0;
+  padding: 0.35rem 0.1rem;
+  margin-inline-end: 0.9rem;
+  font-size: 0.8125rem;
+  border-block-end: 2px solid transparent;
+  margin-block-end: -1px;
+}
+
+.scheda-voce--interna.scheda-voce--attiva {
+  background: none;
+  box-shadow: none;
+  color: var(--accento);
+  border-block-end-color: var(--accento);
 }
 
 .schede__corpo {
