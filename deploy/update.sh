@@ -222,7 +222,12 @@ if [ "$DRY_RUN" = 0 ]; then
     # solo, e senza escluderli venivano cancellati e ricreati a ogni
     # aggiornamento — il resoconto delle modifiche annegava in decine di righe
     # che non dicevano niente.
-    rsync -a --delete --itemize-changes \
+    # `--checksum` confronta il contenuto invece di data e dimensione: il
+    # pacchetto viene ricompilato a ogni rilascio, quindi le date sono sempre
+    # nuove e senza questo *ogni* file risulterebbe modificato — un resoconto
+    # che segnala tutto non segnala niente. Costa una lettura dell'albero, che
+    # e di pochi megabyte.
+    rsync -a --delete --itemize-changes --checksum \
         --exclude '.env' \
         --exclude 'venv' \
         --exclude '__pycache__' \

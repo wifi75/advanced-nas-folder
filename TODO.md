@@ -95,10 +95,10 @@ nessuna dipende da quelle successive.
 - [x] **Lettura in tempo reale dell'access log**, con gestione della rotazione
 - [x] **IP reali dietro il reverse proxy** (`X-Forwarded-For` dai soli proxy fidati)
 - [x] **Cruscotto dei trasferimenti dal vivo** via SSE: file, indirizzo, byte, esito
-- [ ] Avanzamento lato visitatore con pausa e ripresa *(vedi nota sui limiti)*
+- [~] Avanzamento lato visitatore: **e' la stessa voce della barra di avanzamento della fase 2**, ed e' un limite dichiarato, non lavoro rimasto. Realizzarlo significa non delegare piu' la consegna al web server, cioe' rinunciare alla ripresa nativa: e' una decisione da prendere, non un compito da svolgere. Vedere «Limiti dichiarati».
 - [x] **Editor di testo**, con scrittura atomica
 - [x] Evidenziazione della sintassi **in lettura**, con `highlight.js` e i colori del tema. L'anteprima ora apre anche i file di codice, che prima cadevano fra i «non mostrabili».
-- [ ] Evidenziazione **mentre si scrive**: richiede un editor vero (area di testo e strato evidenziato sovrapposti, o una libreria come CodeMirror). Oggi modificando si torna al testo semplice.
+- [x] Evidenziazione **anche mentre si scrive**: strato colorato sotto, area di testo sopra col testo trasparente e il solo cursore visibile. Senza libreria in piu'.
 - [x] **Anteprime**: immagini, video, audio, PDF e testo semplice
 - [x] **Checksum SHA-256** calcolato su richiesta e mostrato nell'anteprima
 

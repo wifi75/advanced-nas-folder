@@ -18,6 +18,33 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.11.0] - 2026-08-30
+
+Chiude la fase 4. La fase 3 era gia' completa.
+
+### Aggiunto
+- **Evidenziazione della sintassi anche mentre si scrive.** Uno strato colorato
+  sotto, l'area di testo sopra col testo trasparente e il solo cursore visibile.
+  Non serve una libreria per editor: le due copie del testo devono solo avere le
+  stesse identiche metriche del carattere, o si sfalsano riga dopo riga.
+
+### Corretto
+- **Nel resoconto dell'aggiornamento risultava modificato ogni file.** rsync
+  confronta data e dimensione, e il pacchetto viene ricompilato a ogni rilascio:
+  le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
+  segnala tutto non segnala niente. Ora il confronto e' sul contenuto. *(La
+  v0.10.2 dichiarava questa correzione senza contenerla: la modifica non era
+  stata applicata al file. Le sue note sono state corrette.)*
+
+### Non fatto, e perche'
+- **L'avanzamento del download lato pannello resta fuori.** Le due voci ancora
+  aperte della fase 2 e della fase 4 sono la stessa cosa, ed e' un limite
+  dichiarato: la consegna e' delegata al web server, e da quel momento
+  l'applicazione e' uscita di scena. Mostrare una percentuale richiede di far
+  passare i byte da Python, cioe' rinunciare alla ripresa nativa dei download e
+  saturare i worker. Non e' lavoro rimasto: e' una decisione gia' presa, che
+  andrebbe ribaltata di proposito.
+
 ## [0.10.1] - 2026-08-30
 
 ### Corretto

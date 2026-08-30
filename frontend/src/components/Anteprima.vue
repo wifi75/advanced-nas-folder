@@ -100,8 +100,26 @@ const evidenziato = computed(() => {
   return hljs.highlight(testo.value, { language: linguaggio, ignoreIllegals: true }).value
 })
 
-/** In sola lettura si evidenzia; modificando no: servirebbe un editor vero. */
 const inModifica = ref(false)
+
+/** Lo strato colorato sotto l'area di testo, da tenere allineato allo scorrimento. */
+const strato = ref<HTMLElement | null>(null)
+
+function sincronizza(evento: Event): void {
+  const area = evento.target as HTMLTextAreaElement
+  if (!strato.value) return
+  strato.value.scrollTop = area.scrollTop
+  strato.value.scrollLeft = area.scrollLeft
+}
+
+/**
+ * Il testo evidenziato con una riga vuota in coda.
+ *
+ * Senza, l'ultima riga scompare dallo strato colorato mentre la si scrive:
+ * un `<pre>` che finisce con un a capo non lo mostra, mentre l'area di testo
+ * ce l'ha e il cursore sta li.
+ */
+const evidenziatoConCoda = computed(() => evidenziato.value + '\n')
 
 async function prepara(): Promise<void> {
   indirizzo.value = null
@@ -226,13 +244,30 @@ async function calcolaImpronta(): Promise<void> {
         </p>
 
         <template v-if="testo !== null">
-          <textarea
+          <!-- Editor con evidenziazione: uno strato colorato sotto, l'area di
+               testo sopra con il testo trasparente e il solo cursore visibile.
+               Devono avere le stesse identiche metriche del carattere, o le
+               due copie si sfalsano riga dopo riga. -->
+          <div
             v-if="inModifica"
-            v-model="testo"
-            class="editor"
-            spellcheck="false"
-            :aria-label="voce.nome"
-          />
+            class="editore"
+          >
+            <!-- eslint-disable vue/no-v-html -->
+            <pre
+              ref="strato"
+              class="editore__strato hljs"
+              aria-hidden="true"
+            ><code v-html="evidenziatoConCoda" /></pre>
+            <!-- eslint-enable vue/no-v-html -->
+            <textarea
+              v-model="testo"
+              class="editore__testo"
+              spellcheck="false"
+              wrap="off"
+              :aria-label="voce.nome"
+              @scroll="sincronizza"
+            />
+          </div>
           <!-- L'HTML qui dentro lo produce highlight.js dal testo del file, non
                il file stesso: la libreria sostituisce i caratteri speciali
                prima di aggiungere i propri tag, quindi un file che contiene
@@ -419,18 +454,52 @@ async function calcolaImpronta(): Promise<void> {
   border-top: 1px solid var(--bordo);
 }
 
-.editor {
-  width: 100%;
+/* Le due copie del testo devono coincidere carattere per carattere: ogni
+   proprieta' che sposta il testo va dichiarata identica su entrambe. */
+.editore {
+  position: relative;
   min-height: 20rem;
-  padding: 0.6rem;
   border: 1px solid var(--bordo);
   border-radius: var(--raggio);
   background: var(--sfondo);
-  color: var(--testo);
+  overflow: hidden;
+}
+
+.editore__strato,
+.editore__testo {
+  margin: 0;
+  padding: 0.6rem;
+  border: 0;
   font-family: ui-monospace, monospace;
   font-size: 0.82rem;
   line-height: 1.5;
-  resize: vertical;
+  tab-size: 2;
+  white-space: pre;
+  overflow: auto;
+}
+
+.editore__strato {
+  position: absolute;
+  inset: 0;
+  background: none;
+  pointer-events: none;
+}
+
+.editore__testo {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 20rem;
+  background: transparent;
+  /* Il testo e' invisibile: quello che si legge e' lo strato sotto. Il cursore
+     invece deve restare visibile, o non si capisce dove si sta scrivendo. */
+  color: transparent;
+  caret-color: var(--testo);
+  resize: none;
+}
+
+.editore__testo::selection {
+  background: color-mix(in srgb, var(--accento) 35%, transparent);
 }
 
 .fatto {
