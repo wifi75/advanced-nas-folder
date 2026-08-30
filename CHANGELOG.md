@@ -18,6 +18,14 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.13.1] - 2026-08-30
+
+### Corretto
+- **Le pubblicazioni gia' esistenti continuavano a mostrare il cestino del NAS.**
+  La 0.13.0 proponeva i nomi da nascondere solo alle pubblicazioni nuove: chi
+  aggiornava non vedeva alcun cambiamento, che e' esattamente il contrario di
+  quello che serve. Ora una migrazione riempie l'elenco dove era rimasto vuoto.
+
 ## [0.13.0] - 2026-08-30
 
 Di una pubblicazione si poteva cambiare quasi niente. Ora tutto quello che la
