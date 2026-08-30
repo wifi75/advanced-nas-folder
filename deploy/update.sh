@@ -127,14 +127,14 @@ if [ "$DRY_RUN" = 0 ]; then
     # all'impianto, non al programma.
     rsync -a --delete \
         --exclude '.env' \
-        --exclude 'backend/.venv' \
+        --exclude 'venv' \
         "$TEMPORANEA/nuova/" "$RADICE/"
 
     passo "$(msg 'Aggiorno le dipendenze' 'Updating dependencies')"
-    "$RADICE/backend/.venv/bin/pip" install -q -e "$RADICE/backend"
+    "$RADICE/venv/bin/pip" install -q -e "$RADICE/backend"
 
     passo "$(msg 'Applico le migrazioni del database' 'Applying database migrations')"
-    (cd "$RADICE/backend" && "$RADICE/backend/.venv/bin/alembic" upgrade head)
+    (cd "$RADICE/backend" && "$RADICE/venv/bin/alembic" upgrade head)
 fi
 
 passo "$(msg 'Riavvio i servizi' 'Restarting services')"

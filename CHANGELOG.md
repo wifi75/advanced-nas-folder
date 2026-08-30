@@ -10,6 +10,16 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.6.9] - 2026-08-30
+
+### Corretto
+- **`update.sh` non aggiornava nulla**: cercava l'ambiente Python in
+  `backend/.venv`, che è il percorso di sviluppo. In produzione l'installer lo
+  crea nella radice, e l'aggiornamento si fermava con «No such file or
+  directory». Il ripristino automatico funzionava — la versione precedente
+  tornava al suo posto e i servizi ripartivano — ma l'aggiornamento non era mai
+  possibile.
+
 ## [0.6.8] - 2026-08-30
 
 ### Aggiunto
