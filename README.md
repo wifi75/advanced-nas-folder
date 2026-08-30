@@ -2,6 +2,9 @@
 
 🇬🇧 [English version](README.en.md)
 
+[![Release](https://img.shields.io/github/v/release/wifi75/advanced-nas-folder?label=Release&color=2B7489&logo=github)](https://github.com/wifi75/advanced-nas-folder/releases/latest)
+[![Controlli](https://img.shields.io/github/actions/workflow/status/wifi75/advanced-nas-folder/controlli.yml?branch=main&label=Controlli&logo=githubactions&logoColor=white)](https://github.com/wifi75/advanced-nas-folder/actions/workflows/controlli.yml)
+[![Test](https://img.shields.io/badge/Test-375-6E9F18?logo=pytest&logoColor=white)](tests)
 [![Platform](https://img.shields.io/badge/Platform-Linux%20%2B%20systemd-FCC624?logo=linux&logoColor=black)](https://systemd.io)
 [![Backend](https://img.shields.io/badge/Backend-FastAPI%200.141-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![Python](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white)](https://www.python.org)
@@ -20,10 +23,10 @@ Pannello self-hosted che **monta condivisioni NFS**, **pubblica cartelle con per
 per sottocartella** e sostituisce integralmente FileBrowser — senza che tu debba mai
 modificare a mano un file di configurazione del server.
 
-> **Stato: fasi 1 e 2 quasi complete.** Il pannello monta condivisioni NFS, pubblica
-> cartelle con permessi fino al singolo utente, è installabile sul telefono e parla
-> italiano e inglese. Manca la consegna dei file, cioè il download vero e proprio.
-> Vedere [TODO.md](TODO.md).
+> **Stato: funzionante e completo nelle sue parti principali (v0.6.0).** Monta
+> condivisioni NFS, pubblica cartelle con permessi fino al singolo utente, scarica e
+> carica file con ripresa, cerca, mostra anteprime e registra i trasferimenti. Non è
+> ancora stato installato su un server di produzione. Vedere [TODO.md](TODO.md).
 
 ---
 
@@ -49,14 +52,21 @@ mount, così un errore resta isolato e non impedisce l'avvio del server.
 per prefisso di percorso: pubblica, protetta da password, riservata a utenti
 registrati, o link con scadenza e limite di download.
 
-**Gestione file** — navigazione con viste elenco / griglia / galleria, upload
-drag&drop riprendibile, download di cartelle come archivio, editor di testo e codice,
-anteprime, ricerca, multiutente con ambiti e permessi granulari.
+**Gestione file** — navigazione, operazioni su file e cartelle, caricamento
+drag&drop **riprendibile** (anche di cartelle intere), download di una cartella come
+archivio ZIP, selezione multipla, ricerca ricorsiva, anteprime di immagini, video,
+audio e PDF, editor di testo, checksum SHA-256. Multiutente con ambiti e permessi
+granulari.
 
 **Download** — la consegna dei file è delegata al web server (`X-Sendfile` su Apache,
 `X-Accel-Redirect` su Nginx): Python non tocca mai il contenuto, e il *resume* delle
-richieste interrotte funziona in modo nativo. Dashboard in tempo reale con file, IP
-reale del client, percentuale e velocità.
+richieste interrotte funziona in modo nativo. Un cruscotto dal vivo mostra file,
+indirizzo reale del client ed esito.
+
+> I **byte davvero trasferiti** li conosce solo il web server, che è quello che invia
+> i file: compaiono nel cruscotto se ne è indicato l'access log, e restano vuoti
+> altrimenti. Una percentuale in tempo reale richiederebbe di far passare i byte da
+> Python, cioè rinunciare alla ripresa nativa: non vale lo scambio.
 
 ## Sicurezza
 
@@ -109,6 +119,18 @@ sudo bash install.sh
 
 Aggiungi `--dry-run` per vedere esattamente cosa farebbe, senza applicare nulla.
 
+### Aggiornare e disinstallare
+
+```bash
+curl -fsSLO https://github.com/wifi75/advanced-nas-folder/releases/latest/download/update.sh
+sudo bash update.sh
+```
+
+`update.sh` mette la nuova versione accanto a quella in uso e scambia le due cartelle
+solo dopo che la nuova ha risposto: se qualcosa non va, la precedente torna in
+servizio da sola. `uninstall.sh` rimuove servizi e programma **lasciando i dati**;
+per togliere anche database e configurazione serve `--tutto`.
+
 ## Struttura del progetto
 
 ```
@@ -117,6 +139,7 @@ agent/       processo privilegiato, senza dipendenze esterne (solo libreria stan
 frontend/    interfaccia Vue 3 + TypeScript, compilata dalla CI
 deploy/      unit systemd, modelli di configurazione per il web server, installer
 docs/        piano tecnico, versioni delle dipendenze, guide operative
+tests/       test di API e agent, eseguiti dalla CI a ogni push
 ```
 
 ## Avvio in sviluppo
@@ -173,8 +196,10 @@ percorsi che poi non funzionano installati.
 
 | Comando | Cosa fa |
 |---|---|
-| `cd backend && .venv/bin/ruff check app/` | analisi statica del backend |
-| `cd backend && .venv/bin/mypy app/` | controllo dei tipi, modalità `strict` |
+| `.venv/bin/ruff check .` | analisi statica di backend, agent e test |
+| `.venv/bin/ruff format .` | formattazione |
+| `.venv/bin/pytest` | i test, dalla radice del progetto |
+| `cd backend && .venv/bin/mypy app` | controllo dei tipi, modalità `strict` |
 | `cd backend && .venv/bin/alembic upgrade head` | applica le migrazioni |
 | `cd backend && .venv/bin/alembic revision --autogenerate -m "…"` | nuova migrazione |
 | `cd frontend && npm run typecheck` | controllo dei tipi del frontend |
@@ -196,7 +221,7 @@ nomi delle condivisioni vivono in `.env` e nel database.
 - [Versioni delle dipendenze](docs/VERSIONI.md) — stato attuale e come verificarle
 - [Agent privilegiato](agent/README.md) — protocollo e regole di sicurezza
 - [Abilitare la scrittura NFS su Synology](docs/synology-nfs-scrittura.md)
-- [TODO.md](TODO.md) — stato di ogni fase
+- [TODO.md](TODO.md) — stato di ogni fase, e i limiti dichiarati per scelta
 - [CHANGELOG.md](CHANGELOG.md) — cosa è cambiato e perché
 
 ## Licenza

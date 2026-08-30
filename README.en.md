@@ -2,6 +2,9 @@
 
 🇮🇹 [Versione italiana](README.md)
 
+[![Release](https://img.shields.io/github/v/release/wifi75/advanced-nas-folder?label=Release&color=2B7489&logo=github)](https://github.com/wifi75/advanced-nas-folder/releases/latest)
+[![Checks](https://img.shields.io/github/actions/workflow/status/wifi75/advanced-nas-folder/controlli.yml?branch=main&label=Checks&logo=githubactions&logoColor=white)](https://github.com/wifi75/advanced-nas-folder/actions/workflows/controlli.yml)
+[![Tests](https://img.shields.io/badge/Tests-375-6E9F18?logo=pytest&logoColor=white)](tests)
 [![Platform](https://img.shields.io/badge/Platform-Linux%20%2B%20systemd-FCC624?logo=linux&logoColor=black)](https://systemd.io)
 [![Backend](https://img.shields.io/badge/Backend-FastAPI%200.141-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![Python](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white)](https://www.python.org)
@@ -13,17 +16,17 @@
 [![Database](https://img.shields.io/badge/DB-SQLite%20(WAL)-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/wal.html)
 [![Storage](https://img.shields.io/badge/Storage-NFS%20v3%20%7C%20v4-EE0000?logo=redhat&logoColor=white)](https://linux-nfs.org)
 [![Web server](https://img.shields.io/badge/Web%20server-Apache%20%7C%20Nginx-D22128?logo=apache&logoColor=white)](https://httpd.apache.org)
-[![Security](https://img.shields.io/badge/Privileges-isolated%20root%20agent-4B0082)](docs/PIANO.md)
+[![Security](https://img.shields.io/badge/Privileges-isolated%20root%20agent-4B0082)](docs/PIANO.en.md)
 [![License](https://img.shields.io/badge/License-MIT-3DA639?logo=opensourceinitiative&logoColor=white)](LICENSE)
 
 Self-hosted panel that **mounts NFS shares**, **publishes folders with per-subfolder
 permissions** and fully replaces FileBrowser — without ever editing a server
 configuration file by hand.
 
-> **Status: phases 1 and 2 nearly complete.** The panel mounts NFS shares, publishes
-> folders with per-user permissions, installs on your phone and speaks Italian and
-> English. File delivery — the actual download — is still missing. See
-> [TODO.md](TODO.md).
+> **Status: working and complete in its main parts (v0.6.0).** It mounts NFS shares,
+> publishes folders with per-user permissions, downloads and uploads files with
+> resume, searches, shows previews and records transfers. It has not yet been
+> installed on a production server. See [TODO.md](TODO.md).
 
 ---
 
@@ -52,14 +55,20 @@ restricted to specific people. Per-user permissions decide **which user reaches 
 folder**, or all of them; an explicit denial overrides the path rule, so you can take a
 branch away from one person while it stays open to everyone else.
 
-**File management** — list, grid and gallery views, resumable drag&drop uploads,
-folder downloads as archives, a code editor, previews, search, multi-user with scopes
-and granular permissions.
+**File management** — browsing, file and folder operations, **resumable** drag&drop
+uploads (whole folders included), downloading a folder as a ZIP archive, multiple
+selection, recursive search, previews for images, video, audio and PDF, a text
+editor, SHA-256 checksums. Multi-user with scopes and granular permissions.
 
 **Downloads** — file delivery is delegated to the web server (`X-Sendfile` on Apache,
 `X-Accel-Redirect` on Nginx): Python never touches the content, and resuming
-interrupted transfers works natively. Real-time dashboard with file, real client IP,
-percentage and speed.
+interrupted transfers works natively. A live dashboard shows file, real client
+address and outcome.
+
+> The **bytes actually transferred** are known only to the web server, since it is
+> the one sending the files: they appear in the dashboard if its access log is
+> configured, and stay empty otherwise. A real-time percentage would require routing
+> the bytes through Python, giving up native resume: not worth the trade.
 
 ## Security
 
@@ -112,6 +121,18 @@ sudo bash install.sh
 
 Add `--dry-run` to see exactly what it would do without applying anything.
 
+### Updating and uninstalling
+
+```bash
+curl -fsSLO https://github.com/wifi75/advanced-nas-folder/releases/latest/download/update.sh
+sudo bash update.sh
+```
+
+`update.sh` puts the new version next to the running one and swaps the two folders
+only after the new one has answered: if something goes wrong, the previous one comes
+back on its own. `uninstall.sh` removes services and program **keeping the data**; to
+remove the database and configuration too it needs `--tutto`.
+
 ## Project layout
 
 ```
@@ -120,6 +141,7 @@ agent/       privileged process, no external dependencies (standard library only
 frontend/    Vue 3 + TypeScript interface, built by CI
 deploy/      systemd units, web server templates, installer
 docs/        technical plan, dependency versions, operational guides
+tests/       API and agent tests, run by CI on every push
 ```
 
 ## Running in development
@@ -165,8 +187,10 @@ make paths work locally that break once installed.
 
 | Command | What it does |
 |---|---|
-| `cd backend && .venv/bin/ruff check app/` | backend static analysis |
-| `cd backend && .venv/bin/mypy app/` | type checking, `strict` mode |
+| `.venv/bin/ruff check .` | static analysis of backend, agent and tests |
+| `.venv/bin/ruff format .` | formatting |
+| `.venv/bin/pytest` | the tests, from the project root |
+| `cd backend && .venv/bin/mypy app` | type checking, `strict` mode |
 | `cd backend && .venv/bin/alembic upgrade head` | apply migrations |
 | `pytest` (from the repository root) | run the test suite |
 | `cd frontend && npm run typecheck` | frontend type checking |
@@ -185,10 +209,11 @@ in `.env` and in the database.
 - [User guide](docs/GUIDA.en.md) — how to use it, from first sign-in to share links
 - [Installation](docs/INSTALL.en.md) — complete guide and troubleshooting
 - [NFS write access on Synology](docs/synology-nfs-scrittura.en.md)
-- [Technical plan](docs/PIANO.md) *(Italian)* — architecture, data model, rationale
-- [Dependency versions](docs/VERSIONI.md) *(Italian)* — current state and how to check
-- [Privileged agent](agent/README.md) *(Italian)* — protocol and security rules
-- [TODO.md](TODO.md) · [CHANGELOG.md](CHANGELOG.md)
+- [Technical plan](docs/PIANO.en.md) — architecture, data model, rationale
+- [Dependency versions](docs/VERSIONI.en.md) — current state and how to check them
+- [Privileged agent](agent/README.en.md) — protocol and security rules
+- [TODO.md](TODO.md) — state of each phase, and the limits accepted on purpose
+- [CHANGELOG.md](CHANGELOG.md) — what changed and why
 
 ## License
 

@@ -7,6 +7,21 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non rilasciato]
 
+### Corretto
+- **Il README dichiarava cose non vere.** Il banner di stato diceva che mancava la
+  consegna dei file, fatta dalla v0.6.0; le funzionalità elencavano viste a griglia e
+  galleria, che non esistono; il cruscotto prometteva «percentuale e velocità», che con
+  la consegna delegata al web server non sono ottenibili. Corretto in entrambe le
+  lingue, e aggiunta la nota che spiega perché quella percentuale non c'è.
+- I collegamenti ai documenti interni nel README inglese puntavano alle versioni
+  italiane, tradotte nel frattempo.
+
+### Aggiunto
+- Badge di **release**, **stato dei controlli** e **numero di test** nei due README:
+  i primi due sono dinamici e dicono la verità da soli.
+- README: sezione su `update.sh` e `uninstall.sh`, che esistevano senza essere
+  documentati, e i comandi dei test e della formattazione fra quelli utili.
+
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
