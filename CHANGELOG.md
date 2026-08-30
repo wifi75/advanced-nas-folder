@@ -18,6 +18,21 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.14.3] - 2026-08-30
+
+### Corretto
+- **Nessuna pagina puo' piu' scorrere in orizzontale.** Cio' che e' largo
+  davvero — una tabella, un percorso — scorre dentro il proprio riquadro, non
+  trascina la pagina intera. Un testo lungo nei passi della pagina iniziale
+  poteva spingerla oltre il bordo.
+
+### Interno
+- **`controlla.ps1`**: un solo comando che esegue formattazione, analisi
+  statica, tipi, test e compilazione, e si ferma davvero se qualcosa fallisce.
+  Lanciandoli a mano finivo il comando con una pipe verso `tail` per leggere
+  solo il riepilogo — e una pipe restituisce l'esito dell'ultimo comando, non
+  di pytest. Due difetti sono arrivati su GitHub cosi'.
+
 ## [0.14.2] - 2026-08-30
 
 ### Corretto

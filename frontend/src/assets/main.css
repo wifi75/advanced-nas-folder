@@ -147,6 +147,9 @@
 
 body {
   margin: 0;
+  /* La pagina non scorre mai di lato: cio' che e' largo davvero — una tabella,
+     un percorso — scorre dentro il proprio riquadro. */
+  overflow-x: hidden;
   background: var(--sfondo);
   color: var(--testo);
   font-family:
@@ -311,6 +314,10 @@ a {
 
 .pagina {
   flex: 1;
+  /* Senza, un figlio in griglia o in flex puo' rifiutarsi di restringersi e
+     spingere la pagina oltre il bordo, facendo comparire la barra di
+     scorrimento orizzontale. */
+  min-width: 0;
   width: min(880px, 100% - 2.5rem);
   margin-inline: auto;
   padding-block: 2.5rem;

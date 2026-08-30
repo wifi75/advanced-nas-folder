@@ -248,6 +248,10 @@ onMounted(() => {
   margin: 0 0 0.35rem;
   color: var(--testo-tenue);
   max-width: 60ch;
+  /* Una parola lunga — un percorso, un indirizzo — non deve poter allargare la
+     pagina oltre lo schermo: il testo va a capo, e la pagina non scorre di
+     lato. */
+  overflow-wrap: anywhere;
 }
 
 .conteggio {

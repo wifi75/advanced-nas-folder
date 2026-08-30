@@ -25,6 +25,10 @@ dependencies = [
     # Produce lo ZIP mentre lo si invia, senza costruirlo prima su disco: una
     # cartella del NAS puo' pesare piu' dello spazio libero della macchina.
     "zipstream-ng==1.9.3",
+    # Miniature delle immagini. Senza, la galleria scarica ogni foto per
+    # intero e la rimpicciolisce nel browser: su una cartella del NAS sono
+    # centinaia di megabyte per vedere delle anteprime.
+    "pillow==12.3.0",
 ]
 
 [project.optional-dependencies]
