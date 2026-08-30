@@ -10,6 +10,8 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.6.8] - 2026-08-30
+
 ### Aggiunto
 - **Ogni pubblicazione mostra l'indirizzo completo su cui si raggiunge**, con un
   pulsante per copiarlo. Prima compariva solo l'identificatore (`/documenti`), e
