@@ -114,12 +114,18 @@ Full guide: **[docs/INSTALL.en.md](docs/INSTALL.en.md)**
 Download, inspect, run — three separate steps, because the script runs as root:
 
 ```bash
+cd /root
 curl -fsSLO https://github.com/wifi75/advanced-nas-folder/releases/latest/download/install.sh
 sha256sum install.sh
 sudo bash install.sh
 ```
 
 Add `--dry-run` to see exactly what it would do without applying anything.
+
+The installer shows what it found on the machine — web server, which ports are taken
+and by what — and asks which port to use plus a final confirmation. With
+`curl … | sudo bash` it asks nothing and decides on its own, because there it has no
+terminal to read from.
 
 ### Updating and uninstalling
 

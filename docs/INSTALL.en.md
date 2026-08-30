@@ -51,31 +51,56 @@ wrong makes uploaded files unmanageable from File Station.
 
 ## Installation
 
-The installer is downloaded, inspected and run in **three separate steps**: it runs as
-root, so it deserves to be read first.
+The installer is downloaded, inspected and run in **separate steps**: it runs as root,
+so it deserves to be read first.
+
+**Download it into a directory of your own**, `/root` for instance. Not into
+`/var/www`: that is where the installer puts itself, and leaving the installation
+file among the sites only muddles things.
 
 ```bash
+cd /root
 curl -fsSLO https://github.com/wifi75/advanced-nas-folder/releases/latest/download/install.sh
 ```
 
+Look at what you downloaded, before handing it to root:
+
 ```bash
 sha256sum install.sh
+less install.sh
 ```
+
+### Try it dry first
+
+It prints everything it would do — commands included — without touching anything. On
+a server hosting other sites this is not an option: it is the first step.
+
+```bash
+sudo bash install.sh --dry-run
+```
+
+From here you already see the three things that matter: which web server it found,
+**which ports are taken and by what**, and where everything will end up.
+
+### Then the real thing
 
 ```bash
 sudo bash install.sh
 ```
 
+It asks **two questions**, and Enter accepts what it proposes for both:
+
+1. **which port to use.** It shows the first five free ones; if 8100 is taken it says
+   so, naming the service holding it;
+2. **the final confirmation**, after the summary of what will be installed and where.
+   That is the last moment to stop before anything is written.
+
 Messages appear in the system language. To force it: `--lang en` or `--lingua it`.
 
-### Try it dry first
-
-Recommended on a server that hosts other sites: it prints every command without
-running any of them.
-
-```bash
-sudo bash install.sh --dry-run
-```
+> **If you use `curl … | sudo bash` the installer asks nothing** and decides on its
+> own. That is not a defect: that way it has no terminal to read from, and waiting for
+> an answer that will never come would be worse. It works, but you lose the questions —
+> download the file if you want them.
 
 ### Options
 
@@ -92,20 +117,15 @@ sudo bash install.sh --dry-run
 
 ### The port is not fixed
 
-The API listens on a local port, behind the web server. With no instructions
-the installer starts at **8100** and goes up until it finds a free one, saying
-which it picked:
+The API listens on a local port, behind the web server. On a machine already hosting
+other applications, finding 8100 taken is the normal case, not an exception.
 
-```
-==> Looking for a free port for the API
-  !  Port 8100 is already taken: using 8101 instead
-```
+With no questions asked — that is, with `curl | bash` or `--dry-run` — the installer
+takes the first free one from 8100 and says which it picked.
 
-On a machine already hosting other applications that is the normal case, not
-an exception. With `--port` you pick a specific one instead: if that one is
-taken the installer **stops** rather than moving on its own — whoever named it
-had a reason, and finding the panel somewhere else would be worse than an
-error.
+With `--port` you name a specific one instead: if that one is taken the installer
+**stops** rather than moving on its own. Whoever named it had a reason, and finding
+the panel somewhere else would be worse than an error.
 
 The chosen number goes into `.env` (`ANF_PORT`) and into the web server
 configuration, which stay consistent with each other.

@@ -7,6 +7,13 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non rilasciato]
 
+### Modificato
+- **Guida all'installazione riscritta** sui due punti che mancavano: scaricare
+  l'installer da una cartella propria e non da `/var/www`, dove si installa da solo, e
+  la prova a vuoto come primo passo e non come opzione. Documentate le due domande che
+  ora pone, e il fatto che con `curl | bash` non ne pone nessuna perché non ha un
+  terminale da cui leggere.
+
 ### Da fare
 Vedere [TODO.md](TODO.md).
 

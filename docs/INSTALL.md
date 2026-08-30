@@ -51,31 +51,56 @@ rende i file caricati ingestibili da File Station.
 
 ## Installazione
 
-L'installer si scarica, si controlla e si esegue in **tre passi separati**: gira da
-root, quindi merita che tu possa leggerlo prima.
+L'installer si scarica, si controlla e si esegue in **passi separati**: gira da root,
+quindi merita che tu possa leggerlo prima.
+
+**Scaricalo da una cartella tua**, per esempio `/root`. Non da `/var/www`: lì
+l'installer ci si installa da solo, e lasciarci in mezzo anche il file di
+installazione confonde le cose.
 
 ```bash
+cd /root
 curl -fsSLO https://github.com/wifi75/advanced-nas-folder/releases/latest/download/install.sh
 ```
 
+Guarda cosa hai scaricato, prima di darlo a root:
+
 ```bash
 sha256sum install.sh
+less install.sh
 ```
+
+### Prima la prova a vuoto
+
+Mostra tutto quello che farebbe — comandi compresi — senza toccare niente. Su un
+server che ospita altri siti non è un'opzione: è il primo passo.
+
+```bash
+sudo bash install.sh --dry-run
+```
+
+Da qui vedi già le tre cose che contano: quale web server ha trovato, **quali porte
+sono occupate e da chi**, e dove finirà ogni cosa.
+
+### Poi l'installazione vera
 
 ```bash
 sudo bash install.sh
 ```
 
+Ti chiede **due cose**, e per entrambe basta Invio per accettare quello che propone:
+
+1. **quale porta usare.** Ti mostra le prime cinque libere; se la 8100 è occupata te
+   lo dice, con il nome del servizio che la tiene;
+2. **la conferma finale**, dopo il riepilogo di cosa verrà installato e dove. È
+   l'ultimo momento per fermarsi prima che qualcosa venga scritto.
+
 I messaggi escono nella lingua del sistema. Per forzarla: `--lingua it` o `--lang en`.
 
-### Prima prova a vuoto
-
-Consigliato su un server che ospita altri siti: mostra ogni comando senza eseguirne
-nessuno.
-
-```bash
-sudo bash install.sh --dry-run
-```
+> **Se usi `curl … | sudo bash` l'installer non ti chiede niente** e decide da solo.
+> Non è un difetto: in quel modo non ha un terminale da cui leggere, e restare fermo
+> ad aspettare una risposta che non arriverà sarebbe peggio. Funziona, ma perdi le
+> domande — scarica il file se le vuoi.
 
 ### Opzioni
 
@@ -90,20 +115,15 @@ sudo bash install.sh --dry-run
 
 ### La porta non è fissa
 
-L'API ascolta su una porta locale, dietro il web server. Senza indicazioni
-l'installer parte dalla **8100** e sale finché non ne trova una libera,
-dicendo quale ha scelto:
+L'API ascolta su una porta locale, dietro il web server. Su una macchina che ospita
+già altre applicazioni trovare la 8100 occupata è il caso normale, non un'eccezione.
 
-```
-==> Cerco una porta libera per l'API
-  !  La porta 8100 è già occupata: uso la 8101
-```
+Senza domande — cioè con `curl | bash` o con `--dry-run` — l'installer prende la prima
+libera a partire dalla 8100 e dice quale ha scelto.
 
-Su una macchina che ospita già altre applicazioni è il caso normale, non
-un'eccezione. Con `--porta` si sceglie invece una porta precisa: se quella è
-occupata l'installer **si ferma** invece di spostarsi da solo — chi l'ha
-indicata aveva un motivo, e ritrovarsi il pannello altrove sarebbe peggio di
-un errore.
+Con `--porta` si indica invece una porta precisa: se quella è occupata l'installer
+**si ferma** invece di spostarsi da solo. Chi l'ha indicata aveva un motivo, e
+ritrovarsi il pannello altrove sarebbe peggio di un errore.
 
 Il numero scelto finisce in `.env` (`ANF_PORT`) e nella configurazione del web
 server, che restano coerenti fra loro.

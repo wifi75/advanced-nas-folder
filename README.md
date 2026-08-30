@@ -109,15 +109,22 @@ distribuito già pronto nella release.
 
 Guida completa: **[docs/INSTALL.md](docs/INSTALL.md)**
 
-Scaricare, controllare, eseguire — tre passi separati, perché lo script gira da root:
+Scaricare, controllare, eseguire — passi separati, perché lo script gira da root.
+Da una cartella tua, **non** da `/var/www`, dove l'installer ci si mette da solo:
 
 ```bash
+cd /root
 curl -fsSLO https://github.com/wifi75/advanced-nas-folder/releases/latest/download/install.sh
 sha256sum install.sh
 sudo bash install.sh
 ```
 
 Aggiungi `--dry-run` per vedere esattamente cosa farebbe, senza applicare nulla.
+
+L'installer mostra cosa ha trovato sulla macchina — web server, porte occupate e da
+quale servizio — e chiede quale porta usare e una conferma finale. Con
+`curl … | sudo bash` non chiede nulla e decide da solo, perché lì non ha un terminale
+da cui leggere.
 
 ### Aggiornare e disinstallare
 
