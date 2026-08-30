@@ -81,6 +81,19 @@ const form = ref({
   is_enabled: true,
 })
 
+onMounted(async () => {
+  await Promise.all([shares.carica(), mounts.carica()])
+})
+
+const puoCreare = computed(
+  () => form.value.slug !== '' && form.value.label !== '' && form.value.mount_id > 0,
+)
+
+function apriNuovo(mountId?: number): void {
+  form.value.mount_id = mountId ?? mounts.elenco[0]?.id ?? 0
+  nuovoAperto.value = true
+}
+
 // `?nuova=<id>` apre la creazione gia' legata a quella condivisione: e' il
 // «+ pubblica» dell'albero, che deve creare la cartella dove e' stato premuto
 // senza far riscegliere l'origine.
@@ -94,19 +107,6 @@ watch(
   },
   { immediate: true },
 )
-
-onMounted(async () => {
-  await Promise.all([shares.carica(), mounts.carica()])
-})
-
-const puoCreare = computed(
-  () => form.value.slug !== '' && form.value.label !== '' && form.value.mount_id > 0,
-)
-
-function apriNuovo(mountId?: number): void {
-  form.value.mount_id = mountId ?? mounts.elenco[0]?.id ?? 0
-  nuovoAperto.value = true
-}
 
 /**
  * L'indirizzo che uscira dall'identificatore scritto finora.

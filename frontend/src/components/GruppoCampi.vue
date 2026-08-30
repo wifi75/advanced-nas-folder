@@ -32,22 +32,25 @@ defineProps<{ titolo: string; descrizione?: string }>()
 
 <style scoped>
 .gruppo {
+  /* Non un riquadro dentro un riquadro: un titolo e sotto una pila di schede,
+     come una categoria della barra laterale. */
   margin: 0;
-  padding: 0.9rem 1rem 1rem;
+  padding: 0;
   border: 0;
 }
 
 .gruppo__titolo {
-  padding: 0 0.35rem;
-  font-size: 0.78rem;
+  padding: 0 0 0 0.15rem;
+  font-size: 0.68rem;
   font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
   color: var(--testo-tenue);
 }
 
 .gruppo__descrizione {
-  margin: 0 0 0.75rem;
+  margin: 0.3rem 0 0.7rem;
+  padding-left: 0.15rem;
   font-size: 0.85rem;
   color: var(--testo-tenue);
   max-width: 60ch;

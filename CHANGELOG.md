@@ -18,6 +18,25 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.14.5] - 2026-08-30
+
+### Corretto
+- **«Nuova pubblicazione» dentro una condivisione lasciava la pagina bianca.**
+  Il controllo che apre la finestra veniva eseguito subito, prima che la
+  funzione che chiama fosse stata inizializzata: la pagina moriva con un errore
+  e restava vuota. Introdotto nella 0.14.4, insieme alla correzione del
+  collegamento.
+
+### Modificato
+- **Le pagine hanno un fondo proprio**, come la barra laterale. Prima poggiavano
+  su un colore quasi identico a quello delle schede, e ogni cosa sembrava
+  incollata alla successiva.
+- **Ogni campo e' una scheda con il materiale delle voci di menu** — vetro,
+  raggio di 11px, filo di luce — invece di un rettangolo grigio dentro un
+  pannello piatto. I gruppi non sono piu' riquadri dentro riquadri: sono un
+  titolo con sotto una pila di schede, come una categoria del menu.
+- I pulsanti hanno spazio fra loro e da cio' che li precede.
+
 ## [0.14.4] - 2026-08-30
 
 ### Corretto

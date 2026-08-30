@@ -42,6 +42,9 @@
   --vetro-ombra: 0 6px 18px -10px rgb(23 36 51 / 38%);
   --vetro-attivo: linear-gradient(158deg, rgb(255 255 255 / 95%), rgb(255 255 255 / 68%));
   --barra-fondo: linear-gradient(180deg, #e9edf3, #dfe5ee);
+  /* Il fondo su cui poggiano le schede. Piu' profondo di `--superficie`, o il
+     vetro non si distingue da cio' che ha sotto e tutto sembra incollato. */
+  --fondo-pagina: radial-gradient(120% 100% at 50% 0%, #eff2f7 0%, #e6ebf2 100%);
 
   /* Tinte dei pulsanti, una per voce, sul modello delle icone di sistema. */
   --tinta-nfs: #0a84ff;
@@ -90,6 +93,8 @@
     --vetro-ombra: 0 6px 18px -10px rgb(0 0 0 / 70%);
     --vetro-attivo: linear-gradient(158deg, rgb(255 255 255 / 22%), rgb(255 255 255 / 9%));
     --barra-fondo: linear-gradient(180deg, #131d28, #0d151e);
+  --fondo-pagina: radial-gradient(120% 100% at 50% 0%, #111a24 0%, #0b1119 100%);
+    --fondo-pagina: radial-gradient(120% 100% at 50% 0%, #111a24 0%, #0b1119 100%);
 
     --tinta-nfs: #4aa3ff;
     --tinta-pubblicazioni: #45c9b8;
@@ -490,7 +495,6 @@ a {
    riquadri piatti bianchi e sembravano un'altra applicazione. */
 
 .scheda,
-.gruppo,
 .riquadro-vetro {
   border-radius: 11px;
   background: var(--vetro-sfondo);
@@ -561,6 +565,21 @@ a {
   color: var(--testo-tenue);
 }
 
+/* Ogni campo e' una scheda con lo stesso materiale delle voci di menu: vetro
+   traslucido, raggio 11px, filo di luce in alto. Prima erano rettangoli grigi
+   dentro un pannello piatto, e la pagina non somigliava al menu accanto. */
+.campo {
+  padding: 0.6rem 0.75rem;
+  border-radius: 11px;
+  background: var(--vetro-sfondo);
+  border: 1px solid var(--vetro-bordo);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 var(--vetro-luce),
+    var(--vetro-ombra);
+}
+
 .campo input[type='text'],
 .campo input[type='password'],
 .campo input[type='number'],
@@ -568,12 +587,12 @@ a {
 .campo select,
 .campo textarea {
   width: 100%;
-  padding: 0.55rem 0.7rem;
+  padding: 0.4rem 0.55rem;
   font: inherit;
   color: var(--testo);
-  background: var(--superficie);
+  background: var(--sfondo);
   border: 1px solid var(--bordo);
-  border-radius: 9px;
+  border-radius: 8px;
   transition: border-color 0.12s ease, box-shadow 0.12s ease;
 }
 
@@ -596,11 +615,7 @@ a {
 .campo.interruttore {
   flex-direction: row;
   align-items: flex-start;
-  gap: 0.6rem;
-  padding: 0.6rem 0.7rem;
-  border: 1px solid var(--bordo);
-  border-radius: 9px;
-  background: var(--superficie);
+  gap: 0.7rem;
   cursor: pointer;
 }
 
@@ -630,6 +645,23 @@ a {
 /* Un'opzione che espone il NAS a scritture non deve sembrare una preferenza
    qualunque. */
 .campo.rischio {
-  border-color: color-mix(in srgb, var(--attenzione) 45%, var(--bordo));
-  background: color-mix(in srgb, var(--attenzione) 7%, var(--superficie));
+  border-color: color-mix(in srgb, var(--attenzione) 50%, var(--vetro-bordo));
+  background:
+    linear-gradient(
+      158deg,
+      color-mix(in srgb, var(--attenzione) 14%, transparent),
+      color-mix(in srgb, var(--attenzione) 5%, transparent)
+    );
+}
+
+/* L'area del contenuto ha un fondo proprio, come la barra laterale: le schede
+   di vetro hanno bisogno di qualcosa sotto da cui staccarsi. */
+.contenuto {
+  background: var(--fondo-pagina);
+}
+
+/* I pulsanti non stanno appiccicati fra loro ne' al contenuto sopra. */
+.azioni {
+  gap: 0.6rem;
+  margin-top: 0.35rem;
 }
