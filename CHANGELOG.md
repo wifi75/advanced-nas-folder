@@ -10,6 +10,23 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.26.1] - 2026-08-30
+
+### Corretto
+
+- **Le schede di una pubblicazione non si scavalcano piu'.** I due gruppi
+  annidati — le sezioni della pubblicazione e, dentro «Chi accede», le sue
+  quattro schede — scrivevano entrambi in `?scheda=`. Cliccare una scheda
+  interna riscriveva il valore letto dalla barra esterna, che non lo
+  riconosceva e ripiegava sulla prima sezione: si veniva buttati fuori
+  proprio dalla scheda appena aperta. Ora ogni gruppo ha il suo parametro.
+
+### Modificato
+
+- Il gruppo di schede annidato e' disegnato come linguette sottolineate
+  invece che come una seconda barra identica alla prima: due barre uguali
+  una dentro l'altra sembravano allo stesso livello.
+
 ## [0.10.2] - 2026-08-30
 
 ### Corretto
