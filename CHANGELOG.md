@@ -10,6 +10,14 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.7.1] - 2026-08-30
+
+### Corretto
+- **`update.sh` non ricaricava le unit systemd.** I servizi ripartivano con la
+  definizione caricata all'avvio, quindi una correzione a un file `.service`
+  installata dall'aggiornamento non aveva effetto — e systemd si limitava a un
+  avviso in coda all'output, facile da non vedere.
+
 ## [0.7.0] - 2026-08-30
 
 ### Aggiunto

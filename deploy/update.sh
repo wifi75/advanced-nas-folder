@@ -137,6 +137,12 @@ if [ "$DRY_RUN" = 0 ]; then
     (cd "$RADICE/backend" && "$RADICE/venv/bin/alembic" upgrade head)
 fi
 
+# Senza, systemd continua a usare la definizione caricata all'avvio e avvisa
+# che il file su disco e cambiato: i servizi ripartono con la versione vecchia
+# dell'unit, e la correzione appena installata non ha effetto.
+passo "$(msg 'Ricarico le unit systemd' 'Reloading systemd units')"
+esegui systemctl daemon-reload
+
 passo "$(msg 'Riavvio i servizi' 'Restarting services')"
 for s in "${SERVIZI[@]}"; do
     esegui systemctl start "$s"
