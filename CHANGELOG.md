@@ -18,6 +18,14 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.14.2] - 2026-08-30
+
+### Corretto
+- **Un mount in transizione mostrava `mount.statoInCorso`** al posto del testo:
+  la chiave era usata ma non definita. Il test che controlla proprio questo era
+  rosso, ma il rilascio e' partito lo stesso perche' nel comando la pipe verso
+  `tail` nascondeva l'esito di pytest. Il difetto e' durato una versione.
+
 ## [0.14.1] - 2026-08-30
 
 ### Modificato

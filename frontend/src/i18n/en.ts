@@ -97,6 +97,7 @@ export default {
     statoMontato: 'Mounted',
     statoSmontato: 'Not mounted',
     statoErrore: 'Error',
+    statoInCorso: 'Operation in progress…',
     statoConfigurato: 'Configured',
     scritturaNegata: 'The NAS is denying write access.',
     scritturaNegataDettaglio:

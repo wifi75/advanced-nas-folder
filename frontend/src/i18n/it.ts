@@ -98,6 +98,7 @@ export default {
     statoMontato: 'Montato',
     statoSmontato: 'Non montato',
     statoErrore: 'Errore',
+    statoInCorso: 'Operazione in corso…',
     statoConfigurato: 'Configurato',
     scritturaNegata: 'Il NAS sta negando la scrittura.',
     scritturaNegataDettaglio:
