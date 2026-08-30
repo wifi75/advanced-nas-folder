@@ -18,6 +18,28 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.22.1] - 2026-08-30
+
+### Corretto
+- **L'archivio non si apriva piu'**: `carica` legge ora la vista scelta per
+  decidere se chiedere anche le date di scatto, ma la vista era dichiarata piu'
+  sotto — e il controllo che esegue `carica` parte subito. Introdotto nella
+  0.22.0.
+
+### Interno
+- **Regola `no-use-before-define` accesa**, e i dodici casi latenti che ha
+  trovato sono stati riordinati.
+
+  E' lo stesso difetto che si e' presentato **quattro volte** oggi, sempre
+  uguale: in `<script setup>` un `watch` con `immediate` o un `onMounted`
+  eseguono subito funzioni scritte in cima, che leggono variabili dichiarate
+  piu' sotto. Il codice compila, i tipi passano, il lint passava — e la pagina
+  moriva all'apertura con «Cannot access … before initialization», senza
+  lasciare traccia se non una schermata bianca.
+
+  Le funzioni restano escluse dalla regola: sono sollevate, e vietarle
+  costringerebbe a scrivere ogni file dal basso verso l'alto.
+
 ## [0.22.0] - 2026-08-30
 
 Ultima delle cinque funzioni fotografiche scelte.

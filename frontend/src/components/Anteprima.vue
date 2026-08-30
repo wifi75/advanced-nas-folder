@@ -49,6 +49,97 @@ const haSuccessiva = computed(() => props.posizione > 0 && props.posizione < pro
  * Tastiera e dito: sono i due modi in cui si sfoglia una raccolta di foto.
  * Senza, ogni immagine andrebbe chiusa e riaperta dalla griglia.
  */
+const { t } = useI18n()
+
+// Lo stato di base — che file e', il suo indirizzo, il suo testo — sta prima
+// delle sezioni che lo leggono: dati di scatto, ingrandimento e
+// presentazione lo usano tutte, e dichiararlo dopo lo renderebbe
+// irraggiungibile nel momento in cui il componente si prepara.
+
+/** Vero mentre si modifica il testo: le frecce servono al cursore, non a
+ *  cambiare immagine. */
+const inModifica = ref(false)
+const testo = ref<string | null>(null)
+const troncato = ref(false)
+const salvando = ref(false)
+const salvato = ref(false)
+const indirizzo = ref<string | null>(null)
+const errore = ref<string | null>(null)
+const impronta = ref<string | null>(null)
+const calcolando = ref(false)
+
+const LINGUAGGI: Record<string, string> = {
+  ts: 'typescript',
+  js: 'javascript',
+  mjs: 'javascript',
+  json: 'json',
+  py: 'python',
+  sh: 'bash',
+  bash: 'bash',
+  yml: 'yaml',
+  yaml: 'yaml',
+  toml: 'ini',
+  ini: 'ini',
+  conf: 'ini',
+  sql: 'sql',
+  css: 'css',
+  html: 'xml',
+  htm: 'xml',
+  xml: 'xml',
+  vue: 'xml',
+}
+
+const genere = computed(() => {
+  const nome = props.voce.nome.toLowerCase()
+  if (/\.(jpe?g|png|gif|webp|avif|bmp)$/.test(nome)) return 'immagine'
+  if (/\.(mp4|webm|mov|m4v)$/.test(nome)) return 'video'
+  if (/\.(mp3|ogg|wav|m4a|opus|flac)$/.test(nome)) return 'audio'
+  if (nome.endsWith('.pdf')) return 'pdf'
+  if (/\.(txt|md|log|csv)$/.test(nome)) return 'testo'
+  if (LINGUAGGI[estensione(nome)]) return 'codice'
+  return 'nessuno'
+})
+
+/**
+ * Il linguaggio da usare per l'evidenziazione, per estensione.
+ *
+ * Si dichiarano uno per uno invece di caricare highlight.js per intero: la
+ * libreria completa pesa piu di un megabyte, e finirebbe tutta nella precache
+ * della PWA per evidenziare cinque tipi di file.
+ */
+
+function estensione(nome: string): string {
+  return nome.split('.').pop()?.toLowerCase() ?? ''
+}
+
+/** Il contenuto evidenziato, gia trasformato in HTML da highlight.js. */
+const evidenziato = computed(() => {
+  if (testo.value === null) return ''
+  const linguaggio = LINGUAGGI[estensione(props.voce.nome)]
+  if (!linguaggio) return hljs.highlightAuto(testo.value).value
+  return hljs.highlight(testo.value, { language: linguaggio, ignoreIllegals: true }).value
+})
+
+
+/** Lo strato colorato sotto l'area di testo, da tenere allineato allo scorrimento. */
+const strato = ref<HTMLElement | null>(null)
+
+function sincronizza(evento: Event): void {
+  const area = evento.target as HTMLTextAreaElement
+  if (!strato.value) return
+  strato.value.scrollTop = area.scrollTop
+  strato.value.scrollLeft = area.scrollLeft
+}
+
+/**
+ * Il testo evidenziato con una riga vuota in coda.
+ *
+ * Senza, l'ultima riga scompare dallo strato colorato mentre la si scrive:
+ * un `<pre>` che finisce con un a capo non lo mostra, mentre l'area di testo
+ * ce l'ha e il cursore sta li.
+ */
+const evidenziatoConCoda = computed(() => evidenziato.value + '\n')
+
 function daTastiera(evento: KeyboardEvent): void {
   // Non mentre si scrive: le frecce servono a muoversi nel testo.
   if (inModifica.value) return
@@ -83,6 +174,33 @@ async function alternaSchermoIntero(): Promise<void> {
 function segnaSchermoIntero(): void {
   aSchermoIntero.value = document.fullscreenElement !== null
 }
+
+async function prepara(): Promise<void> {
+  indirizzo.value = null
+  errore.value = null
+  impronta.value = null
+  testo.value = null
+  salvato.value = false
+  if (genere.value === 'nessuno') return
+  // Il codice non si consegna come file da mostrare nel riquadro: si legge il
+  // testo e lo si evidenzia qui.
+  if (genere.value === 'codice') {
+    void mostraTesto()
+    return
+  }
+
+  try {
+    indirizzo.value = await indirizzoDownload(props.slug, props.voce.percorso, undefined, true)
+  } catch (e) {
+    errore.value = e instanceof Error ? e.message : t('errori.generico')
+  }
+}
+
+// --- modifica del testo ---
+// Solo per i file di testo e solo dove si può scrivere: aprire un editor su
+// un file che poi non si riesce a salvare è un modo di far perdere tempo.
+
+/** Carica il contenuto per la sola lettura, senza aprire l'editor. */
 
 // --- dati di scatto ---
 const scatto = ref<DatiScatto | null>(null)
@@ -241,8 +359,6 @@ onBeforeUnmount(() => {
   if (document.fullscreenElement) void document.exitFullscreen()
 })
 
-const { t } = useI18n()
-
 for (const [nome, definizione] of Object.entries({
   bash,
   css,
@@ -258,113 +374,6 @@ for (const [nome, definizione] of Object.entries({
   hljs.registerLanguage(nome, definizione)
 }
 
-const indirizzo = ref<string | null>(null)
-const errore = ref<string | null>(null)
-const impronta = ref<string | null>(null)
-const calcolando = ref(false)
-
-const genere = computed(() => {
-  const nome = props.voce.nome.toLowerCase()
-  if (/\.(jpe?g|png|gif|webp|avif|bmp)$/.test(nome)) return 'immagine'
-  if (/\.(mp4|webm|mov|m4v)$/.test(nome)) return 'video'
-  if (/\.(mp3|ogg|wav|m4a|opus|flac)$/.test(nome)) return 'audio'
-  if (nome.endsWith('.pdf')) return 'pdf'
-  if (/\.(txt|md|log|csv)$/.test(nome)) return 'testo'
-  if (LINGUAGGI[estensione(nome)]) return 'codice'
-  return 'nessuno'
-})
-
-/**
- * Il linguaggio da usare per l'evidenziazione, per estensione.
- *
- * Si dichiarano uno per uno invece di caricare highlight.js per intero: la
- * libreria completa pesa piu di un megabyte, e finirebbe tutta nella precache
- * della PWA per evidenziare cinque tipi di file.
- */
-const LINGUAGGI: Record<string, string> = {
-  ts: 'typescript',
-  js: 'javascript',
-  mjs: 'javascript',
-  json: 'json',
-  py: 'python',
-  sh: 'bash',
-  bash: 'bash',
-  yml: 'yaml',
-  yaml: 'yaml',
-  toml: 'ini',
-  ini: 'ini',
-  conf: 'ini',
-  sql: 'sql',
-  css: 'css',
-  html: 'xml',
-  htm: 'xml',
-  xml: 'xml',
-  vue: 'xml',
-}
-
-function estensione(nome: string): string {
-  return nome.split('.').pop()?.toLowerCase() ?? ''
-}
-
-/** Il contenuto evidenziato, gia trasformato in HTML da highlight.js. */
-const evidenziato = computed(() => {
-  if (testo.value === null) return ''
-  const linguaggio = LINGUAGGI[estensione(props.voce.nome)]
-  if (!linguaggio) return hljs.highlightAuto(testo.value).value
-  return hljs.highlight(testo.value, { language: linguaggio, ignoreIllegals: true }).value
-})
-
-const inModifica = ref(false)
-
-/** Lo strato colorato sotto l'area di testo, da tenere allineato allo scorrimento. */
-const strato = ref<HTMLElement | null>(null)
-
-function sincronizza(evento: Event): void {
-  const area = evento.target as HTMLTextAreaElement
-  if (!strato.value) return
-  strato.value.scrollTop = area.scrollTop
-  strato.value.scrollLeft = area.scrollLeft
-}
-
-/**
- * Il testo evidenziato con una riga vuota in coda.
- *
- * Senza, l'ultima riga scompare dallo strato colorato mentre la si scrive:
- * un `<pre>` che finisce con un a capo non lo mostra, mentre l'area di testo
- * ce l'ha e il cursore sta li.
- */
-const evidenziatoConCoda = computed(() => evidenziato.value + '\n')
-
-async function prepara(): Promise<void> {
-  indirizzo.value = null
-  errore.value = null
-  impronta.value = null
-  testo.value = null
-  salvato.value = false
-  if (genere.value === 'nessuno') return
-  // Il codice non si consegna come file da mostrare nel riquadro: si legge il
-  // testo e lo si evidenzia qui.
-  if (genere.value === 'codice') {
-    void mostraTesto()
-    return
-  }
-
-  try {
-    indirizzo.value = await indirizzoDownload(props.slug, props.voce.percorso, undefined, true)
-  } catch (e) {
-    errore.value = e instanceof Error ? e.message : t('errori.generico')
-  }
-}
-
-// --- modifica del testo ---
-// Solo per i file di testo e solo dove si può scrivere: aprire un editor su
-// un file che poi non si riesce a salvare è un modo di far perdere tempo.
-const testo = ref<string | null>(null)
-const troncato = ref(false)
-const salvando = ref(false)
-const salvato = ref(false)
-
-/** Carica il contenuto per la sola lettura, senza aprire l'editor. */
 async function mostraTesto(): Promise<void> {
   inModifica.value = false
   try {

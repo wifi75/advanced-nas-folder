@@ -41,6 +41,87 @@ const percorso = computed(() => {
   return Array.isArray(parti) ? parti.join('/') : String(parti ?? '')
 })
 
+// Prima di `carica`, che legge `vista` per decidere se chiedere anche le date
+// di scatto: il controllo che la esegue parte subito, e trovando la
+// dichiarazione piu' sotto la pagina moriva con «Cannot access ... before
+// initialization».
+// --- vista ---
+//
+// La scelta resta nel browser di chi guarda: e una preferenza di lettura, non
+// una proprieta della cartella, e imporla a tutti sarebbe sbagliato.
+type Vista = 'elenco' | 'griglia' | 'galleria'
+const VISTE: Vista[] = ['elenco', 'griglia', 'galleria']
+const CHIAVE_VISTA = 'anf.archivio.vista'
+
+function vistaSalvata(): Vista {
+  try {
+    const letta = localStorage.getItem(CHIAVE_VISTA)
+    if (letta && (VISTE as string[]).includes(letta)) return letta as Vista
+  } catch {
+    // Finestra privata, dati del sito bloccati: si riparte dall'elenco.
+  }
+  return 'elenco'
+}
+
+const vista = ref<Vista>(vistaSalvata())
+
+function cambiaVista(nuova: Vista): void {
+  const servonoDate = nuova === 'galleria' && vista.value !== 'galleria'
+  vista.value = nuova
+  if (servonoDate) void carica()
+  try {
+    localStorage.setItem(CHIAVE_VISTA, nuova)
+  } catch {
+    // La vista funziona lo stesso, semplicemente non viene ricordata.
+  }
+}
+
+/** Immagini e video: entrambi hanno una miniatura, prodotta dal server. */
+function haMiniatura(voce: Voce): boolean {
+  return !voce.cartella && /\.(jpe?g|png|gif|webp|avif|bmp|mp4|m4v|mov|mkv|webm|avi)$/i.test(voce.nome)
+}
+
+/** Le sole immagini: la presentazione e i dati di scatto valgono per quelle. */
+function eImmagine(voce: Voce): boolean {
+  return !voce.cartella && /\.(jpe?g|png|gif|webp|avif|bmp)$/i.test(voce.nome)
+}
+
+// La ricerca sta qui, prima di tutto cio' che legge `voci`: menu contestuale,
+// anteprima e raggruppamenti la usano, e dichiararla piu' sotto la
+// renderebbe irraggiungibile nel momento in cui il componente si prepara.
+
+// --- ricerca ---
+const termine = ref('')
+const risultati = ref<Voce[] | null>(null)
+const troncata = ref(false)
+const cercando = ref(false)
+
+/** Le voci a schermo: i risultati se si sta cercando, altrimenti la cartella. */
+const voci = computed(() => risultati.value ?? contenuto.value?.voci ?? [])
+
+// --- menu contestuale ---
+//
+// Le stesse azioni della riga, raggiungibili col tasto destro. Nelle viste a
+// griglia e galleria i pulsanti per esteso non ci stanno, e senza il menu
+// quelle viste sarebbero di sola lettura.
+const menu = ref<{ voce: Voce; x: number; y: number } | null>(null)
+
+function apriMenu(voce: Voce, evento: MouseEvent): void {
+  // Si tiene il menu dentro la finestra: aperto a filo del bordo destro
+  // finirebbe fuori schermo, e sui telefoni non ci sarebbe modo di tornarci.
+  const larghezza = 200
+  const altezza = 190
+  menu.value = {
+    voce,
+    x: Math.min(evento.clientX, window.innerWidth - larghezza),
+    y: Math.min(evento.clientY, window.innerHeight - altezza),
+  }
+}
+
+function chiudiMenu(): void {
+  menu.value = null
+}
+
 async function carica(): Promise<void> {
   carico.value = true
   errore.value = null
@@ -95,70 +176,6 @@ async function scarica(voce: Voce): Promise<void> {
   } finally {
     inPreparazione.value = null
   }
-}
-
-// --- vista ---
-//
-// La scelta resta nel browser di chi guarda: e una preferenza di lettura, non
-// una proprieta della cartella, e imporla a tutti sarebbe sbagliato.
-type Vista = 'elenco' | 'griglia' | 'galleria'
-const VISTE: Vista[] = ['elenco', 'griglia', 'galleria']
-const CHIAVE_VISTA = 'anf.archivio.vista'
-
-function vistaSalvata(): Vista {
-  try {
-    const letta = localStorage.getItem(CHIAVE_VISTA)
-    if (letta && (VISTE as string[]).includes(letta)) return letta as Vista
-  } catch {
-    // Finestra privata, dati del sito bloccati: si riparte dall'elenco.
-  }
-  return 'elenco'
-}
-
-const vista = ref<Vista>(vistaSalvata())
-
-function cambiaVista(nuova: Vista): void {
-  const servonoDate = nuova === 'galleria' && vista.value !== 'galleria'
-  vista.value = nuova
-  if (servonoDate) void carica()
-  try {
-    localStorage.setItem(CHIAVE_VISTA, nuova)
-  } catch {
-    // La vista funziona lo stesso, semplicemente non viene ricordata.
-  }
-}
-
-/** Immagini e video: entrambi hanno una miniatura, prodotta dal server. */
-function haMiniatura(voce: Voce): boolean {
-  return !voce.cartella && /\.(jpe?g|png|gif|webp|avif|bmp|mp4|m4v|mov|mkv|webm|avi)$/i.test(voce.nome)
-}
-
-/** Le sole immagini: la presentazione e i dati di scatto valgono per quelle. */
-function eImmagine(voce: Voce): boolean {
-  return !voce.cartella && /\.(jpe?g|png|gif|webp|avif|bmp)$/i.test(voce.nome)
-}
-
-// --- menu contestuale ---
-//
-// Le stesse azioni della riga, raggiungibili col tasto destro. Nelle viste a
-// griglia e galleria i pulsanti per esteso non ci stanno, e senza il menu
-// quelle viste sarebbero di sola lettura.
-const menu = ref<{ voce: Voce; x: number; y: number } | null>(null)
-
-function apriMenu(voce: Voce, evento: MouseEvent): void {
-  // Si tiene il menu dentro la finestra: aperto a filo del bordo destro
-  // finirebbe fuori schermo, e sui telefoni non ci sarebbe modo di tornarci.
-  const larghezza = 200
-  const altezza = 190
-  menu.value = {
-    voce,
-    x: Math.min(evento.clientX, window.innerWidth - larghezza),
-    y: Math.min(evento.clientY, window.innerHeight - altezza),
-  }
-}
-
-function chiudiMenu(): void {
-  menu.value = null
 }
 
 // --- anteprima ---
@@ -277,15 +294,6 @@ function famiglia(voce: Voce): string {
   }
   return 'file'
 }
-
-// --- ricerca ---
-const termine = ref('')
-const risultati = ref<Voce[] | null>(null)
-const troncata = ref(false)
-const cercando = ref(false)
-
-/** Le voci a schermo: i risultati se si sta cercando, altrimenti la cartella. */
-const voci = computed(() => risultati.value ?? contenuto.value?.voci ?? [])
 
 async function cerca(): Promise<void> {
   const q = termine.value.trim()

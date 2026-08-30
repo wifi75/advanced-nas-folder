@@ -22,6 +22,21 @@ export default tseslint.config(
   {
     rules: {
       'vue/multi-word-component-names': 'off',
+
+      // Una costante usata prima della propria dichiarazione non e' un errore
+      // di sintassi: il codice compila, i tipi passano, e la pagina muore
+      // all'apertura con «Cannot access ... before initialization». In
+      // `<script setup>` capita facilmente, perche' un `watch` con `immediate`
+      // o un `onMounted` eseguono subito funzioni scritte in cima che leggono
+      // variabili dichiarate piu' sotto. E' successo quattro volte prima di
+      // accendere questa regola.
+      //
+      // Le funzioni restano escluse: sono sollevate, e vietarle costringerebbe
+      // a scrivere ogni file dal basso verso l'alto.
+      '@typescript-eslint/no-use-before-define': [
+        'error',
+        { functions: false, classes: true, variables: true },
+      ],
     },
   },
 )
