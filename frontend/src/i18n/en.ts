@@ -387,6 +387,15 @@ export default {
   },
 
   anteprima: {
+    presentazione: 'Slideshow',
+    datiScatto: 'Shot data',
+    quando: 'Taken on',
+    fotocamera: 'Camera',
+    obiettivo: 'Lens',
+    esposizione: 'Exposure',
+    dimensioni: 'Dimensions',
+    luogo: 'Place',
+    vediSullaMappa: 'See on the map',
     schermoIntero: 'Full screen',
     posizione: '{n} of {tot}',
     precedente: 'Previous image',

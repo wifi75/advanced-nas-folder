@@ -44,6 +44,12 @@ interface Gettone {
 }
 
 export const archivioApi = {
+  /** Quando e con cosa e' stata scattata una foto. */
+  scatto: (slug: string, percorso: string) =>
+    api.get<DatiScatto>(
+      `/archivio/${encodeURIComponent(slug)}/scatto?${new URLSearchParams({ percorso })}`,
+    ),
+
   contenuto: (slug: string, percorso = '', password?: string) => {
     const q = new URLSearchParams({ percorso })
     if (password) q.set('password', password)
@@ -130,6 +136,20 @@ export const archivioApi = {
  * miniature seguono gli stessi permessi del file da cui vengono, altrimenti
  * basterebbe la galleria per vedere cosa c'e' in una cartella vietata.
  */
+export interface DatiScatto {
+  scattata: string | null
+  fotocamera: string | null
+  obiettivo: string | null
+  tempo: string | null
+  diaframma: string | null
+  iso: number | null
+  focale: string | null
+  latitudine: number | null
+  longitudine: number | null
+  larghezza: number | null
+  altezza: number | null
+}
+
 export async function indirizzoMiniatura(slug: string, percorso: string): Promise<string> {
   const { gettone } = await archivioApi.gettone(slug, percorso)
   const q = new URLSearchParams({ percorso, g: gettone })

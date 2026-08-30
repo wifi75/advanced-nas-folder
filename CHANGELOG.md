@@ -18,6 +18,32 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.20.0] - 2026-08-30
+
+Il pannello diventa un posto in cui **guardare** le foto, non solo scaricarle.
+
+### Aggiunto
+- **Dati dello scatto**: quando, con che fotocamera e obiettivo, tempo,
+  diaframma, ISO, focale, e il punto sulla mappa se la foto ha le coordinate.
+  Letti dal file e **mai riscritti** — modificarli significherebbe alterare
+  l'originale di qualcun altro per mostrare una schermata.
+
+  Una foto senza questi dati non e' un errore: le immagini modificate o
+  esportate spesso li perdono, e il riquadro semplicemente non compare.
+- **Ingrandimento fino a otto volte** con la rotella, trascinamento per
+  spostarsi dentro l'immagine, doppio clic per tornare intera. Su una
+  panoramica da 14000 pixel guardare tutto insieme non serve a niente: il
+  dettaglio si vede solo ingrandendo.
+- **Presentazione automatica**, con il pulsante o la barra spaziatrice.
+  Arrivata all'ultima ricomincia, invece di fermarsi: una presentazione che si
+  interrompe da sola costringe a rimetterla in moto ogni giro.
+
+### Nota tecnica
+- I valori EXIF razionali arrivano in forme diverse a seconda di come il file
+  e' stato scritto — un `IFDRational`, una coppia `(numeratore, denominatore)`,
+  o un numero gia' pronto. Vengono convertiti tutti, perche' `Fraction` da solo
+  rifiuta la coppia.
+
 ## [0.19.1] - 2026-08-30
 
 ### Corretto

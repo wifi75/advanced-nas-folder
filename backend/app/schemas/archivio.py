@@ -247,3 +247,22 @@ class TestoOut(BaseModel):
 class SalvaTesto(BaseModel):
     percorso: str = Field(min_length=1, max_length=1024)
     contenuto: str = Field(max_length=2_000_000)
+
+
+class DatiScattoOut(BaseModel):
+    """Dati di scatto di una foto. Ogni campo puo' mancare: le immagini
+    modificate o esportate spesso perdono gli EXIF, ed e' un caso normale."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    scattata: datetime | None = None
+    fotocamera: str | None = None
+    obiettivo: str | None = None
+    tempo: str | None = None
+    diaframma: str | None = None
+    iso: int | None = None
+    focale: str | None = None
+    latitudine: float | None = None
+    longitudine: float | None = None
+    larghezza: int | None = None
+    altezza: int | None = None

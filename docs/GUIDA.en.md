@@ -187,6 +187,37 @@ On a phone the gallery fits three photos per row and the preview takes the whole
 screen: a window's margins would waste exactly the space needed to look at the
 image.
 
+### Looking closely at a photo
+
+With an image open:
+
+| | |
+|---|---|
+| **Mouse wheel** | zooms, up to eight times |
+| **Drag** | pans inside the image when zoomed |
+| **Double click** | back to the whole picture |
+| **▶** | starts the slideshow |
+| **Space bar** | starts and stops the slideshow |
+| **⤢** | real full screen, on a dark ground |
+
+The slideshow starts over at the end: one that stops by itself has to be
+restarted every round.
+
+### Shot data
+
+Under the image, **Shot data** opens what the camera wrote into the file: when
+it was taken, with which body and lens, exposure time, aperture, ISO, focal
+length, and — when present — a link to the spot on the map.
+
+The panel only **reads** it: changing it would mean rewriting someone else's
+original just to show a screen.
+
+If the panel does not appear, that photo has no shot data: edited or exported
+images often lose it, and that is normal.
+
+> The **shot date** is not the file date. On a NAS the latter is almost always
+> the date the photo was *copied*, not the date it was taken.
+
 ## Sharing with people who have no account
 
 **Publications → Folder rules → Share links.**

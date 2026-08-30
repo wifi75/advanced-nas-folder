@@ -390,6 +390,15 @@ export default {
   },
 
   anteprima: {
+    presentazione: 'Presentazione',
+    datiScatto: 'Dati dello scatto',
+    quando: 'Scattata il',
+    fotocamera: 'Fotocamera',
+    obiettivo: 'Obiettivo',
+    esposizione: 'Esposizione',
+    dimensioni: 'Dimensioni',
+    luogo: 'Luogo',
+    vediSullaMappa: 'Vedi sulla mappa',
     schermoIntero: 'Schermo intero',
     posizione: '{n} di {tot}',
     precedente: 'Immagine precedente',

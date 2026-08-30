@@ -188,6 +188,38 @@ Sul telefono la galleria mette tre foto per riga e l'anteprima occupa tutto lo
 schermo: i margini di una finestra sprecherebbero proprio lo spazio che serve a
 guardare l'immagine.
 
+### Guardare una foto da vicino
+
+Aperta un'immagine:
+
+| | |
+|---|---|
+| **Rotella del mouse** | ingrandisce, fino a otto volte |
+| **Trascinamento** | sposta dentro l'immagine, quando è ingrandita |
+| **Doppio clic** | torna alla dimensione intera |
+| **▶** | avvia la presentazione: le foto scorrono da sole |
+| **Barra spaziatrice** | avvia e ferma la presentazione |
+| **⤢** | schermo intero vero, con il fondo scuro |
+
+La presentazione, arrivata all'ultima, ricomincia: una che si ferma da sola
+costringe a rimetterla in moto ogni giro.
+
+### I dati dello scatto
+
+Sotto l'immagine, **Dati dello scatto** apre quello che la macchina ha scritto
+nel file: quando è stata scattata, con che apparecchio e obiettivo, tempo,
+diaframma, ISO, focale, e — se c'è — un collegamento al punto sulla mappa.
+
+Il pannello li **legge e basta**: modificarli significherebbe riscrivere
+l'originale di qualcun altro per mostrare una schermata.
+
+Se il riquadro non compare, quella foto non ha dati di scatto: le immagini
+modificate o esportate spesso li perdono, ed è un caso normale.
+
+> La **data dello scatto** non è la data del file. Sul NAS quest'ultima è quasi
+> sempre la data in cui la foto è stata *copiata*, non quella in cui è stata
+> fatta.
+
 ## Condividere con chi non ha un account
 
 **Pubblicazioni → Regole per cartella → Link di condivisione.**

@@ -30,6 +30,7 @@ from app.schemas.archivio import (
     CompletaCaricamento,
     ContenutoOut,
     CreaCartella,
+    DatiScattoOut,
     Elimina,
     GettoneOut,
     RichiestaChecksum,
@@ -49,6 +50,7 @@ from app.services import (
     archivio_zip,
     caricamento,
     consegna,
+    exif,
     miniature,
     operazioni,
     ricerca,
@@ -746,3 +748,24 @@ async def miniatura(
         # browser non puo' restituire quella vecchia.
         headers={"Cache-Control": "private, max-age=604800, immutable"},
     )
+
+
+@router.get("/{slug}/scatto", response_model=DatiScattoOut)
+async def dati_scatto(
+    slug: str,
+    sessione: Sessione,
+    utente: UtenteFacoltativo,
+    percorso: str = Query(max_length=1024),
+) -> DatiScattoOut:
+    """Quando e con cosa e' stata scattata una foto.
+
+    Letti dal file e mai riscritti: modificarli significherebbe alterare
+    l'originale di qualcun altro per mostrare una schermata.
+    """
+    share = await _pubblicazione(sessione, slug)
+    percorso = _normalizza(percorso)
+    await _autorizza(sessione, share, percorso, utente)
+
+    reale = await _reale(sessione, share, percorso)
+    dati = await anyio.to_thread.run_sync(exif.leggi, reale)
+    return DatiScattoOut.model_validate(dati)

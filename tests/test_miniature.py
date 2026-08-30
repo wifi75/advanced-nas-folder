@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-from app.services import agent_client, miniature
+from app.services import agent_client, exif, miniature
 from httpx import AsyncClient
 from PIL import Image
 
@@ -152,3 +152,64 @@ async def test_una_risalita_nel_percorso_viene_rifiutata(admin: AsyncClient, sha
     )
 
     assert risposta.status_code in (400, 403, 404)
+
+
+# --- dati di scatto ---------------------------------------------------------
+
+
+def _con_exif(destinazione: Path) -> Path:
+    """Una foto con dentro data, fotocamera e tempi, come la scrive una
+    macchina fotografica."""
+    from PIL import Image
+    from PIL.ExifTags import Base
+
+    immagine = Image.new("RGB", (800, 600), (20, 60, 120))
+    dati = Image.Exif()
+    dati[Base.Make.value] = "Canon"
+    dati[Base.Model.value] = "EOS 90D"
+    dettagli = {
+        Base.DateTimeOriginal.value: "2021:05:26 20:35:25",
+        Base.ExposureTime.value: (1, 250),
+        Base.FNumber.value: (28, 10),
+        Base.ISOSpeedRatings.value: 400,
+        Base.FocalLength.value: (50, 1),
+    }
+    dati[Base.ExifOffset.value] = dettagli
+    immagine.save(destinazione, "JPEG", exif=dati)
+    return destinazione
+
+
+def test_legge_quando_e_con_cosa(cartella: Path) -> None:
+    dati = exif.leggi(_con_exif(cartella / "scatto.jpg"))
+
+    assert dati.scattata is not None
+    assert dati.scattata.year == 2021
+    assert dati.fotocamera == "Canon EOS 90D"
+    assert dati.tempo == "1/250 s"
+    assert dati.diaframma == "f/2.8"
+    assert dati.iso == 400
+    assert dati.focale == "50 mm"
+
+
+def test_una_foto_senza_exif_non_e_un_errore(cartella: Path) -> None:
+    """Le immagini modificate o esportate spesso li perdono: e' normale."""
+    dati = exif.leggi(cartella / "foto.jpg")
+
+    assert dati.vuoto
+    assert dati.larghezza == 1200
+
+
+def test_un_file_che_non_e_immagine_non_solleva(cartella: Path) -> None:
+    assert exif.leggi(cartella / "documento.txt").vuoto
+
+
+async def test_lendpoint_restituisce_i_dati(
+    admin: AsyncClient, share_id: int, cartella: Path
+) -> None:
+    _con_exif(cartella / "scatto.jpg")
+
+    risposta = await admin.get("/api/v1/archivio/foto/scatto", params={"percorso": "scatto.jpg"})
+
+    assert risposta.status_code == 200
+    assert risposta.json()["fotocamera"] == "Canon EOS 90D"
+    assert risposta.json()["iso"] == 400

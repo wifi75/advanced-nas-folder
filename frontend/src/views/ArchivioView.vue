@@ -765,6 +765,7 @@ function quando(iso: string | null): string {
       @salvato="carica"
       @precedente="scorri(-1)"
       @successiva="scorri(1)"
+      @prima-immagine="inAnteprima = immagini[0] ?? inAnteprima"
     />
 
     <div

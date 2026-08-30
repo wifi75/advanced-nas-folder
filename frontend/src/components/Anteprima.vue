@@ -22,7 +22,7 @@ import yaml from 'highlight.js/lib/languages/yaml'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { archivioApi, indirizzoDownload, type Voce } from '@/api/archivio'
+import { archivioApi, indirizzoDownload, type DatiScatto, type Voce } from '@/api/archivio'
 
 const props = defineProps<{
   slug: string
@@ -33,7 +33,13 @@ const props = defineProps<{
   posizione: number
   quante: number
 }>()
-const emit = defineEmits<{ chiudi: []; salvato: []; precedente: []; successiva: [] }>()
+const emit = defineEmits<{
+  chiudi: []
+  salvato: []
+  precedente: []
+  successiva: []
+  primaImmagine: []
+}>()
 
 /** Le frecce compaiono solo se c'e' davvero qualcosa prima o dopo. */
 const haPrecedente = computed(() => props.posizione > 1)
@@ -49,6 +55,10 @@ function daTastiera(evento: KeyboardEvent): void {
   if (evento.key === 'ArrowLeft' && haPrecedente.value) emit('precedente')
   if (evento.key === 'ArrowRight' && haSuccessiva.value) emit('successiva')
   if (evento.key === 'Escape') emit('chiudi')
+  if (evento.key === ' ' && props.quante > 1) {
+    evento.preventDefault()
+    alternaPresentazione()
+  }
 }
 
 /** Schermo intero vero, quello del browser: la finestra del pannello resta
@@ -74,6 +84,102 @@ function segnaSchermoIntero(): void {
   aSchermoIntero.value = document.fullscreenElement !== null
 }
 
+// --- dati di scatto ---
+const scatto = ref<DatiScatto | null>(null)
+const dettagliAperti = ref(false)
+
+async function leggiScatto(): Promise<void> {
+  scatto.value = null
+  if (genere.value !== 'immagine') return
+  try {
+    scatto.value = await archivioApi.scatto(props.slug, props.voce.percorso)
+  } catch {
+    // Una foto senza dati di scatto e' normale: le immagini modificate o
+    // esportate spesso li perdono. Il riquadro semplicemente non compare.
+  }
+}
+
+const haDettagli = computed(
+  () =>
+    scatto.value !== null &&
+    (scatto.value.scattata !== null ||
+      scatto.value.fotocamera !== null ||
+      scatto.value.tempo !== null),
+)
+
+const quandoScattata = computed(() => {
+  const q = scatto.value?.scattata
+  if (!q) return null
+  return new Date(q).toLocaleString()
+})
+
+const mappa = computed(() => {
+  const s = scatto.value
+  if (!s || s.latitudine === null || s.longitudine === null) return null
+  return `https://www.openstreetmap.org/?mlat=${s.latitudine}&mlon=${s.longitudine}#map=15/${s.latitudine}/${s.longitudine}`
+})
+
+// --- ingrandimento ---
+//
+// Su una panoramica da 14000 pixel guardare l'immagine intera non serve a
+// niente: il dettaglio si vede solo ingrandendo.
+const ingrandimento = ref(1)
+const spostamento = ref({ x: 0, y: 0 })
+
+function azzeraIngrandimento(): void {
+  ingrandimento.value = 1
+  spostamento.value = { x: 0, y: 0 }
+}
+
+function rotella(evento: WheelEvent): void {
+  if (genere.value !== 'immagine') return
+  evento.preventDefault()
+  const passo = evento.deltaY < 0 ? 1.2 : 1 / 1.2
+  ingrandimento.value = Math.min(8, Math.max(1, ingrandimento.value * passo))
+  if (ingrandimento.value === 1) spostamento.value = { x: 0, y: 0 }
+}
+
+let trascina: { x: number; y: number } | null = null
+
+function iniziaTrascino(evento: MouseEvent): void {
+  if (ingrandimento.value === 1) return
+  trascina = { x: evento.clientX - spostamento.value.x, y: evento.clientY - spostamento.value.y }
+}
+
+function muovi(evento: MouseEvent): void {
+  if (!trascina) return
+  spostamento.value = { x: evento.clientX - trascina.x, y: evento.clientY - trascina.y }
+}
+
+function fermaTrascino(): void {
+  trascina = null
+}
+
+// --- presentazione ---
+const inPresentazione = ref(false)
+const intervallo = ref(4)
+let timer: ReturnType<typeof setInterval> | null = null
+
+function fermaPresentazione(): void {
+  if (timer) clearInterval(timer)
+  timer = null
+  inPresentazione.value = false
+}
+
+function alternaPresentazione(): void {
+  if (inPresentazione.value) {
+    fermaPresentazione()
+    return
+  }
+  inPresentazione.value = true
+  timer = setInterval(() => {
+    // Alla fine ricomincia invece di fermarsi: una presentazione che si
+    // interrompe da sola costringe a rimetterla in moto ogni giro.
+    if (haSuccessiva.value) emit('successiva')
+    else emit('primaImmagine')
+  }, intervallo.value * 1000)
+}
+
 let partenzaX = 0
 
 function inizioTocco(evento: TouchEvent): void {
@@ -97,6 +203,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', daTastiera)
   document.removeEventListener('fullscreenchange', segnaSchermoIntero)
+  fermaPresentazione()
   // Uscendo dall'anteprima mentre si e' a schermo intero, il browser
   // resterebbe cosi' su una pagina che non lo prevede.
   if (document.fullscreenElement) void document.exitFullscreen()
@@ -281,7 +388,15 @@ async function calcolaImpronta(): Promise<void> {
 // subito, e `prepara` azzera anche `testo` e `salvato`, dichiarati piu' sotto.
 // Eseguito prima della loro inizializzazione, il componente moriva con
 // «Cannot access ... before initialization» e l'anteprima restava su «Carico...».
-watch(() => props.voce.percorso, prepara, { immediate: true })
+watch(
+  () => props.voce.percorso,
+  () => {
+    void prepara()
+    void leggiScatto()
+    azzeraIngrandimento()
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
@@ -302,6 +417,16 @@ watch(() => props.voce.percorso, prepara, { immediate: true })
           v-if="quante > 1 && posizione > 0"
           class="posizione"
         >{{ t('anteprima.posizione', { n: posizione, tot: quante }) }}</span>
+        <button
+          v-if="quante > 1"
+          type="button"
+          class="chiudi"
+          :aria-label="t('anteprima.presentazione')"
+          :title="t('anteprima.presentazione')"
+          @click="alternaPresentazione"
+        >
+          {{ inPresentazione ? '❚❚' : '▶' }}
+        </button>
         <button
           v-if="genere === 'immagine' || genere === 'video'"
           type="button"
@@ -405,6 +530,17 @@ watch(() => props.voce.percorso, prepara, { immediate: true })
             :src="indirizzo"
             :alt="voce.nome"
             class="media"
+            :class="{ 'media--ingrandita': ingrandimento > 1 }"
+            :style="{
+              transform: `translate(${spostamento.x}px, ${spostamento.y}px) scale(${ingrandimento})`,
+            }"
+            draggable="false"
+            @wheel="rotella"
+            @mousedown.prevent="iniziaTrascino"
+            @mousemove="muovi"
+            @mouseup="fermaTrascino"
+            @mouseleave="fermaTrascino"
+            @dblclick="azzeraIngrandimento"
           >
           <video
             v-else-if="genere === 'video'"
@@ -433,6 +569,59 @@ watch(() => props.voce.percorso, prepara, { immediate: true })
           {{ t('comune.carico') }}
         </p>
       </div>
+
+      <section
+        v-if="haDettagli"
+        class="scatto"
+      >
+        <button
+          type="button"
+          class="scatto__testa"
+          :aria-expanded="dettagliAperti"
+          @click="dettagliAperti = !dettagliAperti"
+        >
+          <span>{{ t('anteprima.datiScatto') }}</span>
+          <span aria-hidden="true">{{ dettagliAperti ? '▾' : '▸' }}</span>
+        </button>
+
+        <dl
+          v-if="dettagliAperti && scatto"
+          class="scatto__dati"
+        >
+          <template v-if="quandoScattata">
+            <dt>{{ t('anteprima.quando') }}</dt>
+            <dd>{{ quandoScattata }}</dd>
+          </template>
+          <template v-if="scatto.fotocamera">
+            <dt>{{ t('anteprima.fotocamera') }}</dt>
+            <dd>{{ scatto.fotocamera }}</dd>
+          </template>
+          <template v-if="scatto.obiettivo">
+            <dt>{{ t('anteprima.obiettivo') }}</dt>
+            <dd>{{ scatto.obiettivo }}</dd>
+          </template>
+          <template v-if="scatto.tempo || scatto.diaframma || scatto.iso || scatto.focale">
+            <dt>{{ t('anteprima.esposizione') }}</dt>
+            <dd>
+              {{ [scatto.tempo, scatto.diaframma, scatto.iso ? `ISO ${scatto.iso}` : null, scatto.focale].filter(Boolean).join(' · ') }}
+            </dd>
+          </template>
+          <template v-if="scatto.larghezza && scatto.altezza">
+            <dt>{{ t('anteprima.dimensioni') }}</dt>
+            <dd>{{ scatto.larghezza }} × {{ scatto.altezza }}</dd>
+          </template>
+          <template v-if="mappa">
+            <dt>{{ t('anteprima.luogo') }}</dt>
+            <dd>
+              <a
+                :href="mappa"
+                target="_blank"
+                rel="noopener noreferrer"
+              >{{ t('anteprima.vediSullaMappa') }}</a>
+            </dd>
+          </template>
+        </dl>
+      </section>
 
       <footer class="piede">
         <button
@@ -543,6 +732,53 @@ watch(() => props.voce.percorso, prepara, { immediate: true })
 
 .finestra--intera .media {
   max-height: 88vh;
+}
+
+.media--ingrandita {
+  cursor: grab;
+}
+
+.media {
+  transform-origin: center;
+  transition: transform 0.08s linear;
+}
+
+.scatto {
+  border-top: 1px solid var(--bordo);
+  padding: 0.5rem 0.9rem;
+}
+
+.scatto__testa {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.25rem 0;
+  border: 0;
+  background: none;
+  color: var(--testo-tenue);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.scatto__dati {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.2rem 0.9rem;
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+}
+
+.scatto__dati dt {
+  color: var(--testo-tenue);
+}
+
+.scatto__dati dd {
+  margin: 0;
 }
 
 .posizione {
