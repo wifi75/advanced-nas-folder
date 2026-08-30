@@ -10,13 +10,30 @@
  * E' un `fieldset` e non un `div`: il titolo diventa cosi' il nome del gruppo
  * anche per chi naviga con la tastiera o con un lettore di schermo.
  */
-defineProps<{ titolo: string; descrizione?: string }>()
+defineProps<{ titolo: string; descrizione?: string; tinta?: string; icona?: string }>()
 </script>
 
 <template>
   <fieldset class="gruppo">
-    <legend class="gruppo__titolo">
-      {{ titolo }}
+    <legend class="gruppo__testa">
+      <span
+        v-if="icona"
+        class="gruppo__pastiglia"
+        :style="{ '--tinta': tinta ?? 'var(--accento)' }"
+        aria-hidden="true"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path :d="icona" />
+        </svg>
+      </span>
+      <span class="gruppo__titolo">{{ titolo }}</span>
     </legend>
     <p
       v-if="descrizione"
@@ -39,8 +56,38 @@ defineProps<{ titolo: string; descrizione?: string }>()
   border: 0;
 }
 
+.gruppo__testa {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0;
+}
+
+.gruppo__pastiglia {
+  flex: none;
+  inline-size: 22px;
+  block-size: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  color: #fff;
+  background:
+    linear-gradient(
+      165deg,
+      color-mix(in srgb, var(--tinta) 100%, white 18%),
+      color-mix(in srgb, var(--tinta) 78%, black 22%)
+    );
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 45%),
+    0 2px 5px -1px color-mix(in srgb, var(--tinta) 55%, transparent);
+}
+
+.gruppo__pastiglia svg {
+  width: 14px;
+  height: 14px;
+}
+
 .gruppo__titolo {
-  padding: 0 0 0 0.15rem;
   font-size: 0.68rem;
   font-weight: 600;
   letter-spacing: 0.1em;
@@ -57,8 +104,12 @@ defineProps<{ titolo: string; descrizione?: string }>()
 }
 
 .gruppo__campi {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  /* In griglia, non impilati: un campo per il nome non deve essere largo
+     quanto la pagina. I campi corti stanno affiancati, quelli che hanno
+     bisogno di spazio lo chiedono con `.campo--largo`. */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 0.55rem;
+  align-items: start;
 }
 </style>

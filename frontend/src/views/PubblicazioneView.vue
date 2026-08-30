@@ -152,6 +152,8 @@ async function elimina(): Promise<void> {
 
         <GruppoCampi
           :titolo="t('share.gruppoNome')"
+          tinta="var(--tinta-pubblicazioni)"
+          icona="M3 7a2 2 0 0 1 2-2h6l9 9-8 8-9-9Z M7.5 9.5h.01"
           :descrizione="t('share.gruppoNomeAiuto')"
         >
           <label class="campo">
@@ -185,6 +187,8 @@ async function elimina(): Promise<void> {
 
         <GruppoCampi
           :titolo="t('share.gruppoCosa')"
+          tinta="var(--tinta-nfs)"
+          icona="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z M12 11v3 M9 17h6"
           :descrizione="t('share.gruppoCosaAiuto')"
         >
           <label class="campo">
@@ -236,6 +240,8 @@ async function elimina(): Promise<void> {
       <template v-else-if="attiva === 'accesso'">
         <GruppoCampi
           :titolo="t('share.gruppoAccesso')"
+          tinta="var(--tinta-utenti)"
+          icona="M15 7a4 4 0 1 1-3.9 5H7v3H4v-3l3.1-3H11a4 4 0 0 1 4-2Z"
           :descrizione="t('share.gruppoAccessoAiuto')"
         >
           <label class="campo">
@@ -276,6 +282,8 @@ async function elimina(): Promise<void> {
       <template v-else>
         <GruppoCampi
           :titolo="t('share.gruppoNascosti')"
+          tinta="var(--tinta-file)"
+          icona="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6Z M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
           :descrizione="t('share.gruppoNascostiAiuto')"
         >
           <label class="campo">
@@ -306,6 +314,8 @@ async function elimina(): Promise<void> {
 
         <GruppoCampi
           :titolo="t('condivisione.zonaPericolosa')"
+          tinta="var(--errore)"
+          icona="M4 7h16 M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2 M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"
           :descrizione="t('pubblicazione.rimozioneAiuto')"
         >
           <div class="azioni">

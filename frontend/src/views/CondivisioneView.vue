@@ -224,6 +224,8 @@ async function elimina(): Promise<void> {
       <template v-else-if="attiva === 'montaggio'">
         <GruppoCampi
           :titolo="t('nuovoMount.gruppoNome')"
+          tinta="var(--tinta-nfs)"
+          icona="M3 7a2 2 0 0 1 2-2h6l9 9-8 8-9-9Z M7.5 9.5h.01"
           :descrizione="t('nuovoMount.gruppoNomeAiuto')"
         >
           <label class="campo">
@@ -238,6 +240,8 @@ async function elimina(): Promise<void> {
 
         <GruppoCampi
           :titolo="t('nuovoMount.gruppoMontaggio')"
+          tinta="var(--tinta-nfs)"
+          icona="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z M12 11v3 M9 17h6"
           :descrizione="t('nuovoMount.gruppoMontaggioAiuto')"
         >
           <label class="campo">
@@ -346,6 +350,8 @@ async function elimina(): Promise<void> {
       <template v-else>
         <GruppoCampi
           :titolo="t('condivisione.zonaPericolosa')"
+          tinta="var(--errore)"
+          icona="M4 7h16 M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2 M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"
           :descrizione="t('condivisione.zonaPericolosaAiuto')"
         >
           <p

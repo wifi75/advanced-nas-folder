@@ -675,3 +675,11 @@ a {
   gap: 0.6rem;
   margin-top: 0.35rem;
 }
+
+/* Un campo occupa una colonna della griglia del gruppo. Alcuni ne servono
+   tutte: un interruttore con la sua spiegazione, o un elenco su piu' righe. */
+.campo--largo,
+.campo.interruttore,
+.campo:has(textarea) {
+  grid-column: 1 / -1;
+}

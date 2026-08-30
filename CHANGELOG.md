@@ -18,6 +18,19 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.15.0] - 2026-08-30
+
+### Modificato
+- **I campi stanno in griglia, non impilati.** Un campo per il nome era largo
+  quanto la pagina: una fascia di 570 pixel per contenere una parola. Ora i
+  campi corti stanno affiancati, e chiedono l'intera larghezza solo quelli che
+  ne hanno bisogno — un interruttore con la sua spiegazione, un elenco su piu'
+  righe.
+- **Ogni gruppo di campi ha la sua pastiglia colorata**, come le voci del menu:
+  la tinta delle condivisioni per l'origine, quella delle pubblicazioni per il
+  nome, quella degli utenti per gli accessi, il rosso per la rimozione. Le
+  pagine erano l'unica parte del pannello senza un'icona.
+
 ## [0.14.6] - 2026-08-30
 
 ### Modificato
