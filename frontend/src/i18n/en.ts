@@ -464,6 +464,7 @@ export default {
   },
 
   archivio: {
+    comandiNelMenu: 'Long press, or right click, to rename, move and delete.',
     senzaData: 'No date',
     apriCartella: 'Open',
     vediAnteprima: 'Preview',

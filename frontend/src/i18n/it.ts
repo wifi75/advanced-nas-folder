@@ -470,6 +470,7 @@ export default {
   },
 
   archivio: {
+    comandiNelMenu: 'Tocca a lungo, o tasto destro, per rinominare, spostare ed eliminare.',
     senzaData: 'Senza data',
     apriCartella: 'Apri',
     vediAnteprima: 'Anteprima',

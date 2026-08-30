@@ -620,6 +620,13 @@ function quando(iso: string | null): string {
       </button>
     </div>
 
+    <p
+      v-if="vista !== 'elenco' && contenuto && voci.length"
+      class="suggerimento"
+    >
+      {{ t('archivio.comandiNelMenu') }}
+    </p>
+
     <div
       v-if="contenuto && voci.length"
       class="viste"
@@ -1070,6 +1077,12 @@ function quando(iso: string | null): string {
   text-transform: capitalize;
 }
 
+.suggerimento {
+  margin: -0.3rem 0 0.2rem;
+  font-size: 0.78rem;
+  color: var(--testo-tenue);
+}
+
 .viste {
   display: inline-flex;
   gap: 0.2rem;
@@ -1299,7 +1312,12 @@ function quando(iso: string | null): string {
   overflow-wrap: anywhere;
 }
 
+/* In griglia i comandi per esteso occupavano piu' spazio della cartella
+   stessa: tre pulsanti impilati sotto ogni scheda, su un telefono meta'
+   schermo. Restano nel menu contestuale, che li ha tutti. */
 .voci--griglia .voce__data,
+.voci--griglia .voce__dimensione,
+.voci--griglia .voce__azioni,
 .voci--galleria .voce__data,
 .voci--galleria .voce__dimensione {
   display: none;

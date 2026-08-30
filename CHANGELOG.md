@@ -18,6 +18,15 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.23.2] - 2026-08-30
+
+### Modificato
+- **In griglia i comandi non stanno piu' sotto ogni scheda.** Rinomina, Sposta
+  ed Elimina impilati occupavano piu' spazio della cartella che accompagnavano:
+  su un telefono meta' schermo per tre pulsanti. Restano nel menu contestuale,
+  che li ha tutti, e sotto il selettore compare una riga che dice come
+  aprirlo — tocco prolungato o tasto destro.
+
 ## [0.23.1] - 2026-08-30
 
 ### Corretto
