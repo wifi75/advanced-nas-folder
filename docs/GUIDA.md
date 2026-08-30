@@ -32,6 +32,26 @@ da Internet.
 
 ---
 
+## I tre passi, in quest'ordine
+
+È la cosa che più spesso non è chiara, quindi vale la pena dirla prima di tutto
+il resto:
+
+| | Cosa fa | Cosa **non** fa |
+|---|---|---|
+| **1. Condivisioni NFS** | monta una cartella del NAS **sul server** | non la rende raggiungibile da nessuno |
+| **2. Pubblicazioni** | decide quale cartella è raggiungibile dal web, con che nome e da chi | non copia né sposta niente |
+| **3. Archivio** | è dove si sfoglia e si scarica quello che è stato pubblicato | |
+
+Senza il passo 1 il passo 2 non è possibile: una pubblicazione parte sempre da
+una cartella già montata. E **una cartella montata ma non pubblicata non è
+raggiungibile da nessuno**, nemmeno da un amministratore: sta solo sul server.
+
+L'indirizzo da condividere nasce al passo 2, e il pannello lo mostra per esteso
+accanto a ogni pubblicazione, pronto da copiare.
+
+---
+
 ## Montare una cartella del NAS
 
 **Condivisioni NFS → Nuova condivisione.**
@@ -60,9 +80,26 @@ Tre cose da sapere:
 
 **Pubblicazioni → Nuova pubblicazione.**
 
-Una pubblicazione è una cartella del NAS resa raggiungibile a un indirizzo del
-pannello, con un nome breve: `/archivio` diventa
-`https://tuo-dominio/pannello/archivio/archivio`.
+Una pubblicazione è una cartella del NAS resa raggiungibile a un indirizzo, con
+un nome breve che scegli tu.
+
+### L'indirizzo da condividere
+
+Ogni pubblicazione mostra **due indirizzi**, entrambi con un pulsante per
+copiarli. Portano allo stesso posto:
+
+| | Esempio | Quando usarlo |
+|---|---|---|
+| **Corto** | `https://tuo-dominio/documenti` | da dettare o scrivere a mano. Solo con Apache |
+| **Completo** | `https://tuo-dominio/pannello/archivio/documenti` | sempre valido, anche con Nginx |
+
+Il corto è una redirezione verso il completo: funziona ovunque tu lo scriva, ma
+il browser mostra poi quello lungo nella barra.
+
+Se la visibilità è *Chiunque, anche senza accedere*, l'indirizzo funziona per
+chi lo riceve senza che debba avere un account. Se invece vuoi dare accesso a
+**una persona sola**, senza aprire la cartella a tutti, non condividere questo
+indirizzo: usa un **link di condivisione**, che scade e si può revocare.
 
 ### Chi può vederla
 

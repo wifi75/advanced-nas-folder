@@ -8,18 +8,32 @@
  */
 import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { RouterLink } from 'vue-router'
 
 import type { Mount } from '@/api/mounts'
 import ImportaFstab from '@/components/ImportaFstab.vue'
 import NuovoMount from '@/components/NuovoMount.vue'
 import { useMountsStore } from '@/stores/mounts'
+import { useSharesStore } from '@/stores/shares'
 
 const mounts = useMountsStore()
+const shares = useSharesStore()
 const { t } = useI18n()
+
+// Una cartella montata non e ancora raggiungibile da nessuno: senza dirlo qui,
+// il passo successivo resta invisibile e sembra che manchi qualcosa.
+function pubblicazioni(idMount: number): number {
+  return shares.elenco.filter((s) => s.mount_id === idMount).length
+}
 const nuovoAperto = ref(false)
 const daEliminare = ref<Mount | null>(null)
 
-onMounted(() => mounts.carica())
+onMounted(() => {
+  void mounts.carica()
+  // Serve per sapere quali mount sono gia pubblicati: senza, il conteggio
+  // direbbe zero anche quando le pubblicazioni ci sono.
+  void shares.carica()
+})
 
 function etichettaStato(m: Mount): string {
   switch (m.state) {
@@ -164,6 +178,17 @@ function creato(): void {
           role="alert"
         >
           {{ m.last_error }}
+        </p>
+
+        <p class="pubblicazioni">
+          {{ t('mount.giaPubblicata', { count: pubblicazioni(m.id) }, pubblicazioni(m.id)) }}
+          <RouterLink
+            v-if="m.state === 'montato'"
+            class="pubblica"
+            to="/pubblicazioni"
+          >
+            {{ t('mount.pubblicaQuesta') }}
+          </RouterLink>
         </p>
 
         <div class="azioni">
@@ -362,6 +387,16 @@ h1 {
   border: 1px solid var(--attenzione);
   border-left-width: 3px;
   border-radius: var(--raggio);
+}
+
+.pubblicazioni {
+  margin: 0.5rem 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  color: var(--testo-tenue);
 }
 
 .azioni {

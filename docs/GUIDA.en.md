@@ -32,6 +32,26 @@ to the Internet.
 
 ---
 
+## The three steps, in this order
+
+This is the part that most often is not clear, so it is worth saying before
+everything else:
+
+| | What it does | What it does **not** do |
+|---|---|---|
+| **1. NFS shares** | mounts a NAS folder **onto the server** | does not make it reachable by anyone |
+| **2. Publications** | decides which folder is reachable from the web, under what name and by whom | does not copy or move anything |
+| **3. Archive** | is where you browse and download what has been published | |
+
+Without step 1, step 2 is not possible: a publication always starts from an
+already mounted folder. And **a folder that is mounted but not published is
+reachable by nobody**, not even an administrator: it only sits on the server.
+
+The address to share is born at step 2, and the panel shows it in full next to
+every publication, ready to copy.
+
+---
+
 ## Mounting a NAS folder
 
 **NFS shares → New share.**
@@ -60,8 +80,26 @@ Three things worth knowing:
 
 **Publications → New publication.**
 
-A publication is a NAS folder made reachable at a panel address, under a short
-name: `/archivio` becomes `https://your-domain/pannello/archivio/archivio`.
+A publication is a NAS folder made reachable at an address, under a short name
+that you choose.
+
+### The address to share
+
+Every publication shows **two addresses**, each with a copy button. They lead to
+the same place:
+
+| | Example | When to use it |
+|---|---|---|
+| **Short** | `https://your-domain/documents` | to dictate or type by hand. Apache only |
+| **Full** | `https://your-domain/pannello/archivio/documents` | always valid, Nginx included |
+
+The short one is a redirect to the full one: it works wherever you write it, but
+the browser then shows the long one in the address bar.
+
+If the visibility is *Anyone, even without signing in*, the address works for
+whoever receives it, with no account needed. If instead you want to give access
+to **one person only**, without opening the folder to everyone, do not share this
+address: use a **share link**, which expires and can be revoked.
 
 ### Who can see it
 

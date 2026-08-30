@@ -10,6 +10,40 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.8.0] - 2026-08-30
+
+Il pannello faceva tutto, ma non spiegava **in che ordine**. Chi montava una
+cartella del NAS non trovava niente da nessuna parte, perché montata non vuol
+dire pubblicata — e questo non era scritto da nessuna parte.
+
+### Modificato
+- **La pagina iniziale mostra i tre passi reali**, con lo stato di ciascuno:
+  quante cartelle sono montate, quante pubblicate, e da dove si arriva
+  all'archivio. La numerazione non è decorativa: senza il primo passo il secondo
+  non è possibile, e la pagina lo dice.
+- **Toglie l'avviso «in arrivo nella fase 2 e nella fase 3»**, che descriveva
+  come future funzioni presenti da parecchie versioni. Era il primo motivo di
+  confusione: chi lo leggeva concludeva che pubblicare non si potesse ancora
+  fare.
+- **L'indirizzo da condividere ha ora un posto suo**, in un riquadro dedicato
+  accanto a ogni pubblicazione: indirizzo corto e completo, ciascuno con il suo
+  pulsante per copiare e una riga che spiega quando usare l'uno o l'altro. Prima
+  gli indirizzi comparivano come testo in mezzo al resto.
+- **Le condivisioni NFS dicono quante pubblicazioni le usano**, con il
+  collegamento per crearne una. Una cartella montata e mai pubblicata non è
+  raggiungibile da nessuno, nemmeno da un amministratore: adesso si vede.
+- **I sottotitoli delle due pagine dicono anche cosa NON fanno**: montare non
+  rende raggiungibile, pubblicare non copia né sposta niente.
+- **Guida utente riscritta** nella parte iniziale, in italiano e inglese: una
+  tabella dei tre passi con cosa fa e cosa non fa ciascuno, e una sezione
+  dedicata all'indirizzo da condividere — compresa la differenza fra condividere
+  l'indirizzo e creare un link a scadenza per una singola persona.
+
+### Interno
+- Gli indirizzi di una pubblicazione stanno ora in un componente unico
+  (`IndirizziPubblicazione.vue`) invece che duplicati nelle pagine: due copie
+  erano già divergite una volta.
+
 ## [0.7.3] - 2026-08-30
 
 ### Corretto

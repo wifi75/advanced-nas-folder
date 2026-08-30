@@ -1,13 +1,30 @@
 <script setup lang="ts">
+import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RouterLink } from 'vue-router'
 
 import { useAppStore } from '@/stores/app'
 import { useAuthStore } from '@/stores/auth'
+import { useMountsStore } from '@/stores/mounts'
+import { useSharesStore } from '@/stores/shares'
 
 const app = useAppStore()
 const auth = useAuthStore()
+const mounts = useMountsStore()
+const shares = useSharesStore()
 const { t } = useI18n()
+
+/** La prima pubblicazione, come esempio da aprire nel terzo passo. */
+const primaPubblicazione = computed(() => shares.elenco[0])
+
+// I conteggi servono a rispondere alla domanda vera di chi arriva qui — «a che
+// punto sono?» — invece di descrivere il prodotto a chi lo sta gia usando.
+onMounted(() => {
+  if (auth.utente?.is_admin) {
+    void mounts.carica()
+    void shares.carica()
+  }
+})
 </script>
 
 <template>
@@ -47,20 +64,56 @@ const { t } = useI18n()
       </span>
     </section>
 
-    <section class="avviso">
-      <h2>{{ t('menu.condivisioni') }}</h2>
-      <p>{{ t('home.condivisioniDescrizione') }}</p>
-      <RouterLink
-        class="collegamento"
-        to="/condivisioni"
-      >
-        {{ t('home.vaiCondivisioni') }}
-      </RouterLink>
-    </section>
+    <section
+      v-if="auth.utente?.is_admin"
+      class="percorso"
+    >
+      <h2>{{ t('home.comeFunziona') }}</h2>
+      <p class="introduzione">
+        {{ t('home.comeFunzionaIntro') }}
+      </p>
 
-    <section class="avviso">
-      <h2>{{ t('home.inArrivoTitolo') }}</h2>
-      <p>{{ t('home.inArrivoDescrizione') }}</p>
+      <ol class="passi">
+        <li class="passo">
+          <h3>{{ t('home.passo1') }}</h3>
+          <p>{{ t('home.passo1Testo') }}</p>
+          <p class="conteggio">
+            {{ t('home.statoMount', { count: mounts.elenco.length }, mounts.elenco.length) }}
+          </p>
+          <RouterLink
+            class="collegamento"
+            to="/condivisioni"
+          >
+            {{ t('home.passo1Vai') }}
+          </RouterLink>
+        </li>
+
+        <li class="passo">
+          <h3>{{ t('home.passo2') }}</h3>
+          <p>{{ t('home.passo2Testo') }}</p>
+          <p class="conteggio">
+            {{ t('home.statoShare', { count: shares.elenco.length }, shares.elenco.length) }}
+          </p>
+          <RouterLink
+            class="collegamento"
+            to="/pubblicazioni"
+          >
+            {{ t('home.passo2Vai') }}
+          </RouterLink>
+        </li>
+
+        <li class="passo">
+          <h3>{{ t('home.passo3') }}</h3>
+          <p>{{ t('home.passo3Testo') }}</p>
+          <RouterLink
+            v-if="primaPubblicazione"
+            class="collegamento"
+            :to="`/archivio/${primaPubblicazione.slug}`"
+          >
+            {{ t('home.passo3Vai') }}
+          </RouterLink>
+        </li>
+      </ol>
     </section>
   </div>
 </template>
@@ -151,5 +204,62 @@ const { t } = useI18n()
 
 .collegamento {
   font-size: 0.9375rem;
+}
+.percorso h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.15rem;
+}
+
+.introduzione {
+  margin: 0 0 1rem;
+  color: var(--testo-tenue);
+}
+
+/* La numerazione non e decorativa: i passi sono davvero in sequenza, e senza
+   il primo il secondo non e possibile. */
+.passi {
+  list-style: none;
+  counter-reset: passo;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.passo {
+  counter-increment: passo;
+  position: relative;
+  padding-left: 2.6rem;
+}
+
+.passo::before {
+  content: counter(passo);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1.9rem;
+  height: 1.9rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--bordo);
+  border-radius: 50%;
+  font-variant-numeric: tabular-nums;
+  color: var(--testo-tenue);
+}
+
+.passo h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+}
+
+.passo p {
+  margin: 0 0 0.35rem;
+  color: var(--testo-tenue);
+  max-width: 60ch;
+}
+
+.conteggio {
+  font-variant-numeric: tabular-nums;
 }
 </style>

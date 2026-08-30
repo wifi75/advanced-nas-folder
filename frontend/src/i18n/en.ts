@@ -48,23 +48,34 @@ export default {
   },
 
   home: {
-    sottotitolo:
-      'Mount NFS shares, publish folders with per-subfolder permissions, manage your files.',
+    sottotitolo: 'The NAS folders, reachable from the web with the permissions you decide.',
     servizioAttivo: 'Service running',
     servizioNonRaggiungibile: 'Service unreachable',
-    passwordIniziale: 'You are still using the initial password.',
+    passwordIniziale: 'You are using the initial password.',
     passwordInizialeDettaglio: 'Change it before exposing the panel to the internet.',
-    vaiCondivisioni: 'Go to shares',
-    condivisioniDescrizione:
-      'Mount your NAS folders from the panel, without touching configuration files: the system reads the list of available folders from the NAS and mounts them for you.',
-    inArrivoTitolo: 'Coming next',
-    inArrivoDescrizione:
-      'Publishing folders with per-subfolder permissions arrives in phase 2, file management in phase 3.',
+    comeFunziona: 'How a folder becomes shareable',
+    comeFunzionaIntro:
+      'Three steps, in this order: without the first, the second is not possible.',
+    passo1: 'Mount the NAS folder',
+    passo1Testo:
+      'The panel asks the NAS which folders it exports and mounts one on the server. On its own it is not reachable by anyone yet: it only sits on the server.',
+    passo1Vai: 'NFS shares',
+    passo2: 'Publish it',
+    passo2Testo:
+      'Choose which folder — or which subfolder — to make reachable, under what name, and who may enter. This step is what creates the address.',
+    passo2Vai: 'Published folders',
+    passo3: 'Share the address',
+    passo3Testo:
+      'Every publication shows its own address, ready to copy. To give one person access without opening the folder to everyone, use a share link instead, which expires.',
+    passo3Vai: 'Archive',
+    statoMount: 'no folder mounted | 1 folder mounted | {count} folders mounted',
+    statoShare: 'no publication | 1 publication | {count} publications',
   },
 
   mount: {
     titolo: 'NFS shares',
-    sottotitolo: 'Mount your NAS folders without touching configuration files.',
+    sottotitolo:
+      'Step 1. Mounts NAS folders onto the server. Mounted does not mean reachable: that takes a publication.',
     nuova: 'New share',
     vuoto:
       'No share configured yet. Start with “New share”: the panel reads the list of available folders straight from the NAS.',
@@ -75,6 +86,8 @@ export default {
     solaLettura: 'Read only',
     letturaScrittura: 'Read and write',
     nonRilevato: 'Not detected',
+    pubblicaQuesta: 'Publish this folder',
+    giaPubblicata: 'no publication | 1 publication | {count} publications',
     monta: 'Mount',
     smonta: 'Unmount',
     rileggi: 'Refresh status',
@@ -112,17 +125,15 @@ export default {
 
   share: {
     titolo: 'Published folders',
-    sottotitolo: 'Decide which folders are reachable, and by whom.',
+    sottotitolo:
+      'Step 2. Decide which mounted folders are reachable from the web, under what name and by whom. This is where the address to share comes from.',
     nuova: 'New publication',
     vuoto: 'No folder published yet. A publication starts from an NFS share already mounted.',
     servonoMount: 'You need at least one mounted NFS share first: a publication starts from there.',
-    indirizzo: 'Address',
-    indirizzoCorto: 'Short address',
-    indirizzoCortoAiuto:
-      'Easier to dictate or type by hand: it leads to the same place. Apache only, and it updates itself on every change.',
-    indirizzoAiuto:
-      'This is where the folder is reached from a browser. Copy it and try it: if the publication is public, it works without signing in.',
-    copia: 'Copy the address',
+    daCondividere: 'Address to share',
+    cortoNota: 'Short address, easy to dictate or type by hand. Apache only.',
+    completoNota: 'Full address: this is where the short one leads.',
+    copia: 'Copy',
     copiato: 'Copied',
     condivisione: 'NFS share',
     sottopercorso: 'Subfolder',

@@ -48,24 +48,35 @@ export default {
   },
 
   home: {
-    sottotitolo:
-      'Monta condivisioni NFS, pubblica cartelle con permessi per sottocartella, gestisci i file.',
+    sottotitolo: 'Le cartelle del NAS, raggiungibili dal web con i permessi che decidi tu.',
     servizioAttivo: 'Servizio attivo',
     servizioNonRaggiungibile: 'Servizio non raggiungibile',
     passwordIniziale: 'Stai usando la password iniziale.',
     passwordInizialeDettaglio:
       'Cambiala prima di rendere il pannello raggiungibile da Internet.',
-    vaiCondivisioni: 'Vai alle condivisioni',
-    condivisioniDescrizione:
-      'Monta le cartelle del NAS dal pannello, senza toccare file di configurazione: il sistema legge dal NAS l’elenco delle cartelle disponibili e le monta al posto tuo.',
-    inArrivoTitolo: 'In arrivo',
-    inArrivoDescrizione:
-      'La pubblicazione delle cartelle con i permessi per sottocartella arriva nella fase 2, la gestione dei file nella fase 3.',
+    comeFunziona: 'Come si arriva a una cartella condivisa',
+    comeFunzionaIntro:
+      'Tre passi, in quest’ordine: senza il primo il secondo non è possibile.',
+    passo1: 'Monta la cartella del NAS',
+    passo1Testo:
+      'Il pannello chiede al NAS quali cartelle espone e la monta sul server. Da sola non è ancora raggiungibile da nessuno: sta solo sul server.',
+    passo1Vai: 'Condivisioni NFS',
+    passo2: 'Pubblicala',
+    passo2Testo:
+      'Scegli quale cartella — o quale sottocartella — rendere raggiungibile, con che nome e chi può entrarci. È questo passo a creare l’indirizzo.',
+    passo2Vai: 'Pubblicazioni',
+    passo3: 'Condividi l’indirizzo',
+    passo3Testo:
+      'Ogni pubblicazione mostra il proprio indirizzo, pronto da copiare. Per dare accesso a una singola persona senza aprire la cartella a tutti, usa invece un link di condivisione, che scade.',
+    passo3Vai: 'Archivio',
+    statoMount: 'nessuna cartella montata | 1 cartella montata | {count} cartelle montate',
+    statoShare: 'nessuna pubblicazione | 1 pubblicazione | {count} pubblicazioni',
   },
 
   mount: {
     titolo: 'Condivisioni NFS',
-    sottotitolo: 'Monta le cartelle del NAS senza toccare file di configurazione.',
+    sottotitolo:
+      'Passo 1. Monta le cartelle del NAS sul server. Montata non vuol dire raggiungibile: per quello serve una pubblicazione.',
     nuova: 'Nuova condivisione',
     vuoto:
       'Nessuna condivisione configurata. Comincia da «Nuova condivisione»: il pannello legge dal NAS l’elenco delle cartelle disponibili.',
@@ -76,6 +87,8 @@ export default {
     solaLettura: 'Sola lettura',
     letturaScrittura: 'Lettura e scrittura',
     nonRilevato: 'Non rilevato',
+    pubblicaQuesta: 'Pubblica questa cartella',
+    giaPubblicata: 'nessuna pubblicazione | 1 pubblicazione | {count} pubblicazioni',
     monta: 'Monta',
     smonta: 'Smonta',
     rileggi: 'Rileggi stato',
@@ -113,19 +126,17 @@ export default {
 
   share: {
     titolo: 'Pubblicazioni',
-    sottotitolo: 'Decidi quali cartelle sono raggiungibili e da chi.',
+    sottotitolo:
+      'Passo 2. Decidi quali cartelle montate sono raggiungibili dal web, con che nome e da chi. È qui che nasce l’indirizzo da condividere.',
     nuova: 'Nuova pubblicazione',
     vuoto:
       'Nessuna cartella pubblicata. Una pubblicazione parte da una condivisione NFS già montata.',
     servonoMount:
       'Prima serve almeno una condivisione NFS montata: una pubblicazione parte da lì.',
-    indirizzo: 'Indirizzo',
-    indirizzoCorto: 'Indirizzo corto',
-    indirizzoCortoAiuto:
-      'Più facile da dettare o scrivere a mano: porta allo stesso posto. Funziona solo su Apache, e viene aggiornato da solo a ogni modifica.',
-    indirizzoAiuto:
-      'È qui che questa cartella si raggiunge dal browser. Copialo e provalo: se la pubblicazione è pubblica, funziona anche senza accedere.',
-    copia: 'Copia l’indirizzo',
+    daCondividere: 'Indirizzo da condividere',
+    cortoNota: 'Indirizzo breve, da dettare o scrivere a mano. Funziona solo con Apache.',
+    completoNota: 'Indirizzo completo: è qui che quello breve fa arrivare.',
+    copia: 'Copia',
     copiato: 'Copiato',
     condivisione: 'Condivisione',
     sottopercorso: 'Sottocartella',
