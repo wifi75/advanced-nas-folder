@@ -145,8 +145,22 @@ def _impianto(webserver: str) -> Impianto:
 
 
 def installati() -> list[str]:
-    """Quali web server risultano installati su questa macchina."""
-    return [nome for nome, i in IMPIANTI.items() if esegui(i.presenza, timeout=10).riuscito]
+    """Quali web server risultano installati su questa macchina.
+
+    Un web server assente non e un errore: e' la risposta alla domanda. Ma
+    `esegui` solleva quando il comando non esiste, e senza questa cattura
+    chiedere «quali ci sono?» su una macchina con il solo Apache faceva
+    comparire nel pannello un «Comando non disponibile: nginx» in rosso, come
+    se qualcosa si fosse rotto.
+    """
+    presenti = []
+    for nome, impianto in IMPIANTI.items():
+        try:
+            if esegui(impianto.presenza, timeout=10).riuscito:
+                presenti.append(nome)
+        except ErroreAgent:
+            continue
+    return presenti
 
 
 def _percorso(impianto: Impianto, hostname: str) -> Path:

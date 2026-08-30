@@ -349,7 +349,9 @@ export default {
   webserver: {
     titolo: 'Web server',
     descrizione:
-      'Pubblica il pannello su Apache o Nginx. La configurazione viene provata prima di essere applicata, e se il test non passa quella precedente torna al suo posto.',
+      'Serve a rendere il pannello raggiungibile su un altro nome host — per esempio archivio.tuodominio.it — oltre a quello configurato durante l’installazione. Non serve a niente altro: se ti basta l’indirizzo che usi adesso, questa pagina puoi ignorarla.',
+    comeFunziona:
+      'Il pannello scrive un file di configurazione per il web server, lo prova con il suo stesso comando di verifica, e solo se il test passa lo applica. Se non passa, la configurazione precedente torna al suo posto: un errore qui fermerebbe tutti i siti ospitati sulla macchina, non solo questo.',
     nonGestiamo:
       'DNS, certificati e HTTPS restano dove sono: qui si scrive solo la configurazione locale del web server.',
     pubblica: 'Pubblica su un nome host',

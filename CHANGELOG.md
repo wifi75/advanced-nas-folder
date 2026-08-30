@@ -18,6 +18,23 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.21.1] - 2026-08-30
+
+### Corretto
+- **«Comando non disponibile: nginx» compariva in rosso** nella pagina Web
+  server su ogni macchina con il solo Apache. Chiedere quali web server siano
+  installati faceva partire `nginx -v`, e l'assenza del comando veniva
+  segnalata come guasto: ma un web server assente e' la **risposta** alla
+  domanda, non un errore.
+
+### Modificato
+- **La pagina Web server spiega a cosa serve.** Diceva cosa fa senza dire
+  perche' esiste: serve a pubblicare il pannello su un nome host in piu' oltre
+  a quello dell'installazione, e a niente altro — se l'indirizzo che si usa
+  gia' basta, quella pagina si puo' ignorare. E' aggiunta anche la ragione per
+  cui la configurazione viene provata prima: un errore li' fermerebbe *tutti*
+  i siti della macchina, non solo questo.
+
 ## [0.21.0] - 2026-08-30
 
 ### Corretto

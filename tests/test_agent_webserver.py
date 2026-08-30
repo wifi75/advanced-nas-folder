@@ -238,3 +238,21 @@ def test_elenca_solo_i_vhost_nostri(
     (impianto.cartella / "anf-altrui.esempio.it.conf").write_text("altro", encoding="utf-8")
 
     assert webserver.elenca("apache") == ["uno.esempio.it"]
+
+
+def test_un_web_server_assente_non_e_un_errore(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Su una macchina con il solo Apache, chiedere quali ci sono faceva
+    comparire «Comando non disponibile: nginx» in rosso, come se qualcosa si
+    fosse rotto. Un web server assente e' la risposta, non un guasto."""
+    from anf_agent import webserver
+    from anf_agent.comandi import Esito
+    from anf_agent.protocol import CodiceErrore, ErroreAgent
+
+    def finto(argomenti: list[str], timeout: float = 0) -> Esito:
+        if argomenti[0] == "nginx":
+            raise ErroreAgent(CodiceErrore.COMANDO_FALLITO, "Comando non disponibile: 'nginx'")
+        return Esito(codice=0, stdout="Apache/2.4", stderr="")
+
+    monkeypatch.setattr(webserver, "esegui", finto)
+
+    assert webserver.installati() == ["apache"]

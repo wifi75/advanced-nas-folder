@@ -346,7 +346,9 @@ export default {
   webserver: {
     titolo: 'Web server',
     descrizione:
-      'Publish the panel on Apache or Nginx. The configuration is tested before it is applied, and if the test fails the previous one is put back.',
+      'This publishes the panel on an additional host name — say archive.yourdomain.com — beyond the one configured during installation. It does nothing else: if the address you already use is enough, you can ignore this page.',
+    comeFunziona:
+      'The panel writes a configuration file for the web server, tests it with the web server’s own check, and applies it only if the test passes. If it does not, the previous configuration is put back: a mistake here would take down every site on the machine, not just this one.',
     nonGestiamo:
       'DNS, certificates and HTTPS stay where they are: this only writes the web server’s local configuration.',
     pubblica: 'Publish on a host name',
