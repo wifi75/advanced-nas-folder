@@ -33,17 +33,20 @@ const password = ref('')
 const inCorso = ref(false)
 const errore = ref('')
 
-const puoProcedere = computed(() =>
-  props.modo === 'password' ? password.value !== '' : utente.value !== '' && password.value !== '',
-)
+const puoProcedere = computed(() => password.value !== '')
 
 async function invia(): Promise<void> {
   errore.value = ''
 
-  // Con la sola parola d'ordine non c'è nessuna sessione da aprire: la
-  // password viaggia con la richiesta della cartella, e vale solo per quella.
-  if (props.modo === 'password') {
-    emit('password', password.value)
+  // Senza nome utente si prova la parola d'ordine della cartella: chi ha
+  // ricevuto un indirizzo un account non ce l'ha, e obbligarlo a inventarne
+  // uno chiuderebbe la porta proprio a chi doveva entrare.
+  if (utente.value === '') {
+    if (props.modo === 'password') {
+      emit('password', password.value)
+    } else {
+      errore.value = t('accessoCartella.serveNomeUtente')
+    }
     return
   }
 
@@ -87,11 +90,8 @@ async function invia(): Promise<void> {
         {{ modo === 'password' ? t('accessoCartella.servePassword') : t('accessoCartella.serveAccount') }}
       </p>
 
-      <label
-        v-if="modo === 'utenti'"
-        class="campo"
-      >
-        <span>{{ t('accesso.utente') }}</span>
+      <label class="campo">
+        <span>{{ modo === 'password' ? t('accessoCartella.utenteFacoltativo') : t('accesso.utente') }}</span>
         <input
           v-model="utente"
           type="text"

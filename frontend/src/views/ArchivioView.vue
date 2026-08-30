@@ -8,6 +8,8 @@
  */
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+
+import { chiudiConEsc } from '@/composables/finestra'
 import { useRoute, useRouter } from 'vue-router'
 
 import {
@@ -439,10 +441,45 @@ function quando(iso: string | null): string {
   if (!iso) return ''
   return new Date(iso).toLocaleString(locale.value, { dateStyle: 'medium', timeStyle: 'short' })
 }
+
+// Le finestre si chiudono con Esc, non cliccando sullo sfondo: un clic di
+// troppo faceva perdere quello che si stava scrivendo.
+chiudiConEsc(
+  () => inRinomina.value !== null,
+  () => {
+    inRinomina.value = null
+  },
+)
+chiudiConEsc(
+  () => daSpostare.value !== null,
+  () => {
+    daSpostare.value = null
+  },
+)
+chiudiConEsc(
+  () => daEliminare.value !== null,
+  () => {
+    daEliminare.value = null
+  },
+)
 </script>
 
 <template>
-  <section class="archivio">
+  <!-- O la schermata di accesso, o la cartella: mai le due cose insieme.
+       Titolo, ricerca e messaggi d'errore intorno al riquadro facevano
+       sembrare la cartella aperta e qualcosa di rotto. -->
+  <AccessoCartella
+    v-if="modoAccesso"
+    :cartella="contenuto?.label ?? slug"
+    :modo="modoAccesso"
+    @password="sbloccaConPassword"
+    @entrato="carica"
+  />
+
+  <section
+    v-else
+    class="archivio"
+  >
     <header class="intestazione">
       <h1 class="titolo">
         {{ contenuto?.label ?? slug }}
@@ -549,16 +586,6 @@ function quando(iso: string | null): string {
         {{ t('operazioni.crea') }}
       </button>
     </form>
-
-    <!-- Prima di tutto il resto: chi arriva su una cartella protetta deve
-         vedere come entrare, non un errore in fondo alla pagina. -->
-    <AccessoCartella
-      v-if="modoAccesso"
-      :cartella="contenuto?.label ?? slug"
-      :modo="modoAccesso"
-      @password="sbloccaConPassword"
-      @entrato="carica"
-    />
 
     <p
       v-if="errore && !carico"
@@ -846,7 +873,6 @@ function quando(iso: string | null): string {
     <div
       v-if="inRinomina"
       class="velo"
-      @click.self="inRinomina = null"
     >
       <form
         class="pannello"
@@ -880,7 +906,6 @@ function quando(iso: string | null): string {
     <div
       v-if="daSpostare"
       class="velo"
-      @click.self="daSpostare = null"
     >
       <div
         class="pannello"
@@ -929,7 +954,6 @@ function quando(iso: string | null): string {
     <div
       v-if="daEliminare"
       class="velo"
-      @click.self="daEliminare = null"
     >
       <div
         class="pannello"

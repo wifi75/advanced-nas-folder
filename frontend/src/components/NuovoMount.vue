@@ -8,6 +8,8 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { chiudiConEsc } from '@/composables/finestra'
+
 import { mountsApi, type Esportazione, type NuovoMount } from '@/api/mounts'
 import { ApiError } from '@/api/client'
 import GruppoCampi from '@/components/GruppoCampi.vue'
@@ -83,12 +85,20 @@ async function salva(): Promise<void> {
   salvataggio.value = false
   if (fatto) emit('creato')
 }
+
+// Chiude con Esc, non cliccando sullo sfondo: un clic di troppo faceva perdere
+// la ricerca sul NAS e i campi gia' compilati.
+chiudiConEsc(
+  () => true,
+  () => {
+    emit('chiudi')
+  },
+)
 </script>
 
 <template>
   <div
     class="velo"
-    @click.self="emit('chiudi')"
   >
     <section
       class="pannello"

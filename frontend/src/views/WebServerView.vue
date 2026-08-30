@@ -10,6 +10,8 @@
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { chiudiConEsc } from '@/composables/finestra'
+
 import { ApiError } from '@/api/client'
 import { vhostsApi, type VHost, type WebServer } from '@/api/vhosts'
 
@@ -107,6 +109,15 @@ async function mostraScritta(vhost: VHost): Promise<void> {
     racconta(e)
   }
 }
+
+// Le finestre si chiudono con Esc, non cliccando sullo sfondo: un clic di
+// troppo faceva perdere quello che si stava scrivendo.
+chiudiConEsc(
+  () => daEliminare.value !== null,
+  () => {
+    daEliminare.value = null
+  },
+)
 </script>
 
 <template>
@@ -241,7 +252,6 @@ async function mostraScritta(vhost: VHost): Promise<void> {
     <div
       v-if="daEliminare"
       class="velo"
-      @click.self="daEliminare = null"
     >
       <section
         class="pannello"

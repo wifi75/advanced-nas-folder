@@ -9,6 +9,8 @@
  */
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+
+import { chiudiConEsc } from '@/composables/finestra'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import GruppoCampi from '@/components/GruppoCampi.vue'
@@ -93,6 +95,15 @@ const daEliminare = ref(false)
 async function elimina(): Promise<void> {
   if (await mounts.elimina(id.value)) await router.push('/condivisioni')
 }
+
+// Le finestre si chiudono con Esc, non cliccando sullo sfondo: un clic di
+// troppo faceva perdere quello che si stava scrivendo.
+chiudiConEsc(
+  () => daEliminare.value,
+  () => {
+    daEliminare.value = false
+  },
+)
 </script>
 
 <template>
@@ -379,7 +390,6 @@ async function elimina(): Promise<void> {
     <div
       v-if="daEliminare"
       class="velo"
-      @click.self="daEliminare = false"
     >
       <section class="pannello">
         <h2>{{ t('mount.confermaTitolo', { nome: mount?.label ?? '' }) }}</h2>

@@ -466,6 +466,8 @@ export default {
   },
 
   accessoCartella: {
+    utenteFacoltativo: 'User name (only if you have one)',
+    serveNomeUtente: 'This folder needs an account: enter the user name.',
     titolo: 'Protected folder',
     servePassword: 'Opening it needs the password you were given.',
     serveAccount: 'Opening it needs an account on this panel.',

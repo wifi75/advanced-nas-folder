@@ -2,6 +2,8 @@
 /** Elenco delle cartelle pubblicate. */
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+
+import { chiudiConEsc } from '@/composables/finestra'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import type { Visibilita } from '@/api/shares'
@@ -106,6 +108,15 @@ async function salva(): Promise<void> {
     }
   }
 }
+
+// Le finestre si chiudono con Esc, non cliccando sullo sfondo: un clic di
+// troppo faceva perdere quello che si stava scrivendo.
+chiudiConEsc(
+  () => nuovoAperto.value,
+  () => {
+    nuovoAperto.value = false
+  },
+)
 </script>
 
 <template>
@@ -215,7 +226,6 @@ async function salva(): Promise<void> {
     <div
       v-if="nuovoAperto"
       class="velo"
-      @click.self="nuovoAperto = false"
     >
       <section
         class="pannello"

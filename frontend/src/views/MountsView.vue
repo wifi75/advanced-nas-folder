@@ -8,6 +8,8 @@
  */
 import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+
+import { chiudiConEsc } from '@/composables/finestra'
 import { RouterLink } from 'vue-router'
 
 import type { Mount } from '@/api/mounts'
@@ -63,6 +65,21 @@ function creato(): void {
   nuovoAperto.value = false
   void mounts.carica()
 }
+
+// Le finestre si chiudono con Esc, non cliccando sullo sfondo: un clic di
+// troppo faceva perdere quello che si stava scrivendo.
+chiudiConEsc(
+  () => daEliminare.value !== null,
+  () => {
+    daEliminare.value = null
+  },
+)
+chiudiConEsc(
+  () => nuovoAperto.value,
+  () => {
+    nuovoAperto.value = false
+  },
+)
 </script>
 
 <template>
@@ -250,7 +267,6 @@ function creato(): void {
     <div
       v-if="daEliminare"
       class="velo"
-      @click.self="daEliminare = null"
     >
       <section
         class="conferma"

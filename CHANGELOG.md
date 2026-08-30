@@ -18,6 +18,32 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.26.0] - 2026-08-30
+
+### Corretto
+- **Cliccando sullo sfondo si chiudeva la finestra aperta**, e un clic di
+  troppo faceva perdere quello che si stava scrivendo — un modulo compilato a
+  meta' spariva senza che fosse chiaro cosa fosse successo. Nessuna delle
+  dodici finestre si chiude piu' cosi': **Esc, o il pulsante Annulla**.
+
+  Esc ferma la propagazione: con due finestre sovrapposte — la conferma di
+  eliminazione sopra un dettaglio — un solo tasto le chiudeva entrambe.
+- **La schermata di accesso a una cartella protetta compariva in mezzo alla
+  pagina**, con titolo, ricerca e messaggio d'errore intorno: sembrava che la
+  cartella fosse aperta e che qualcosa si fosse rotto. Ora c'e' o l'una o
+  l'altra, mai le due insieme.
+- **La scheda «Chi accede» mostrava la sola visibilita'.** Regole per
+  cartella, permessi per utente, link e verifica erano nel codice ma non
+  comparivano: il componente li legge da una pubblicazione «aperta» che quella
+  pagina non riempiva. Senza, non c'era modo di **assegnare una cartella a una
+  persona** — che e' la ragione per cui quella scheda esiste.
+
+### Modificato
+- **La schermata di accesso chiede nome utente e password.** Il nome resta
+  facoltativo dove basta la parola d'ordine: chi ha ricevuto un indirizzo un
+  account non ce l'ha, e obbligarlo a inventarne uno chiuderebbe la porta
+  proprio a chi doveva entrare.
+
 ## [0.25.0] - 2026-08-30
 
 ### Aggiunto

@@ -498,7 +498,6 @@ watch(
 <template>
   <div
     class="velo"
-    @click.self="emit('chiudi')"
   >
     <section
       ref="finestra"

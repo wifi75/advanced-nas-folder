@@ -472,6 +472,8 @@ export default {
   },
 
   accessoCartella: {
+    utenteFacoltativo: 'Nome utente (solo se ne hai uno)',
+    serveNomeUtente: 'Per questa cartella serve un account: indica il nome utente.',
     titolo: 'Cartella protetta',
     servePassword: 'Per aprirla serve la parola d’ordine che ti è stata data.',
     serveAccount: 'Per aprirla serve un account su questo pannello.',

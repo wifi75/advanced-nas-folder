@@ -10,6 +10,8 @@
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { chiudiConEsc } from '@/composables/finestra'
+
 import { utentiApi, type NuovoUtente, type Utente } from '@/api/utenti'
 import { useAuthStore } from '@/stores/auth'
 
@@ -120,6 +122,21 @@ async function elimina(): Promise<void> {
 function sonoIo(utente: Utente): boolean {
   return auth.utente?.id === utente.id
 }
+
+// Le finestre si chiudono con Esc, non cliccando sullo sfondo: un clic di
+// troppo faceva perdere quello che si stava scrivendo.
+chiudiConEsc(
+  () => nuovoAperto.value,
+  () => {
+    nuovoAperto.value = false
+  },
+)
+chiudiConEsc(
+  () => daEliminare.value !== null,
+  () => {
+    daEliminare.value = null
+  },
+)
 </script>
 
 <template>
@@ -229,7 +246,6 @@ function sonoIo(utente: Utente): boolean {
     <div
       v-if="nuovoAperto"
       class="velo"
-      @click.self="nuovoAperto = false"
     >
       <form
         class="pannello"
@@ -312,7 +328,6 @@ function sonoIo(utente: Utente): boolean {
     <div
       v-if="daEliminare"
       class="velo"
-      @click.self="daEliminare = null"
     >
       <section
         class="pannello"
