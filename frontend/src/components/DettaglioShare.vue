@@ -18,6 +18,7 @@ import {
   type Livello,
   type Visibilita,
 } from '@/api/shares'
+import { utentiApi, type Utente } from '@/api/utenti'
 import { useSharesStore } from '@/stores/shares'
 
 const props = defineProps<{ id: number }>()
@@ -59,19 +60,46 @@ async function aggiungiRegola(): Promise<void> {
 }
 
 // --- nuovo permesso ---
-const permessoUtente = ref<number | null>(null)
+//
+// Le persone si scelgono da un elenco, non scrivendone il numero: nessuno
+// sa a memoria che Mario e' il 3, e sbagliare cifra assegna in silenzio una
+// cartella a qualcun altro.
+const utenti = ref<Utente[]>([])
+const permessoUtenti = ref<number[]>([])
 const permessoPercorso = ref('')
 const permessoLivello = ref<Livello>('lettura')
 
+/** Il nome da mostrare per un permesso gia' assegnato. */
+function nomeUtente(idUtente: number): string {
+  return utenti.value.find((u) => u.id === idUtente)?.username ?? `#${idUtente}`
+}
+
+async function caricaUtenti(): Promise<void> {
+  try {
+    // Gli amministratori vedono gia' tutto: elencarli qui suggerirebbe che
+    // serva dargli un permesso, e assegnarne uno non cambierebbe nulla.
+    utenti.value = (await utentiApi.elenca()).filter((u) => !u.is_admin && u.is_active)
+  } catch {
+    // Senza elenco resta la scheda, solo senza persone fra cui scegliere:
+    // non e' un motivo per far fallire l'intera pagina.
+    utenti.value = []
+  }
+}
+
 async function assegnaPermesso(): Promise<void> {
-  if (permessoUtente.value === null) return
-  const fatto = await shares.assegnaPermesso(
-    props.id,
-    permessoUtente.value,
-    permessoPercorso.value,
-    permessoLivello.value,
+  if (permessoUtenti.value.length === 0) return
+  // Uno per volta: l'API assegna un permesso a una persona, e la stessa
+  // cartella data a cinque persone sono cinque permessi distinti — che si
+  // possono poi togliere singolarmente.
+  const esiti = await Promise.all(
+    permessoUtenti.value.map((idUtente) =>
+      shares.assegnaPermesso(props.id, idUtente, permessoPercorso.value, permessoLivello.value),
+    ),
   )
-  if (fatto) permessoPercorso.value = ''
+  if (esiti.every(Boolean)) {
+    permessoPercorso.value = ''
+    permessoUtenti.value = []
+  }
 }
 
 // --- link di condivisione ---
@@ -155,7 +183,10 @@ function quando(iso: string | null): string {
   return iso ? new Date(iso).toLocaleDateString() : ''
 }
 
-onMounted(caricaLink)
+onMounted(() => {
+  void caricaLink()
+  void caricaUtenti()
+})
 
 // --- verifica ---
 const provaPercorso = ref('')
@@ -304,7 +335,7 @@ const chiHaDeciso = computed(() => {
               v-for="p in share.permessi"
               :key="p.id"
             >
-              <span class="percorso">#{{ p.user_id }}</span>
+              <span class="percorso">{{ nomeUtente(p.user_id) }}</span>
               <span class="freccia">→</span>
               <span class="percorso">{{ p.path_prefix || t('permessi.tutte') }}</span>
               <span
@@ -330,13 +361,27 @@ const chiHaDeciso = computed(() => {
             {{ t('permessi.nessuno') }}
           </p>
 
-          <div class="riga-form">
-            <input
-              v-model.number="permessoUtente"
-              type="number"
-              min="1"
-              :placeholder="t('permessi.utente')"
-            >
+          <div class="riga-form riga-form--permesso">
+            <label class="scelta-utenti">
+              <span class="scelta-utenti__titolo">{{ t('permessi.utente') }}</span>
+              <select
+                v-model="permessoUtenti"
+                multiple
+                size="4"
+                :aria-label="t('permessi.utente')"
+              >
+                <option
+                  v-for="u in utenti"
+                  :key="u.id"
+                  :value="u.id"
+                >
+                  {{ u.username }}
+                </option>
+              </select>
+              <span class="scelta-utenti__nota">
+                {{ utenti.length ? t('permessi.notaMultipla') : t('permessi.nessunUtente') }}
+              </span>
+            </label>
             <input
               v-model="permessoPercorso"
               type="text"
@@ -354,7 +399,7 @@ const chiHaDeciso = computed(() => {
             <button
               class="bottone bottone--principale"
               type="button"
-              :disabled="permessoUtente === null"
+              :disabled="permessoUtenti.length === 0"
               @click="assegnaPermesso"
             >
               {{ t('permessi.assegna') }}
@@ -682,6 +727,45 @@ h3 {
   background: var(--sfondo);
   border: 1px solid var(--bordo);
   border-radius: var(--raggio);
+}
+
+/* Con l'elenco a scelta multipla la riga non e' piu' una riga: le persone
+   occupano quattro righe di altezza, e gli altri campi devono allinearsi in
+   basso invece di stirarsi accanto. */
+.riga-form--permesso {
+  align-items: flex-end;
+}
+
+.scelta-utenti {
+  flex: 2;
+  min-inline-size: 190px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.scelta-utenti__titolo {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--testo-tenue);
+}
+
+.scelta-utenti select {
+  /* Un elenco a scelta multipla, non una tendina: si vede subito chi c'e' e
+     chi e' gia' selezionato, senza aprire nulla. */
+  padding: 0.25rem;
+}
+
+.scelta-utenti option {
+  padding: 0.2rem 0.35rem;
+  border-radius: 5px;
+}
+
+.scelta-utenti__nota {
+  font-size: 0.75rem;
+  color: var(--testo-tenue);
 }
 
 .riga-form button {

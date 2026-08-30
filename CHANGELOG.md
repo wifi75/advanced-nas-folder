@@ -10,6 +10,29 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.26.2] - 2026-08-30
+
+### Aggiunto
+
+- **Gli utenti si scelgono da un elenco, anche piu' d'uno alla volta.** Il
+  campo chiedeva di scrivere il numero della persona: nessuno sa a memoria
+  che Mario e' il 3, e sbagliare cifra assegnava in silenzio una cartella a
+  qualcun altro. I permessi gia' assegnati mostrano il nome invece di `#3`.
+
+### Corretto
+
+- **Il pannello si aggiorna da solo anche in una scheda gia' aperta.** La
+  versione nuova si applicava «al caricamento successivo», che in una scheda
+  aperta non arriva mai: si continuava a vedere quella vecchia finche' non si
+  svuotava la cache a mano. Capitava proprio a chi aggiornava il server e
+  subito dopo andava a guardare il risultato.
+
+### Modificato
+
+- «Link di condivisione» si chiama ora **«Link temporanei»**, e la
+  descrizione dice in cosa differisce dall'indirizzo della pubblicazione:
+  tre cose chiamate «link» sulla stessa pagina sembravano doppioni.
+
 ## [0.26.1] - 2026-08-30
 
 ### Corretto

@@ -247,6 +247,8 @@ export default {
     assegna: 'Assign',
     nessuno: 'No permission assigned.',
     tutte: 'all folders',
+    notaMultipla: 'Hold Ctrl (or Cmd) to pick more than one.',
+    nessunUtente: 'No users to pick: create one from the Users page.',
   },
 
   prova: {
@@ -368,9 +370,9 @@ export default {
   },
 
   link: {
-    titolo: 'Share links',
+    titolo: 'Temporary links',
     descrizione:
-      'A way to get a folder to someone without an account. The link only covers the folder you pick, and can be limited by time and by number of downloads.',
+      'Different from the publication address above, which is permanent and the same for everyone: this is a one-off link for people without an account. It covers only the folder you name, and can expire after a number of days or downloads.',
     cartella: 'Folder (empty = all)',
     etichetta: 'Name (optional)',
     giorni: 'Days',

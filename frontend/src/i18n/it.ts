@@ -250,6 +250,8 @@ export default {
     assegna: 'Assegna',
     nessuno: 'Nessun permesso assegnato.',
     tutte: 'tutte le cartelle',
+    notaMultipla: 'Tieni premuto Ctrl (o Cmd) per selezionarne più di uno.',
+    nessunUtente: 'Nessun utente da scegliere: creane uno dalla voce Utenti.',
   },
 
   prova: {
@@ -371,9 +373,9 @@ export default {
   },
 
   link: {
-    titolo: 'Link di condivisione',
+    titolo: 'Link temporanei',
     descrizione:
-      'Un modo per far arrivare una cartella a chi non ha un account. Il collegamento vale solo per la cartella indicata, e si può limitare nel tempo e nel numero di scaricamenti.',
+      'Diverso dall’indirizzo della pubblicazione qui sopra, che è fisso e vale per tutti: questo è un collegamento usa-e-getta per chi non ha un account. Vale solo per la cartella indicata, e può scadere dopo un certo numero di giorni o di scaricamenti.',
     cartella: 'Cartella (vuoto = tutta)',
     etichetta: 'Nome (facoltativo)',
     giorni: 'Giorni',
