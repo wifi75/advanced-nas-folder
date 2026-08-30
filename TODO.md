@@ -148,6 +148,19 @@ Richieste del 2026-08-29 rimaste aperte alla chiusura della v0.3.0:
 
 - [x] **Indirizzi corti** per le cartelle pubblicate: `sito/documenti` invece di
       `sito/pannello/archivio/documenti`. Fatto nella v0.7.0, solo su Apache.
+- [x] **Un utente specifico per una cartella specifica**, senza aprirla a chi ha
+      la password: si sceglie la persona da un elenco (anche più d'una insieme)
+      e la cartella si percorre invece di scriverla. Fatto nelle v0.26.2 e
+      v0.27.0.
+- [x] **Il menu di chi non amministra**: niente più pagine riservate — che
+      l'API rifiutava comunque — e al loro posto l'elenco delle cartelle
+      raggiungibili. Le rotte sono chiuse anche per indirizzo diretto. v0.27.0
+      e v0.27.1.
+- [x] **Le finestre non si chiudono più cliccando sullo sfondo**: solo Esc o
+      Annulla.
+- [x] **Accesso alle cartelle protette con nome utente e password**, su una
+      schermata con grafica e colori propri, distinta da quella del pannello.
+
 - [ ] **Indirizzi corti su Nginx.** Richiedono di rigenerare il vhost, perché le
       `location` devono stare dentro il blocco `server`: non basta un file a sé
       come su Apache. Oggi il pannello lo dichiara invece di scrivere
@@ -168,6 +181,16 @@ Richieste del 2026-08-29 rimaste aperte alla chiusura della v0.3.0:
 - [x] Riferimenti a strumenti di terze parti nei piè di firma dei commit: rimossi
       riscrivendo la cronologia. Verificato che l'API di GitHub riporti un solo
       contributore.
+
+- [x] **Regola di stile che si annullava da sola.** Due blocchi con lo stesso
+      selettore, uno lontano dall'altro nello stesso foglio, si contraddicevano:
+      il nome delle cartelle in galleria restava largo quanto il testo invece di
+      occupare la riga, e il testo veniva tagliato. Corretto in v0.27.2. Da
+      tenere d'occhio: il file degli stili dell'archivio ha piu' blocchi per lo
+      stesso selettore, e il prossimo scontro non darebbe alcun errore.
+- [x] **La PWA serviva la versione vecchia a una scheda gia' aperta**, e chi
+      aggiornava il server concludeva che l'aggiornamento non avesse funzionato.
+      Ora il pannello controlla e si ricarica da solo. v0.26.2.
 
 ## Limiti dichiarati, non difetti
 

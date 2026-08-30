@@ -57,7 +57,8 @@ booting.
 path prefix: public (anonymous), password protected, restricted to signed-in users, or
 restricted to specific people. Per-user permissions decide **which user reaches which
 folder**, or all of them; an explicit denial overrides the path rule, so you can take a
-branch away from one person while it stays open to everyone else.
+branch away from one person while it stays open to everyone else. Non-administrators
+find in the menu only the folders they can actually open.
 
 **File management** — browsing, file and folder operations, **resumable** drag&drop
 uploads (whole folders included), downloading a folder as a ZIP archive, multiple

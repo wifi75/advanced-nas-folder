@@ -12,43 +12,57 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.6.6
+- Versione corrente: 0.27.3
 
-## Stato alla v0.6.6 — 30 agosto 2026
+## Stato alla v0.27.3 — 30 agosto 2026
 
-*(0.6.1 e 0.6.2 non toccano l'applicazione: documentazione e installer)*
+**In produzione su `folder.iu3cyv.eu`** (server 192.168.1.106) dal 30 agosto 2026.
+**431 test**, gate verde su ruff, mypy `strict`, ESLint, vue-tsc e build.
 
-Il pannello fa tutto quello per cui era stato pensato. **375 test**, gate verde su
-ruff, mypy `strict`, ESLint, vue-tsc e build; la CI li esegue a ogni push.
+Il ciclo di rilascio passa dalle release GitHub: `update.sh` scarica **l'ultima
+release**, non il branch. Un commit pushato ma senza release non arriva sul server,
+e `update.sh` dice comunque «completato» — verificare sempre la versione con
+`/api/v1/health`. Fra la creazione della release e la disponibilità pubblica del
+pacchetto passano **una o due decine di secondi** di propagazione GitHub: prima si
+prende un 404.
 
-**Fatto e verificato eseguendo, non solo leggendo:**
+### Cosa è stato aggiunto dopo la v0.6.6
 
-- **Agent privilegiato** provato contro un NAS Synology reale: scoperta, creazione,
-  montaggio, stato con prova di scrittura sul campo, smontaggio. Tentativi di
-  violazione (slug con `..`, opzioni fuori whitelist, comandi iniettati
-  nell'indirizzo) tutti respinti.
-- **Mount, pubblicazioni e permessi** end-to-end su Linux, pannello → API → agent →
-  NAS reale, compresa la verifica dell'accesso che dice quale regola ha deciso.
-- **Consegna dei file** con ripresa: verificato `206 Partial Content` e blocco delle
-  risalite; su Windows con un file da 9 MB il caricamento interrotto e ripreso ha
-  prodotto uno **sha256 identico all'originale**.
-- **Link di condivisione**: limite di scaricamenti rispettato, ramo non valicabile,
-  divieto esplicito non superabile.
-- **Operazioni sui file, ricerca, ZIP, selezione multipla, anteprime, checksum,
-  editor di testo, utenti, impostazioni**: tutti provati sul filesystem vero, non
-  solo nei test.
-- **Import da `/etc/fstab`** e **pubblicazione sul web server dal pannello**, con
-  `configtest` e ripristino della configurazione precedente se il test fallisce.
-- **Monitoraggio dei trasferimenti** dal vivo via SSE, con lettura dell'access log.
-- `install.sh`, `update.sh` e `uninstall.sh`, tutti bilingui e con `--dry-run`.
-- Documentazione completa in due lingue, guida all'uso compresa.
+- **Indirizzi corti** (`sito/documenti`), solo su Apache, tramite `RedirectMatch`.
+- **Sistema fotografico**: miniature prodotte dal server con Pillow, dati di scatto
+  EXIF, ingrandimento e trascinamento, presentazione, raggruppamento per mese di
+  scatto, fotogrammi dei video con `ffmpeg`.
+- **Pubblicazione riorganizzata** in schede, secondo il modello scelto da Tiziano
+  (albero nel menu, un solo riquadro per pubblicazione). Nome nell'indirizzo,
+  origine e nomi da nascondere sono tutti modificabili.
+- **Accesso alle cartelle protette** con nome utente e password, su una schermata
+  con tinta propria (`--tinta-accesso`), distinta da quella del pannello.
+- **Permessi per singola persona** usabili davvero: l'utente si sceglie da un
+  elenco a selezione multipla e la cartella si percorre invece di scriverla.
+- **Menu di chi non amministra**: solo «Le mie cartelle», dall'endpoint
+  `GET /shares/mie`, che applica `acl.valuta` alla radice di ogni pubblicazione.
+  Le rotte di amministrazione sono chiuse anche per indirizzo diretto.
 
-**Sul server non è ancora stato pubblicato nulla.** È sempre stata la scelta di farlo
-a progetto completo: ora si può.
+### Trappole trovate sul campo, da non ripetere
 
-**Da fare prima della pubblicazione:** provare l'agent end-to-end su Linux con le
-funzioni aggiunte dopo la v0.5.0 (vhost, fstab), che sulla macchina di sviluppo
-Windows non sono verificabili perché i socket Unix non esistono.
+- **Due blocchi CSS con lo stesso selettore** nello stesso foglio, lontani fra
+  loro, si annullano in silenzio. È già successo due volte in
+  `views/ArchivioView.vue`, che ne ha ancora diversi: nessun linter lo segnala.
+- **`mod_rewrite` e `CustomLog` non sono ereditati** dai VirtualHost; `mod_alias`
+  (`Alias`, `RedirectMatch`) invece sì.
+- **`pytest | tail` maschera l'esito**: usare sempre `controlla.ps1`, che si ferma
+  al primo passo fallito. Due commit rotti sono arrivati su GitHub così.
+- **Uso prima della definizione in `<script setup>`**: compila, i tipi passano, la
+  pagina muore bianca. La regola ESLint `no-use-before-define` è attiva e ne ha
+  trovati dodici latenti.
+- **Il service worker serviva la versione vecchia a una scheda già aperta.** Dalla
+  v0.26.2 il pannello controlla e si ricarica da solo; per arrivarci da una
+  versione precedente serve ancora una ricarica forzata.
+
+### Sul server, dati di prova
+
+Utenti `mario` e `gino` non amministratori, con permessi su `foto`. La password di
+`gino` è stata reimpostata a `Prova12345` per provare il menu con i suoi occhi.
 
 ## Ambiente di sviluppo
 
@@ -72,10 +86,13 @@ collegamento all'altra versione. Vale anche per i documenti interni
 - **Nessun colore direttamente nei componenti**: tutto passa dalle variabili in
   `assets/main.css`, definite per il tema chiaro e ridefinite in *due* blocchi scuri
   (`prefers-color-scheme` e `[data-tema='scuro']`).
-- Il menu è raggruppato per categoria; le voci non ancora realizzate restano visibili
-  ma disattivate, con la fase indicata. Alla v0.6.0 resta disattivata solo la pagina
-  che raccoglie i link di tutte le pubblicazioni: i link si gestiscono dentro la
-  pubblicazione a cui appartengono.
+- Il menu è raggruppato per categoria. Dalla v0.27.0 **dipende da chi guarda**: un
+  amministratore vede l'albero delle condivisioni e le pagine di sistema, chiunque
+  altro solo «Le mie cartelle». Le voci di sistema non vanno mostrate a chi non
+  amministra: l'API le rifiuta comunque, e mostrarle produce solo errori.
+- **Le schede annidate hanno ciascuna il proprio parametro** nell'indirizzo
+  (`scheda`, `sezione`). Con un parametro solo si scavalcano, e cliccare una scheda
+  interna butta fuori dalla sezione.
 - `npm run typecheck` usa `vue-tsc --build`: la variante `--noEmit` non controllava i
   progetti referenziati e lasciava passare errori che il build trovava.
 - **Il pannello vive sotto `/pannello/`**, in sviluppo come in produzione: la `base`

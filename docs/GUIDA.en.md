@@ -136,12 +136,36 @@ dead end.
 Visibility can be changed **per subfolder**: the most specific rule always
 wins. A public folder can contain a private one, and the other way round.
 
-### Who can do what
+### Giving a folder to one person only
 
 Next to the rules there are **per-user permissions**: "only Mario sees this
 folder". Here too the longest prefix wins, and a *Denied* permission beats the
 folder rule — that is how you take one branch away from one person while it
 stays open to everyone else.
+
+In practice, to give a folder to **one person only**:
+
+1. **Users → New user**, if they do not exist yet;
+2. in the publication, **Who can access** tab, set *Who can access* to **"Only
+   authorised users"** and save;
+3. below, **Per-user permissions** tab: pick the person from the list, walk
+   down to the folder and grant.
+
+Step 2 is the one people forget, and the one that matters: while visibility
+stays on *"Anyone with the password"*, **anyone holding that word gets in**,
+and the personal permission restricts nothing. Only *"Only authorised users"*
+can tell people apart.
+
+You can pick **several people at once** (Ctrl, or Cmd on a Mac): one permission
+is created for each, and each stays separately revocable. Administrators are
+not listed: they already see everything, and granting them a permission would
+change nothing.
+
+You do not type the folder, you **pick** it, going down one level at a time
+through the real subfolders. A path typed from memory and got wrong raises no
+error: it creates a permission on a folder that does not exist, which simply
+does nothing — and you find out when someone tells you they cannot see the
+folder.
 
 ### Checking before your users do
 
@@ -260,7 +284,11 @@ images often lose it, and that is normal.
 
 ## Sharing with people who have no account
 
-**Publications → Folder rules → Share links.**
+**Publications → Who can access → Temporary links.**
+
+Not to be confused with the publication address, which is permanent and the
+same for everyone: this is a one-off link, it covers only the folder you name
+and it can expire.
 
 You pick the folder and, optionally, an expiry, a maximum number of downloads
 and a password. The link that comes out is what you send: whoever opens it sees
@@ -293,6 +321,24 @@ whatever permissions they are given.
 
 The panel prevents making itself unmanageable: you cannot remove your own
 privileges, and the last administrator can be neither demoted nor deleted.
+
+---
+
+## What non-administrators see
+
+A normal user signs in at the same address, but the panel is a different one:
+the menu shows **My folders**, the list of publications they can actually open
+— worked out with the same access rules, not a fixed list.
+
+They do not see *Users*, *Status*, *Web server*, *Transfers* and *Settings*:
+those are administration pages, and the server refuses them to non-admins
+anyway. Typing their address by hand also lands back on their own home page.
+
+If they have no folder assigned yet they read *"No folders assigned"*, so it is
+clear the emptiness is someone's decision and not a fault.
+
+To see the panel through their eyes, sign out and sign back in with their
+credentials.
 
 ---
 

@@ -54,7 +54,10 @@ mount, così un errore resta isolato e non impedisce l'avvio del server.
 
 **Pubblicazione e permessi** — cartelle pubblicate come *share*, con regole di accesso
 per prefisso di percorso: pubblica, protetta da password, riservata a utenti
-registrati, o link con scadenza e limite di download.
+registrati, o link temporaneo con scadenza e limite di download. Oltre alle regole,
+**permessi per singola persona**: una cartella la può vedere un solo utente, e un
+diniego esplicito toglie un ramo a qualcuno lasciandolo aperto agli altri. Chi non
+amministra trova nel menu solo le cartelle che può davvero aprire.
 
 **Gestione file** — navigazione, operazioni su file e cartelle, caricamento
 drag&drop **riprendibile** (anche di cartelle intere), download di una cartella come

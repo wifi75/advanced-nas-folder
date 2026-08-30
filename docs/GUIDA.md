@@ -138,12 +138,36 @@ La visibilità si può cambiare **per singola sottocartella**: vince sempre la
 regola più specifica. Una cartella pubblica può contenerne una riservata, e
 viceversa.
 
-### Chi può fare cosa
+### Dare una cartella a una persona sola
 
 Accanto alle regole ci sono i **permessi per utente**: «questa cartella la vede
 solo Mario». Anche qui vince il prefisso più lungo, e un permesso *Negato*
 batte la regola della cartella — è il modo di togliere a una persona un ramo
 che per tutti gli altri resta aperto.
+
+In pratica, per dare una cartella a **una persona sola**:
+
+1. **Utenti → Nuovo utente**, se non esiste già;
+2. nella pubblicazione, scheda **Chi accede**, metti *Chi può accedere* su
+   **«Solo gli utenti autorizzati»** e salva;
+3. sotto, scheda **Permessi per utente**: scegli la persona dall'elenco, scendi
+   fino alla cartella e concedi.
+
+Il passaggio 2 è quello che si dimentica, ed è il più importante: finché la
+visibilità resta su *«Chi conosce la password»*, entra **chiunque abbia quella
+parola**, e il permesso personale non restringe niente. Solo *«Solo gli utenti
+autorizzati»* sa distinguere le persone.
+
+Nell'elenco si possono scegliere **più persone insieme** (Ctrl, o Cmd su Mac):
+si crea un permesso per ciascuna, e ognuno resta poi revocabile per conto suo.
+Gli amministratori non compaiono: vedono già tutto, e dargli un permesso non
+cambierebbe niente.
+
+La cartella non si scrive a mano ma si **sceglie**, scendendo un livello per
+volta fra le sottocartelle vere. Un percorso scritto a memoria e sbagliato non
+dà errore: crea un permesso su una cartella che non esiste, che semplicemente
+non fa niente — e te ne accorgi quando qualcuno ti dice che non vede la
+cartella.
 
 ### Verificare prima che lo scoprano gli utenti
 
@@ -263,7 +287,11 @@ modificate o esportate spesso li perdono, ed è un caso normale.
 
 ## Condividere con chi non ha un account
 
-**Pubblicazioni → Regole per cartella → Link di condivisione.**
+**Pubblicazioni → Chi accede → Link temporanei.**
+
+Da non confondere con l'indirizzo della pubblicazione, che è fisso e uguale per
+tutti: questo è un collegamento usa-e-getta, vale solo per la cartella indicata
+e può scadere.
 
 Si sceglie la cartella, facoltativamente una scadenza, un numero massimo di
 scaricamenti e una password. Il collegamento che esce si manda a chi deve
@@ -297,6 +325,27 @@ cartella, qualunque permesso gli si dia.
 
 Il pannello impedisce di rendersi ingestibile: non ci si può togliere i
 privilegi da soli, e l'ultimo amministratore non si può degradare né eliminare.
+
+---
+
+## Cosa vede chi non amministra
+
+Un utente normale entra dallo stesso indirizzo, ma il pannello è un altro: nel
+menu trova **Le mie cartelle**, cioè l'elenco delle pubblicazioni che può
+davvero aprire — calcolato con le stesse regole di accesso, non un elenco
+fisso.
+
+Non vede *Utenti*, *Stato*, *Web server*, *Trasferimenti* e *Impostazioni*:
+sono pagine di amministrazione, e il server le rifiuta comunque a chi non è
+amministratore. Anche scrivendone l'indirizzo a mano si torna alla propria
+pagina iniziale.
+
+Se non ha ancora nessuna cartella assegnata legge *«Nessuna cartella
+assegnata»*, così capisce che il vuoto è una scelta di chi amministra e non un
+guasto.
+
+Per vedere il pannello con i suoi occhi basta uscire e rientrare con le sue
+credenziali.
 
 ---
 
