@@ -1316,7 +1316,7 @@ function quando(iso: string | null): string {
   /* Sopra il pie' di pagina, non addosso: quello sta nel flusso e su una
      cartella corta finisce proprio al fondo dello schermo, dove questa barra
      e' fissa. Si sovrapponevano, e meta' dei comandi restava illeggibile. */
-  bottom: 4.5rem;
+  bottom: var(--fondo-sicuro);
   z-index: 10;
   display: flex;
   flex-wrap: wrap;

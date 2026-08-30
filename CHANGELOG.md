@@ -18,6 +18,29 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.23.0] - 2026-08-30
+
+Il pannello sul telefono.
+
+### Corretto
+- **Lo schermo intero non funzionava su iPhone.** L'API del browser esiste
+  solo per i video: per un elemento qualunque non c'e', il tentativo veniva
+  respinto e il pulsante non faceva assolutamente niente. Dove l'API manca il
+  pannello ora se lo fa da solo, con un riquadro fisso che copre la finestra:
+  non nasconde la barra del browser, ma toglie tutto il resto.
+- **Le pagine saltavano scorrendo.** L'altezza era in `vh`, che su un telefono
+  e' l'altezza con le barre del browser **nascoste**: finche' sono visibili la
+  pagina e' piu' alta dello schermo, e quando spariscono tutto si sposta. Ora
+  e' in `dvh`, che segue l'altezza reale.
+- **Il contenuto finiva sotto il notch e sotto la barra di sistema.** Sono le
+  due cose che servono a far sembrare il pannello un'applicazione —
+  `viewport-fit=cover` e la barra di stato traslucida — e senza tenerne conto
+  mangiano il contenuto ai bordi. Ora lo spazio da lasciare viene chiesto al
+  sistema con `env(safe-area-inset-*)`, e vale zero su tutto il resto.
+
+  Vale anche per gli elementi fissi in fondo — barra della selezione e avviso —
+  che stavano sotto la barra di sistema ed erano coperti a meta'.
+
 ## [0.22.1] - 2026-08-30
 
 ### Corretto

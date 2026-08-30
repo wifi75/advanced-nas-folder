@@ -157,7 +157,21 @@ function daTastiera(evento: KeyboardEvent): void {
 const finestra = ref<HTMLElement | null>(null)
 const aSchermoIntero = ref(false)
 
+/** Vero quando il browser non offre lo schermo intero per un elemento
+ *  qualunque. Su iPhone e' sempre cosi': l'API esiste solo per i video. */
+const senzaSchermoIntero =
+  typeof document !== 'undefined' && !document.documentElement.requestFullscreen
+
 async function alternaSchermoIntero(): Promise<void> {
+  // Dove l'API non c'e' — iPhone, e ogni browser che la nega — si fa da soli:
+  // un riquadro fisso che copre la finestra. Non nasconde la barra del
+  // browser, ma toglie tutto il resto, che e' il novanta per cento del punto.
+  // Prima il pulsante non faceva assolutamente niente.
+  if (senzaSchermoIntero) {
+    aSchermoIntero.value = !aSchermoIntero.value
+    return
+  }
+
   try {
     if (document.fullscreenElement) {
       await document.exitFullscreen()
@@ -165,13 +179,14 @@ async function alternaSchermoIntero(): Promise<void> {
       await finestra.value.requestFullscreen()
     }
   } catch {
-    // Alcuni browser lo negano se non arriva da un gesto diretto, e su iPhone
-    // non esiste affatto per un elemento qualunque: il pulsante non fa nulla,
-    // ma l'anteprima continua a funzionare.
+    // Negato perche' non arriva da un gesto diretto: si ripiega sul riquadro
+    // fisso, invece di lasciare il pulsante senza effetto.
+    aSchermoIntero.value = !aSchermoIntero.value
   }
 }
 
 function segnaSchermoIntero(): void {
+  if (senzaSchermoIntero) return
   aSchermoIntero.value = document.fullscreenElement !== null
 }
 
@@ -759,15 +774,24 @@ watch(
 /* A schermo intero la foto prende tutto: il fondo scuro toglie di mezzo
    l'ambiente e lascia solo l'immagine, che e' il punto. */
 .finestra--intera {
+  /* `fixed` e non solo dimensioni: dove l'API non esiste la finestra e' ancora
+     dentro la pagina, e senza questo resterebbe al suo posto nel flusso. */
+  position: fixed;
+  inset: 0;
+  z-index: 60;
   width: 100vw;
   max-width: none;
-  height: 100vh;
+  height: 100dvh;
   max-height: none;
   border-radius: 0;
   display: flex;
   flex-direction: column;
   background: #0b0f14;
   color: #e8eef6;
+  /* Sotto il notch e sopra la barra di sistema: con la barra di stato
+     traslucida il contenuto ci finirebbe sotto. */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .finestra--intera .corpo {
