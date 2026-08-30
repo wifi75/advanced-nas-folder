@@ -416,10 +416,12 @@ scegli_porta() {
     set -- $libere
     local prima="$1"
 
-    # Interattivo solo se c'è davvero un terminale da cui leggere.
-    if [ -t 0 ] && [ "$DRY_RUN" = 0 ]; then
+    # Interattivo se c'è un terminale da cui leggere. Vale anche in prova a
+    # vuoto: quella prova serve a mostrare cosa succederebbe, e saltare le
+    # domande la renderebbe diversa dall'installazione vera.
+    if [ -t 0 ]; then
         printf '  %s
-' "$(m porta_libere "$(echo $libere | tr ' ' ', ')")"
+' "$(m porta_libere "$(echo $libere | sed 's/ /, /g')")"
         printf '  %s ' "$(m porta_chiedo "$prima")"
         local risposta=""
         read -r risposta || risposta=""

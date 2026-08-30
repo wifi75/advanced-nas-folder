@@ -7,15 +7,26 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non rilasciato]
 
+### Da fare
+Vedere [TODO.md](TODO.md).
+
+## [0.6.4] - 2026-08-30
+
+### Corretto
+- **La prova a vuoto non chiedeva la porta.** Le domande erano disattivate con
+  `--dry-run`, e la prova mostrava quindi un'esperienza diversa da quella vera — che è
+  esattamente ciò che doveva evitare. Ora chiede anche lì: il caso automatico è già
+  coperto dal controllo sulla presenza di un terminale. La conferma finale resta
+  esclusa, perché in una prova a vuoto non c'è nulla da confermare.
+- L'elenco delle porte libere usciva senza spazi («8101,8102»): `tr` sostituisce un
+  carattere con un altro, non con due.
+
 ### Modificato
 - **Guida all'installazione riscritta** sui due punti che mancavano: scaricare
   l'installer da una cartella propria e non da `/var/www`, dove si installa da solo, e
   la prova a vuoto come primo passo e non come opzione. Documentate le due domande che
   ora pone, e il fatto che con `curl | bash` non ne pone nessuna perché non ha un
   terminale da cui leggere.
-
-### Da fare
-Vedere [TODO.md](TODO.md).
 
 ## [0.6.3] - 2026-08-30
 
