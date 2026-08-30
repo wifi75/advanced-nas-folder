@@ -10,6 +10,14 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.10.2] - 2026-08-30
+
+### Corretto
+- **Nel resoconto dell'aggiornamento risultava modificato ogni file.** rsync
+  confronta data e dimensione, e il pacchetto viene ricompilato a ogni rilascio:
+  le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
+  segnala tutto non segnala niente. Ora il confronto è sul contenuto.
+
 ## [0.10.1] - 2026-08-30
 
 ### Corretto
