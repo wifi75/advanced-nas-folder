@@ -55,7 +55,11 @@ function chiudi(): void {
 <style scoped>
 .avviso {
   position: fixed;
-  inset-block-end: 1rem;
+  /* Sopra il piè di pagina, non addosso: quello sta nel flusso e su una pagina
+     corta — l'accesso, per esempio — finisce proprio al fondo dello schermo,
+     dove questo avviso e fisso. Si sovrapponevano, e il testo dell'uno si
+     leggeva attraverso l'altro. */
+  inset-block-end: 4.5rem;
   inset-inline: 1rem;
   margin-inline: auto;
   inline-size: fit-content;

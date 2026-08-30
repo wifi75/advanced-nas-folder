@@ -18,6 +18,14 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.12.2] - 2026-08-30
+
+### Corretto
+- **L'avviso in basso si sovrapponeva al piè di pagina.** Il piede sta nel
+  flusso e su una pagina corta — l'accesso, per esempio — finisce proprio al
+  fondo dello schermo, dove l'avviso e fisso: i due testi si leggevano uno
+  attraverso l'altro. Ora l'avviso sta sopra.
+
 ## [0.12.1] - 2026-08-30
 
 ### Corretto
