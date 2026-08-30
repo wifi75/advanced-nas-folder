@@ -20,6 +20,8 @@ Vedere [TODO.md](TODO.md).
   esclusa, perché in una prova a vuoto non c'è nulla da confermare.
 - L'elenco delle porte libere usciva senza spazi («8101,8102»): `tr` sostituisce un
   carattere con un altro, non con due.
+- Il percorso dell'access log veniva calcolato **prima** delle domande, quindi restava
+  quello del web server rilevato anche se poi ne veniva scelto un altro.
 
 ### Modificato
 - **Guida all'installazione riscritta** sui due punti che mancavano: scaricare

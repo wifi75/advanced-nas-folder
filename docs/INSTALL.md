@@ -88,12 +88,22 @@ sono occupate e da chi**, e dove finirà ogni cosa.
 sudo bash install.sh
 ```
 
-Ti chiede **due cose**, e per entrambe basta Invio per accettare quello che propone:
+Ti fa alcune domande, e per ognuna **basta Invio** per accettare quello che propone:
 
-1. **quale porta usare.** Ti mostra le prime cinque libere; se la 8100 è occupata te
-   lo dice, con il nome del servizio che la tiene;
-2. **la conferma finale**, dopo il riepilogo di cosa verrà installato e dove. È
-   l'ultimo momento per fermarsi prima che qualcosa venga scritto.
+| Domanda | Predefinito |
+|---|---|
+| quale web server usare — *solo se ne hai due installati* | quello trovato |
+| dove montare le condivisioni del NAS | `/srv/nas` |
+| dove installare il programma | `/var/www/advanced-nas-folder` |
+| dove tenere database e dati | `/var/lib/anf` |
+| **quale porta** per l'API | la prima libera dalla 8100 |
+
+Sulla porta ti mostra le prime cinque libere e, se la 8100 è occupata, **da quale
+servizio**. Puoi scriverne una qualsiasi, anche fuori da quell'elenco: se è occupata o
+non è valida te lo dice e te la richiede, senza far ricominciare tutto.
+
+Alla fine arriva il **riepilogo di cosa verrà installato e dove**, con la conferma. È
+l'ultimo momento per fermarsi prima che qualcosa venga scritto.
 
 I messaggi escono nella lingua del sistema. Per forzarla: `--lingua it` o `--lang en`.
 

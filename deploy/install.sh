@@ -70,10 +70,11 @@ m() {
         porta_ok) testo="Porta %s libera" ;;
         porta_presa) testo="La porta %s è occupata" ;;
         porta_chi) testo="La porta %s è occupata da: %s" ;;
-        porta_libere) testo="Porte libere: %s" ;;
-        porta_chiedo) testo="Quale porta uso? [%s]" ;;
+        porta_libere) testo="Fra le prime libere: %s" ;;
+        porta_chiedo) testo="Che porta uso? Scrivine una, o Invio per la %s:" ;;
         porta_spostata) testo="La porta %s è già occupata: uso la %s" ;;
         porta_occupata) testo="La porta %s è già occupata da un altro servizio. Indicane un'altra con --porta, oppure libera quella." ;;
+        porta_presa_ora) testo="La porta %s è occupata: scegline un'altra." ;;
         porta_niente) testo="Nessuna porta libera fra %s e %s. Indicane una con --porta." ;;
         porta_invalida) testo="Porta non valida: %s. Serve un numero fra 1024 e 65535." ;;
         utente_creo) testo="Creo l'utente di sistema %s" ;;
@@ -101,6 +102,13 @@ m() {
         prova) testo="PROVA: nessuna modifica verrà applicata" ;;
         sottotitolo) testo="Monta condivisioni NFS, pubblica cartelle, gestisce i file." ;;
         sistema) testo="Il sistema" ;;
+        configurazione) testo="Configurazione" ;;
+        d_web) testo="Quale web server uso?" ;;
+        d_web_no) testo="Non riconosciuto: %s. Scrivi apache oppure nginx." ;;
+        d_mount) testo="Dove monto le condivisioni del NAS?" ;;
+        d_radice) testo="Dove installo il programma?" ;;
+        d_dati) testo="Dove tengo database e dati?" ;;
+        percorso_relativo) testo="Serve un percorso assoluto, che inizi con /: %s" ;;
         scelte) testo="Cosa verrà installato" ;;
         conferma) testo="Procedo? [S/n]" ;;
         annullato) testo="Annullato. Non è stato modificato nulla." ;;
@@ -136,10 +144,11 @@ m() {
         porta_ok) testo="Port %s is free" ;;
         porta_presa) testo="Port %s is taken" ;;
         porta_chi) testo="Port %s is taken by: %s" ;;
-        porta_libere) testo="Free ports: %s" ;;
-        porta_chiedo) testo="Which port should I use? [%s]" ;;
+        porta_libere) testo="Among the first free ones: %s" ;;
+        porta_chiedo) testo="Which port? Type one, or Enter for %s:" ;;
         porta_spostata) testo="Port %s is already taken: using %s instead" ;;
         porta_occupata) testo="Port %s is already taken by another service. Pick another one with --port, or free it." ;;
+        porta_presa_ora) testo="Port %s is taken: pick another one." ;;
         porta_niente) testo="No free port between %s and %s. Pick one with --port." ;;
         porta_invalida) testo="Invalid port: %s. A number between 1024 and 65535 is required." ;;
         utente_creo) testo="Creating system user %s" ;;
@@ -167,6 +176,13 @@ m() {
         prova) testo="DRY RUN: no change will be applied" ;;
         sottotitolo) testo="Mounts NFS shares, publishes folders, manages files." ;;
         sistema) testo="The system" ;;
+        configurazione) testo="Configuration" ;;
+        d_web) testo="Which web server should I use?" ;;
+        d_web_no) testo="Not recognised: %s. Type apache or nginx." ;;
+        d_mount) testo="Where should I mount the NAS shares?" ;;
+        d_radice) testo="Where should I install the program?" ;;
+        d_dati) testo="Where should I keep the database and data?" ;;
+        percorso_relativo) testo="An absolute path is required, starting with /: %s" ;;
         scelte) testo="What will be installed" ;;
         conferma) testo="Proceed? [Y/n]" ;;
         annullato) testo="Cancelled. Nothing was changed." ;;
@@ -279,6 +295,70 @@ while [ $# -gt 0 ]; do
 done
 
 rileva_lingua
+
+# ---------------------------------------------------------------------------
+# Domande / Questions
+# ---------------------------------------------------------------------------
+
+# Chiede una cosa mostrando il valore predefinito, e restituisce la risposta.
+# Invio a vuoto tiene il predefinito: e' il caso piu' frequente, e deve essere
+# il piu' rapido.
+#
+# Senza terminale non chiede e tiene il predefinito: con `curl | bash` non c'e'
+# nessuno a rispondere, e restare fermi ad aspettare sarebbe peggio.
+chiedi() {
+    local domanda="$1" predefinito="$2" risposta=""
+    if [ ! -t 0 ]; then
+        printf '%s' "$predefinito"
+        return
+    fi
+    printf '  %s%s%s %s[%s]%s ' "$C_GRA" "$domanda" "$C_FINE" "$C_DIM" "$predefinito" "$C_FINE" >&2
+    read -r risposta || risposta=""
+    risposta="${risposta#"${risposta%%[![:space:]]*}"}"
+    risposta="${risposta%"${risposta##*[![:space:]]}"}"
+    printf '%s' "${risposta:-$predefinito}"
+}
+
+# Come sopra, ma per un percorso assoluto: una risposta relativa qui
+# produrrebbe cartelle create dove capita, a seconda di dove si e' lanciato lo
+# script.
+chiedi_percorso() {
+    local domanda="$1" predefinito="$2" risposta=""
+    while :; do
+        risposta="$(chiedi "$domanda" "$predefinito")"
+        case "$risposta" in
+        /*) printf '%s' "$risposta"; return ;;
+        esac
+        [ -t 0 ] || { printf '%s' "$predefinito"; return; }
+        avviso percorso_relativo "$risposta"
+    done
+}
+
+# Le scelte che cambiano davvero l'installazione. Poche e con un predefinito
+# sensato: una domanda a cui si risponde sempre Invio e' una domanda che non
+# andava fatta.
+configura() {
+    [ -t 0 ] || return 0
+
+    passo configurazione
+
+    # Il web server si chiede solo se ce ne sono due: con uno solo non c'e'
+    # scelta, e chiederlo sarebbe finto.
+    if [ "$WEB_AMBIGUO" = 1 ]; then
+        local scelto
+        while :; do
+            scelto="$(chiedi "$(m d_web)" "$WEB")"
+            case "$scelto" in
+            apache | nginx) WEB="$scelto"; break ;;
+            *) avviso d_web_no "$scelto" ;;
+            esac
+        done
+    fi
+
+    MOUNT_ROOT="$(chiedi_percorso "$(m d_mount)" "$MOUNT_ROOT")"
+    RADICE="$(chiedi_percorso "$(m d_radice)" "$RADICE")"
+    DATI="$(chiedi_percorso "$(m d_dati)" "$DATI")"
+}
 
 # ---------------------------------------------------------------------------
 # Intestazione e riepilogo / Banner and summary
@@ -422,22 +502,39 @@ scegli_porta() {
     if [ -t 0 ]; then
         printf '  %s
 ' "$(m porta_libere "$(echo $libere | sed 's/ /, /g')")"
-        printf '  %s ' "$(m porta_chiedo "$prima")"
-        local risposta=""
-        read -r risposta || risposta=""
-        risposta="${risposta// /}"
 
-        if [ -n "$risposta" ]; then
+        # Si richiede finché la risposta non va bene, invece di interrompere:
+        # a una domanda si risponde male per distrazione, e far ricominciare
+        # tutta l'installazione per un numero sbagliato sarebbe punitivo.
+        local risposta="" tentativi=0
+        while [ "$tentativi" -lt 5 ]; do
+            tentativi=$((tentativi + 1))
+            printf '  %s ' "$(m porta_chiedo "$prima")"
+            read -r risposta || risposta=""
+            risposta="${risposta//[[:space:]]/}"
+
+            # Invio a vuoto: va bene la proposta.
+            [ -z "$risposta" ] && break
+
             case "$risposta" in
-            '' | *[!0-9]*) errore porta_invalida "$risposta" ;;
+            *[!0-9]*)
+                avviso porta_invalida "$risposta"
+                continue
+                ;;
             esac
-            [ "$risposta" -ge 1024 ] && [ "$risposta" -le 65535 ] ||
-                errore porta_invalida "$risposta"
-            porta_occupata "$risposta" && errore porta_occupata "$risposta"
+            if [ "$risposta" -lt 1024 ] || [ "$risposta" -gt 65535 ]; then
+                avviso porta_invalida "$risposta"
+                continue
+            fi
+            if porta_occupata "$risposta"; then
+                avviso porta_presa_ora "$risposta"
+                continue
+            fi
+
             PORTA_API="$risposta"
             ok porta_ok "$PORTA_API"
             return
-        fi
+        done
     fi
 
     PORTA_API="$prima"
@@ -511,24 +608,37 @@ fi
 
 # --- web server -------------------------------------------------------------
 
+WEB_AMBIGUO=0
 if [ "$WEB" = "auto" ]; then
-    if command -v apache2ctl >/dev/null 2>&1 || command -v apachectl >/dev/null 2>&1; then
+    ha_apache=0; ha_nginx=0
+    { command -v apache2ctl >/dev/null 2>&1 || command -v apachectl >/dev/null 2>&1; } && ha_apache=1
+    command -v nginx >/dev/null 2>&1 && ha_nginx=1
+
+    if [ "$ha_apache" = 1 ]; then
         WEB="apache"
-    elif command -v nginx >/dev/null 2>&1; then
+    elif [ "$ha_nginx" = 1 ]; then
         WEB="nginx"
     else
         errore web_assente
     fi
+    # Con tutti e due installati la scelta e' vera, e va lasciata a chi
+    # installa: indovinare significherebbe configurare quello sbagliato.
+    [ "$ha_apache" = 1 ] && [ "$ha_nginx" = 1 ] && WEB_AMBIGUO=1
 fi
 ok web_rilevato "$WEB"
 
-# La cartella dei log non porta il nome del web server: Apache scrive in
-# /var/log/apache2. Ricavarla da $WEB darebbe un percorso inesistente, e il
-# monitoraggio dei trasferimenti non leggerebbe mai nulla.
-if [ "$WEB" = "apache" ]; then LOG_WEB="/var/log/apache2"; else LOG_WEB="/var/log/nginx"; fi
 
 # Cosa c'è sulla macchina, prima di toccarla.
 sistema
+
+# Le scelte, chieste a chi installa.
+configura
+
+# Dopo le domande, perché il web server può essere cambiato lì. La cartella dei
+# log non porta il suo nome: Apache scrive in /var/log/apache2, e ricavarla da
+# $WEB darebbe un percorso inesistente su cui il monitoraggio non leggerebbe
+# mai nulla.
+if [ "$WEB" = "apache" ]; then LOG_WEB="/var/log/apache2"; else LOG_WEB="/var/log/nginx"; fi
 
 # La porta si sceglie qui: serve al file .env, al vhost e al controllo finale,
 # e va decisa prima di tutti e tre.

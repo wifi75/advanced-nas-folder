@@ -88,12 +88,22 @@ From here you already see the three things that matter: which web server it foun
 sudo bash install.sh
 ```
 
-It asks **two questions**, and Enter accepts what it proposes for both:
+It asks a few questions, and for each one **Enter accepts** what it proposes:
 
-1. **which port to use.** It shows the first five free ones; if 8100 is taken it says
-   so, naming the service holding it;
-2. **the final confirmation**, after the summary of what will be installed and where.
-   That is the last moment to stop before anything is written.
+| Question | Default |
+|---|---|
+| which web server to use — *only if you have both installed* | the one found |
+| where to mount the NAS shares | `/srv/nas` |
+| where to install the program | `/var/www/advanced-nas-folder` |
+| where to keep the database and data | `/var/lib/anf` |
+| **which port** for the API | the first free one from 8100 |
+
+For the port it shows the first five free ones and, if 8100 is taken, **which service
+holds it**. You can type any port, including one outside that list: if it is taken or
+invalid it says so and asks again, without making you start over.
+
+At the end comes the **summary of what will be installed and where**, with a
+confirmation. That is the last moment to stop before anything is written.
 
 Messages appear in the system language. To force it: `--lang en` or `--lingua it`.
 
