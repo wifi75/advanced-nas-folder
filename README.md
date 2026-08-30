@@ -23,7 +23,7 @@ Pannello self-hosted che **monta condivisioni NFS**, **pubblica cartelle con per
 per sottocartella** e sostituisce integralmente FileBrowser — senza che tu debba mai
 modificare a mano un file di configurazione del server.
 
-> **Stato: funzionante e completo nelle sue parti principali (v0.6.0).** Monta
+> **Stato: funzionante e completo nelle sue parti principali dalla v0.6.0.** Monta
 > condivisioni NFS, pubblica cartelle con permessi fino al singolo utente, scarica e
 > carica file con ripresa, cerca, mostra anteprime e registra i trasferimenti. Non è
 > ancora stato installato su un server di produzione. Vedere [TODO.md](TODO.md).

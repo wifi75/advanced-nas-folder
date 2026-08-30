@@ -7,6 +7,13 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non rilasciato]
 
+### Corretto
+- Il pacchetto della release non conteneva `README.en.md`: chi scaricava il progetto
+  senza passare da GitHub aveva solo la versione italiana.
+- Il banner di stato del README riportava un numero di versione fisso, che sarebbe
+  invecchiato a ogni rilascio. Ora dice «dalla v0.6.0», che è un fatto storico e resta
+  vero: il numero corrente lo mostra già il badge dinamico.
+
 ### Da fare
 Vedere [TODO.md](TODO.md).
 

@@ -36,7 +36,7 @@ jobs:
         run: |
           mkdir -p pacchetto
           cp -r backend agent deploy docs pacchetto/
-          cp README.md CHANGELOG.md LICENSE .env.example pacchetto/
+          cp README.md README.en.md CHANGELOG.md LICENSE .env.example pacchetto/
           mkdir -p pacchetto/frontend
           cp -r frontend/dist pacchetto/frontend/dist
           tar -czf advanced-nas-folder.tar.gz -C pacchetto .

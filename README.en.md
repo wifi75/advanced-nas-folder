@@ -23,7 +23,7 @@ Self-hosted panel that **mounts NFS shares**, **publishes folders with per-subfo
 permissions** and fully replaces FileBrowser — without ever editing a server
 configuration file by hand.
 
-> **Status: working and complete in its main parts (v0.6.0).** It mounts NFS shares,
+> **Status: working and complete in its main parts since v0.6.0.** It mounts NFS shares,
 > publishes folders with per-user permissions, downloads and uploads files with
 > resume, searches, shows previews and records transfers. It has not yet been
 > installed on a production server. See [TODO.md](TODO.md).
