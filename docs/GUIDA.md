@@ -180,6 +180,14 @@ all'apertura significherebbe attendere per immagini che non guarderai.
 Se una foto viene sostituita con un'altra dello stesso nome, la miniatura si
 rifà da sola: dipende anche da data e dimensione del file.
 
+Aprendo una foto si scorre alle altre della cartella con le **frecce ai lati**,
+con i **tasti freccia** della tastiera, o **trascinando col dito** su un
+telefono. In alto è scritto a che punto sei: «3 di 12».
+
+Sul telefono la galleria mette tre foto per riga e l'anteprima occupa tutto lo
+schermo: i margini di una finestra sprecherebbero proprio lo spazio che serve a
+guardare l'immagine.
+
 ## Condividere con chi non ha un account
 
 **Pubblicazioni → Regole per cartella → Link di condivisione.**

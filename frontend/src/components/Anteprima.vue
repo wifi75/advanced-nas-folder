@@ -19,13 +19,55 @@ import sql from 'highlight.js/lib/languages/sql'
 import typescript from 'highlight.js/lib/languages/typescript'
 import xml from 'highlight.js/lib/languages/xml'
 import yaml from 'highlight.js/lib/languages/yaml'
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { archivioApi, indirizzoDownload, type Voce } from '@/api/archivio'
 
-const props = defineProps<{ slug: string; voce: Voce; modificabile?: boolean }>()
-const emit = defineEmits<{ chiudi: []; salvato: [] }>()
+const props = defineProps<{
+  slug: string
+  voce: Voce
+  modificabile?: boolean
+  /** Posizione fra le immagini della cartella, per «3 di 12». Da 1; zero
+   *  significa «non e' una raccolta», e le frecce non compaiono. */
+  posizione: number
+  quante: number
+}>()
+const emit = defineEmits<{ chiudi: []; salvato: []; precedente: []; successiva: [] }>()
+
+/** Le frecce compaiono solo se c'e' davvero qualcosa prima o dopo. */
+const haPrecedente = computed(() => props.posizione > 1)
+const haSuccessiva = computed(() => props.posizione > 0 && props.posizione < props.quante)
+
+/**
+ * Tastiera e dito: sono i due modi in cui si sfoglia una raccolta di foto.
+ * Senza, ogni immagine andrebbe chiusa e riaperta dalla griglia.
+ */
+function daTastiera(evento: KeyboardEvent): void {
+  // Non mentre si scrive: le frecce servono a muoversi nel testo.
+  if (inModifica.value) return
+  if (evento.key === 'ArrowLeft' && haPrecedente.value) emit('precedente')
+  if (evento.key === 'ArrowRight' && haSuccessiva.value) emit('successiva')
+  if (evento.key === 'Escape') emit('chiudi')
+}
+
+let partenzaX = 0
+
+function inizioTocco(evento: TouchEvent): void {
+  partenzaX = evento.changedTouches[0]?.clientX ?? 0
+}
+
+function fineTocco(evento: TouchEvent): void {
+  const spostamento = (evento.changedTouches[0]?.clientX ?? 0) - partenzaX
+  // Sotto i 50 pixel e' un tocco, non uno scorrimento: cambiare foto a ogni
+  // sfioramento renderebbe impossibile guardarne una.
+  if (Math.abs(spostamento) < 50) return
+  if (spostamento > 0 && haPrecedente.value) emit('precedente')
+  if (spostamento < 0 && haSuccessiva.value) emit('successiva')
+}
+
+onMounted(() => window.addEventListener('keydown', daTastiera))
+onBeforeUnmount(() => window.removeEventListener('keydown', daTastiera))
 
 const { t } = useI18n()
 
@@ -217,6 +259,10 @@ async function calcolaImpronta(): Promise<void> {
     >
       <header class="testa">
         <span class="nome">{{ voce.nome }}</span>
+        <span
+          v-if="quante > 1 && posizione > 0"
+          class="posizione"
+        >{{ t('anteprima.posizione', { n: posizione, tot: quante }) }}</span>
         <button
           type="button"
           class="chiudi"
@@ -227,7 +273,30 @@ async function calcolaImpronta(): Promise<void> {
         </button>
       </header>
 
-      <div class="corpo">
+      <div
+        class="corpo"
+        @touchstart.passive="inizioTocco"
+        @touchend.passive="fineTocco"
+      >
+        <button
+          v-if="haPrecedente"
+          type="button"
+          class="freccia freccia--prima"
+          :aria-label="t('anteprima.precedente')"
+          @click="emit('precedente')"
+        >
+          ‹
+        </button>
+        <button
+          v-if="haSuccessiva"
+          type="button"
+          class="freccia freccia--dopo"
+          :aria-label="t('anteprima.successiva')"
+          @click="emit('successiva')"
+        >
+          ›
+        </button>
+
         <p
           v-if="errore"
           class="messaggio"
@@ -403,6 +472,38 @@ async function calcolaImpronta(): Promise<void> {
   white-space: nowrap;
 }
 
+.posizione {
+  font-size: 0.8rem;
+  color: var(--testo-tenue);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Sopra l'immagine, ai lati: e' dove si cercano, e su un telefono cadono
+   sotto il pollice senza coprire il centro della foto. */
+.freccia {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 2.6rem;
+  height: 2.6rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--vetro-bordo);
+  border-radius: 50%;
+  background: var(--vetro-sfondo);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  color: var(--testo);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.freccia--prima { left: 0.5rem; }
+.freccia--dopo { right: 0.5rem; }
+
 .chiudi {
   padding: 0 0.4rem;
   border: 0;
@@ -414,6 +515,7 @@ async function calcolaImpronta(): Promise<void> {
 }
 
 .corpo {
+  position: relative;
   display: grid;
   min-height: 12rem;
   overflow: auto;
@@ -524,5 +626,25 @@ async function calcolaImpronta(): Promise<void> {
   font-size: 0.85rem;
   line-height: 1.5;
   tab-size: 2;
+}
+@media (width <= 40rem) {
+  /* A tutto schermo: su un telefono una finestra con i margini spreca proprio
+     lo spazio che serve a guardare la foto. */
+  .finestra {
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    border-radius: 0;
+  }
+
+  /* Bersagli piu' grandi e piu' in basso: in alto il pollice non arriva. */
+  .freccia {
+    width: 3rem;
+    height: 3rem;
+    top: auto;
+    bottom: 1rem;
+    transform: none;
+  }
 }
 </style>

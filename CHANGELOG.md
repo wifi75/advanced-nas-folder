@@ -18,6 +18,25 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.19.0] - 2026-08-30
+
+### Aggiunto
+- **Si sfoglia da un'immagine all'altra** senza tornare alla griglia: frecce ai
+  lati, tasti freccia della tastiera, e **scorrimento col dito** sul telefono.
+  In alto la posizione, «3 di 12». Le frecce compaiono solo se c'e' davvero
+  qualcosa prima o dopo, e i tasti freccia non rubano il posto al cursore
+  mentre si modifica un testo.
+
+### Modificato
+- **Ottimizzazione per il telefono.** La galleria mette tre foto per riga
+  invece di due grandi, la griglia due schede. L'anteprima occupa tutto lo
+  schermo: i margini di una finestra sprecherebbero proprio lo spazio che serve
+  a guardare l'immagine. Le frecce scendono in basso, dove arriva il pollice.
+
+  Due dettagli che su un telefono non funzionavano affatto: il nome in
+  sovrimpressione dipendeva dal passaggio del mouse, che non esiste, e la
+  casella di selezione pure — senza, non si poteva scegliere niente col dito.
+
 ## [0.18.2] - 2026-08-30
 
 ### Corretto

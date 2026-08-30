@@ -387,6 +387,9 @@ export default {
   },
 
   anteprima: {
+    posizione: '{n} of {tot}',
+    precedente: 'Previous image',
+    successiva: 'Next image',
     nonMostrabile: 'This file type cannot be shown here: download it to open it.',
     modifica: 'Edit text',
     salvato: 'Saved',

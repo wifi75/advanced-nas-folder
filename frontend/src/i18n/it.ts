@@ -390,6 +390,9 @@ export default {
   },
 
   anteprima: {
+    posizione: '{n} di {tot}',
+    precedente: 'Immagine precedente',
+    successiva: 'Immagine successiva',
     nonMostrabile: 'Questo tipo di file non si può mostrare qui: scaricalo per aprirlo.',
     modifica: 'Modifica il testo',
     salvato: 'Salvato',

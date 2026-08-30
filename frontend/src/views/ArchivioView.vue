@@ -153,6 +153,19 @@ function chiudiMenu(): void {
 // --- anteprima ---
 const inAnteprima = ref<Voce | null>(null)
 
+/** Le sole immagini della cartella, nell'ordine in cui si vedono. */
+const immagini = computed(() => voci.value.filter(haMiniatura))
+
+const posizione = computed(() => {
+  if (!inAnteprima.value) return 0
+  return immagini.value.findIndex((v) => v.percorso === inAnteprima.value?.percorso) + 1
+})
+
+function scorri(passo: number): void {
+  const nuova = immagini.value[posizione.value - 1 + passo]
+  if (nuova) inAnteprima.value = nuova
+}
+
 // --- selezione ---
 // Un insieme di percorsi, non di indici: cambiando cartella o cercando,
 // l'elenco si rimescola e gli indici punterebbero ad altro.
@@ -746,8 +759,12 @@ function quando(iso: string | null): string {
       :slug="slug"
       :voce="inAnteprima"
       :modificabile="puoScrivere"
+      :posizione="posizione"
+      :quante="immagini.length"
       @chiudi="inAnteprima = null"
       @salvato="carica"
+      @precedente="scorri(-1)"
+      @successiva="scorri(1)"
     />
 
     <div
@@ -1421,6 +1438,46 @@ function quando(iso: string | null): string {
 
   .voce__data {
     display: none;
+  }
+
+  /* Su un telefono lo spazio orizzontale e' quello che manca: la galleria
+     mette tre foto per riga invece di due grandi, e la griglia due schede. */
+  .voci--galleria {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  .voci--griglia {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Il nome in sovrimpressione dipende dal passaggio del mouse, che su un
+     telefono non esiste: per le foto sparisce, e resta solo per le cartelle
+     che senza sarebbero indistinguibili. */
+  .voci--galleria .voce__nome {
+    display: none;
+  }
+
+  .voci--galleria .voce:has(.voce__icona--cartella) .voce__nome {
+    display: block;
+    opacity: 1;
+  }
+
+  /* La casella non compare al passaggio: o si vede sempre, o non si puo'
+     selezionare niente col dito. */
+  .voci--galleria .voce__scelta {
+    opacity: 1;
+  }
+
+  /* Il selettore di vista a tutta larghezza, con bersagli piu' grandi. */
+  .viste {
+    display: flex;
+    width: 100%;
+  }
+
+  .vista {
+    flex: 1;
+    padding-block: 0.5rem;
   }
 }
 </style>

@@ -179,6 +179,14 @@ open would mean waiting for images you will not look at.
 If a photo is replaced by another with the same name the thumbnail is redone on
 its own: it depends on the file's date and size too.
 
+Opening a photo, you move to the others in the folder with the **arrows at the
+sides**, the **keyboard arrows**, or by **swiping** on a phone. The header says
+where you are: «3 of 12».
+
+On a phone the gallery fits three photos per row and the preview takes the whole
+screen: a window's margins would waste exactly the space needed to look at the
+image.
+
 ## Sharing with people who have no account
 
 **Publications → Folder rules → Share links.**
