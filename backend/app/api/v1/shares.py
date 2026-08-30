@@ -148,7 +148,6 @@ async def elimina(share_id: int, sessione: Sessione, _: Amministratore) -> None:
     await scorciatoie.riallinea(sessione)
 
 
-
 @router.post("/scorciatoie")
 async def riapplica_scorciatoie(sessione: Sessione, _: Amministratore) -> dict[str, object]:
     """Riscrive gli indirizzi corti nel web server.

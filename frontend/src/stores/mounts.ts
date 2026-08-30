@@ -93,6 +93,21 @@ export const useMountsStore = defineStore('mounts', () => {
     }
   }
 
+  /** Cambia la configurazione di un mount gia' creato. */
+  async function modifica(id: number, dati: Partial<NuovoMount>): Promise<boolean> {
+    segna(id, true)
+    errore.value = ''
+    try {
+      aggiorna(await mountsApi.modifica(id, dati))
+      return true
+    } catch (e) {
+      errore.value = messaggio(e)
+      return false
+    } finally {
+      segna(id, false)
+    }
+  }
+
   async function elimina(id: number): Promise<boolean> {
     segna(id, true)
     errore.value = ''
@@ -117,6 +132,7 @@ export const useMountsStore = defineStore('mounts', () => {
     carica,
     dettaglio,
     crea,
+    modifica,
     avvia,
     ferma,
     elimina,
