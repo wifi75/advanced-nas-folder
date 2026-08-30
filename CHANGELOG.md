@@ -10,6 +10,23 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.9.1] - 2026-08-30
+
+### Modificato
+- **`update.sh` mostra i file cambiati**, in verde quelli aggiunti, in rosso i
+  rimossi, in giallo i modificati, con il totale in fondo. Senza, un
+  aggiornamento riuscito e uno che non ha toccato niente erano indistinguibili
+  — ed è esattamente la domanda che ci si fa dopo averlo lanciato. Quando non
+  cambia nulla lo dice: «eri già aggiornato».
+
+  I colori escono solo su un terminale vero: rediretto in un file, le sequenze
+  di escape sporcherebbero l'output senza colorare niente.
+- **Il campo che decide l'indirizzo si chiama ora «Nome nell'indirizzo»**, non
+  più «Identificatore», e sotto compare **l'indirizzo che ne uscirà, mentre lo
+  si scrive**. Il collegamento fra quel campo e l'indirizzo pubblico si scopriva
+  solo dopo aver salvato. Il nome resta proposto a partire dall'etichetta, ma è
+  chiaro che si può riscrivere.
+
 ## [0.9.0] - 2026-08-30
 
 Chiude le tre voci rimaste della gestione file.

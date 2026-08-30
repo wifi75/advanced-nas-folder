@@ -114,7 +114,10 @@ export default {
     soloVersioni:
       'This NAS only offers NFS {versioni}: version 4 is unavailable, and asking for it would make the mount fail.',
     nome: 'Name',
-    identificatore: 'Identifier',
+    identificatore: 'Name in the address',
+    identificatoreAiuto:
+      'You choose it. It is proposed from the name, but you can rewrite it: letters, numbers, - and _.',
+    anteprimaIndirizzo: 'It will be reachable here:',
     versioneNfs: 'NFS version',
     montaARichiesta: 'Mount on first access',
     consentiScrittura: 'Allow writing',

@@ -43,6 +43,17 @@ function apriNuovo(): void {
   nuovoAperto.value = true
 }
 
+/**
+ * L'indirizzo che uscira dall'identificatore scritto finora.
+ *
+ * Mostrarlo mentre si scrive e l'unico modo di rendere evidente che quel campo
+ * *e* l'indirizzo: chiamarlo «identificatore» e lasciarlo lì non lo diceva, e
+ * il collegamento fra i due si scopriva solo dopo aver salvato.
+ */
+const indirizzoPrevisto = computed(() =>
+  form.value.slug ? `${window.location.origin}/${form.value.slug}` : '',
+)
+
 function proponiIdentificatore(): void {
   if (form.value.slug) return
   form.value.slug = form.value.label
@@ -238,8 +249,17 @@ function alterna(s: Share): void {
               type="text"
               maxlength="63"
             >
+            <small class="aiuto">{{ t('share.identificatoreAiuto') }}</small>
           </label>
         </div>
+
+        <p
+          v-if="indirizzoPrevisto"
+          class="previsto"
+        >
+          {{ t('share.anteprimaIndirizzo') }}
+          <span class="previsto__valore">{{ indirizzoPrevisto }}</span>
+        </p>
 
         <label class="campo">
           <span>{{ t('share.sottopercorso') }}</span>
@@ -541,4 +561,20 @@ button.pericolo {
 
 
 
+.aiuto {
+  color: var(--testo-tenue);
+  font-size: 0.78rem;
+}
+
+.previsto {
+  margin: 0.15rem 0 0;
+  font-size: 0.85rem;
+  color: var(--testo-tenue);
+}
+
+.previsto__valore {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--testo);
+  word-break: break-all;
+}
 </style>

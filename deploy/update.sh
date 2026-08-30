@@ -51,6 +51,14 @@ msg() {
     if [ "$LINGUA" = "en" ]; then printf '%s\n' "$en"; else printf '%s\n' "$it"; fi
 }
 
+# Colori solo su un terminale vero: rediretto in un file o in una pipe, le
+# sequenze di escape sporcherebbero l'output senza colorare nulla.
+if [ -t 1 ]; then
+    C_PIU=$'\033[32m'; C_MENO=$'\033[31m'; C_MOD=$'\033[33m'; C_FINE=$'\033[0m'
+else
+    C_PIU=""; C_MENO=""; C_MOD=""; C_FINE=""
+fi
+
 passo() { printf '\n\033[1;36m==>\033[0m %s\n' "$1"; }
 errore() { printf '\033[1;31mErrore:\033[0m %s\n' "$1" >&2; exit 1; }
 
@@ -88,6 +96,51 @@ for strumento in curl tar rsync sha256sum; do
     command -v "$strumento" >/dev/null ||
         errore "$(msg "Manca $strumento: installalo e riprova." "Missing $strumento: install it and retry.")"
 done
+
+# --- resoconto delle modifiche ----------------------------------------------
+
+# Traduce l'output di `rsync --itemize-changes` in righe leggibili.
+#
+# Il formato di rsync e un codice di undici caratteri seguito dal percorso:
+# `>f+++++++++` per un file nuovo, `*deleting` per uno rimosso, e per uno gia
+# presente le lettere dicono *cosa* e cambiato (dimensione, data, permessi).
+# Qui serve solo la distinzione fra aggiunto, rimosso e modificato: il resto e
+# dettaglio che nessuno legge.
+mostra_cambiamenti() {
+    local file="$1" riga aggiunti=0 rimossi=0 modificati=0
+
+    while IFS= read -r riga; do
+        case "$riga" in
+            "*deleting"*)
+                printf "  "%s"- %s"%s"\n" "$C_MENO" "${riga:12}" "$C_FINE"
+                rimossi=$((rimossi + 1))
+                ;;
+            ?f+++++++++*|?d+++++++++*|?L+++++++++*)
+                printf "  "%s"+ %s"%s"\n" "$C_PIU" "${riga:12}" "$C_FINE"
+                aggiunti=$((aggiunti + 1))
+                ;;
+            ?f.........*|?d.........*)
+                # Attributi tutti a punto: rsync l'ha esaminato e non e
+                # cambiato niente. Contarlo gonfierebbe il resoconto.
+                ;;
+            ?f*)
+                printf "  "%s"~ %s"%s"\n" "$C_MOD" "${riga:12}" "$C_FINE"
+                modificati=$((modificati + 1))
+                ;;
+        esac
+    done <"$file"
+
+    if [ $((aggiunti + rimossi + modificati)) -eq 0 ]; then
+        msg 'Nessun file cambiato: eri gia aggiornato.' \
+            'No file changed: you were already up to date.'
+        return
+    fi
+
+    printf "\n  %s+ %d%s  %s- %d%s  %s~ %d%s\n" \
+        "$C_PIU" "$aggiunti" "$C_FINE" \
+        "$C_MENO" "$rimossi" "$C_FINE" \
+        "$C_MOD" "$modificati" "$C_FINE"
+}
 
 # --- scaricamento -----------------------------------------------------------
 
@@ -161,10 +214,18 @@ if [ "$DRY_RUN" = 0 ]; then
 
     # Il file di configurazione e il database restano dove sono: appartengono
     # all'impianto, non al programma.
-    rsync -a --delete \
+    # --itemize-changes elenca cosa cambia davvero, riga per riga. Senza, un
+    # aggiornamento riuscito e uno che non ha toccato niente sono
+    # indistinguibili, ed e proprio la domanda che ci si fa dopo averlo lanciato.
+    CAMBIAMENTI="$(mktemp)"
+    rsync -a --delete --itemize-changes \
         --exclude '.env' \
         --exclude 'venv' \
-        "$TEMPORANEA/nuova/" "$RADICE/"
+        "$TEMPORANEA/nuova/" "$RADICE/" >"$CAMBIAMENTI"
+
+    passo "$(msg 'File cambiati' 'Changed files')"
+    mostra_cambiamenti "$CAMBIAMENTI"
+    rm -f "$CAMBIAMENTI"
 
     passo "$(msg 'Aggiorno le dipendenze' 'Updating dependencies')"
     "$RADICE/venv/bin/pip" install -q -e "$RADICE/backend"

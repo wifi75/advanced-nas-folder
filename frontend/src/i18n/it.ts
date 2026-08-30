@@ -115,7 +115,10 @@ export default {
     soloVersioni:
       'Il NAS espone solo NFS {versioni}: la versione 4 non è disponibile e chiederla farebbe fallire il montaggio.',
     nome: 'Nome',
-    identificatore: 'Identificatore',
+    identificatore: 'Nome nell’indirizzo',
+    identificatoreAiuto:
+      'Lo scegli tu. Viene proposto dal nome, ma puoi riscriverlo: lettere, numeri, - e _.',
+    anteprimaIndirizzo: 'Sarà raggiungibile qui:',
     versioneNfs: 'Versione NFS',
     montaARichiesta: 'Monta alla prima richiesta',
     consentiScrittura: 'Consenti la scrittura',
