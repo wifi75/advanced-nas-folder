@@ -965,25 +965,37 @@ function quando(iso: string | null): string {
 }
 
 .viste {
-  display: flex;
-  gap: 0.25rem;
+  display: inline-flex;
+  gap: 0.2rem;
   margin-bottom: 0.6rem;
+  padding: 0.25rem;
+  border: 1px solid var(--vetro-bordo);
+  border-radius: 12px;
+  background: var(--vetro-sfondo);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  box-shadow: inset 0 1px 0 var(--vetro-luce);
+  align-self: flex-start;
 }
 
 .vista {
-  border: 1px solid var(--bordo);
-  border-radius: var(--raggio);
+  border: 0;
+  border-radius: 9px;
   background: none;
   color: var(--testo-tenue);
-  padding: 0.2rem 0.6rem;
+  padding: 0.35rem 0.8rem;
   font: inherit;
   font-size: 0.85rem;
+  font-weight: 500;
   cursor: pointer;
 }
 
 .vista--scelta {
   color: var(--testo);
-  background: var(--superficie-alt);
+  background: var(--superficie);
+  box-shadow:
+    inset 0 1px 0 var(--vetro-luce),
+    var(--vetro-ombra);
 }
 
 /* Griglia e galleria: le stesse voci disposte in schede invece che in righe.
@@ -1046,13 +1058,9 @@ function quando(iso: string | null): string {
 .voci {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 0.35rem;
   margin: 0;
   padding: 0;
-  overflow: hidden;
-  border: 1px solid var(--bordo);
-  border-radius: var(--raggio);
-  background: var(--bordo);
   list-style: none;
 }
 
@@ -1061,10 +1069,21 @@ function quando(iso: string | null): string {
   align-items: center;
   gap: 0.75rem;
   padding: 0.5rem 0.85rem;
-  background: var(--superficie);
+  border-radius: 11px;
+  background: var(--vetro-sfondo);
+  border: 1px solid var(--vetro-bordo);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 var(--vetro-luce),
+    var(--vetro-ombra);
   /* Casella, poi nome elastico, poi dimensione e data a larghezza fissa così
      le colonne restano allineate anche quando i nomi sono molto diversi. */
   grid-template-columns: auto minmax(0, 1fr) 5.5rem 11rem auto;
+}
+
+.voce:hover {
+  border-color: color-mix(in srgb, var(--accento) 32%, var(--vetro-bordo));
 }
 
 .voce__scelta {
@@ -1077,17 +1096,24 @@ function quando(iso: string | null): string {
 .selezione {
   position: fixed;
   left: 50%;
-  bottom: 1rem;
+  /* Sopra il pie' di pagina, non addosso: quello sta nel flusso e su una
+     cartella corta finisce proprio al fondo dello schermo, dove questa barra
+     e' fissa. Si sovrapponevano, e meta' dei comandi restava illeggibile. */
+  bottom: 4.5rem;
   z-index: 10;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.6rem;
-  padding: 0.6rem 0.9rem;
-  border: 1px solid var(--accento);
-  border-radius: var(--raggio);
-  background: var(--superficie);
-  box-shadow: var(--ombra);
+  padding: 0.55rem 0.7rem 0.55rem 1rem;
+  border: 1px solid var(--vetro-bordo);
+  border-radius: 12px;
+  background: var(--vetro-sfondo);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 var(--vetro-luce),
+    0 8px 26px -12px rgb(0 0 0 / 45%);
   font-size: 0.9rem;
   transform: translateX(-50%);
 }

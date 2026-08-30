@@ -18,6 +18,20 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.15.2] - 2026-08-30
+
+### Corretto
+- **La barra della selezione finiva sotto il pie' di pagina.** Su una cartella
+  corta il piede arriva al fondo dello schermo, dove quella barra e' fissa: si
+  sovrapponevano, e meta' dei comandi restava illeggibile. Lo stesso difetto
+  gia' corretto per l'avviso di aggiornamento, nell'altro punto in cui
+  capitava.
+
+### Modificato
+- **L'archivio usa il materiale del menu**: ogni voce e' una scheda di vetro
+  invece di una riga incollata alla successiva, e il selettore fra elenco,
+  griglia e galleria e' una barra segmentata come i sottomenu.
+
 ## [0.15.1] - 2026-08-30
 
 ### Corretto
