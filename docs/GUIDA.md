@@ -213,10 +213,16 @@ Aperta un'immagine:
 | **Doppio clic** | torna alla dimensione intera |
 | **▶** | avvia la presentazione: le foto scorrono da sole |
 | **Barra spaziatrice** | avvia e ferma la presentazione |
-| **⤢** | schermo intero vero, con il fondo scuro |
+| **⤢** | schermo intero, con il fondo scuro |
+| **Girare il telefono** | passa da solo a schermo intero, e tornando in verticale si esce |
 
 La presentazione, arrivata all'ultima, ricomincia: una che si ferma da sola
 costringe a rimetterla in moto ogni giro.
+
+> **La barra del browser non si toglie da una scheda.** Nessuna pagina web può
+> nasconderla: è una regola del browser, non una mancanza del pannello. Per non
+> averla, aggiungi il pannello alla schermata Home — *condividi ▸ «Aggiungi a
+> Home»* — e da lì si apre come un'applicazione, senza barre.
 
 ### I dati dello scatto
 

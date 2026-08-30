@@ -32,7 +32,13 @@ export default defineConfig({
           'Monta condivisioni NFS, pubblica cartelle con permessi per sottocartella, gestisci i file.',
         start_url: '/pannello/',
         scope: '/pannello/',
-        display: 'standalone',
+        // `fullscreen` dove il sistema lo concede — su Android toglie anche la
+        // barra di stato — e `standalone` come ripiego, che e' quanto iOS
+        // offre. Installato nella schermata Home il pannello non ha comunque
+        // nessuna barra del browser: da una scheda, invece, non esiste alcun
+        // modo per una pagina di nasconderla.
+        display: 'fullscreen',
+        display_override: ['fullscreen', 'standalone'],
         orientation: 'any',
         background_color: '#f4f6f9',
         theme_color: '#1d5fa8',

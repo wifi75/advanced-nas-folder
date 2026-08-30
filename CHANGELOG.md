@@ -18,6 +18,28 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.24.0] - 2026-08-30
+
+### Aggiunto
+- **Girando il telefono in orizzontale si passa da soli a schermo intero**, e
+  tornando in verticale si esce. E' il gesto con cui si chiede di guardare una
+  foto in grande: farlo seguire da un tocco su un pulsante e' una richiesta in
+  piu' per un'intenzione gia' espressa. Solo sui dispositivi che si girano
+  davvero — su un monitor una finestra piu' larga che alta non significa
+  «voglio lo schermo intero».
+
+### Modificato
+- **Installato nella schermata Home il pannello si apre senza alcuna barra**:
+  il manifest chiede `fullscreen`, con `standalone` come ripiego dove il
+  sistema non lo concede.
+
+### Limite dichiarato
+- **Da una scheda del browser la barra di navigazione non si puo' togliere.**
+  Nessuna API web lo permette: e' una regola del browser, non una mancanza del
+  pannello. A schermo intero, a chi quella barra ce l'ha ancora davanti, il
+  pannello lo dice e spiega come aggiungerlo alla schermata Home — che e'
+  l'unico modo per non averla.
+
 ## [0.23.2] - 2026-08-30
 
 ### Modificato

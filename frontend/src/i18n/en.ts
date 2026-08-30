@@ -266,6 +266,8 @@ export default {
   },
 
   pwa: {
+    barraDelBrowser:
+      'To remove the browser bar too: share ▸ «Add to Home Screen». From there the panel opens like an app, with no bars. From a browser tab no page can hide it.',
     aggiornamento: 'A new version of the panel is available.',
     ricarica: 'Update',
     prontoOffline: 'The panel now works offline too.',

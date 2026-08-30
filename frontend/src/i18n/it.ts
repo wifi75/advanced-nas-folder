@@ -269,6 +269,8 @@ export default {
   },
 
   pwa: {
+    barraDelBrowser:
+      'Per togliere anche la barra del browser: condividi ▸ «Aggiungi a Home». Da lì il pannello si apre come un’applicazione, senza barre. Da una scheda del browser nessuna pagina può nasconderla.',
     aggiornamento: 'È disponibile una versione aggiornata del pannello.',
     ricarica: 'Aggiorna',
     prontoOffline: 'Il pannello ora funziona anche senza rete.',

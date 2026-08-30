@@ -185,6 +185,40 @@ async function alternaSchermoIntero(): Promise<void> {
   }
 }
 
+/**
+ * Girando il telefono in orizzontale si passa da soli a schermo intero.
+ *
+ * E' il gesto con cui si chiede di guardare una foto in grande, e farlo
+ * seguire da un secondo tocco su un pulsante e' una richiesta in piu' per una
+ * intenzione gia' espressa. Tornando in verticale si esce, perche' li' lo
+ * schermo intero non serve.
+ *
+ * Dove l'API esiste si usa quella; dove non c'e' — iPhone — resta il riquadro
+ * fisso, che toglie tutto tranne la barra del browser. Quella non e'
+ * nascondibile da una pagina: per non averla il pannello va aggiunto alla
+ * schermata Home, e allora il manifest lo apre senza.
+ */
+function alRuotare(evento: MediaQueryListEvent | MediaQueryList): void {
+  const orizzontale = evento.matches
+  if (orizzontale === aSchermoIntero.value) return
+  if (orizzontale) void alternaSchermoIntero()
+  else if (aSchermoIntero.value) void alternaSchermoIntero()
+}
+
+/** Vero quando il pannello e' aperto dalla schermata Home, senza barre. */
+const comeApplicazione =
+  typeof window !== 'undefined' &&
+  (window.matchMedia('(display-mode: standalone)').matches ||
+    window.matchMedia('(display-mode: fullscreen)').matches)
+
+/** Il suggerimento serve solo a chi la barra ce l'ha ancora davanti. */
+const spiegaBarra = computed(
+  () => aSchermoIntero.value && senzaSchermoIntero && !comeApplicazione,
+)
+
+const orientamento =
+  typeof window !== 'undefined' ? window.matchMedia('(orientation: landscape)') : null
+
 function segnaSchermoIntero(): void {
   if (senzaSchermoIntero) return
   aSchermoIntero.value = document.fullscreenElement !== null
@@ -362,11 +396,17 @@ function fineTocco(evento: TouchEvent): void {
 onMounted(() => {
   window.addEventListener('keydown', daTastiera)
   document.addEventListener('fullscreenchange', segnaSchermoIntero)
+  // Solo sui dispositivi che si girano davvero: su un monitor una finestra
+  // piu' larga che alta non significa «voglio lo schermo intero».
+  if (orientamento && window.matchMedia('(pointer: coarse)').matches) {
+    orientamento.addEventListener('change', alRuotare)
+  }
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', daTastiera)
   document.removeEventListener('fullscreenchange', segnaSchermoIntero)
+  orientamento?.removeEventListener('change', alRuotare)
   if (attesaComandi) clearTimeout(attesaComandi)
   fermaPresentazione()
   // Uscendo dall'anteprima mentre si e' a schermo intero, il browser
@@ -630,6 +670,13 @@ watch(
           {{ t('comune.carico') }}
         </p>
       </div>
+
+      <p
+        v-if="spiegaBarra"
+        class="nota-barra"
+      >
+        {{ t('pwa.barraDelBrowser') }}
+      </p>
 
       <section
         v-if="haDettagli"
@@ -912,6 +959,29 @@ watch(
 
 .scatto__dati dd {
   margin: 0;
+}
+
+/* Sopra l'immagine e in fondo, dove sta la barra che spiega come togliere:
+   sparisce con gli altri comandi dopo qualche secondo. */
+.nota-barra {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 3;
+  margin: 0;
+  padding: 0.6rem 1rem calc(0.6rem + env(safe-area-inset-bottom));
+  background: linear-gradient(to top, rgb(0 0 0 / 68%), transparent);
+  color: #e8eef6;
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+.finestra--sgombra .nota-barra {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.nota-barra {
+  transition: opacity 0.35s ease;
 }
 
 .posizione {

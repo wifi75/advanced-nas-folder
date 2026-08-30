@@ -212,10 +212,16 @@ With an image open:
 | **Double click** | back to the whole picture |
 | **▶** | starts the slideshow |
 | **Space bar** | starts and stops the slideshow |
-| **⤢** | real full screen, on a dark ground |
+| **⤢** | full screen, on a dark ground |
+| **Turning the phone** | switches to full screen by itself, and back when upright |
 
 The slideshow starts over at the end: one that stops by itself has to be
 restarted every round.
+
+> **The browser bar cannot be removed from a tab.** No web page can hide it:
+> it is a browser rule, not a shortcoming of the panel. To do without it, add
+> the panel to the Home screen — *share ▸ «Add to Home Screen»* — and from
+> there it opens like an app, with no bars.
 
 ### Shot data
 
