@@ -100,6 +100,9 @@ const { t } = useI18n()
 // così hanno tutte lo stesso peso ottico.
 const ICONE = {
   cartellaRete: 'M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z M12 11v3 M9 17h6',
+  // Una cartella, non un mappamondo: nel menu di chi non amministra queste
+  // voci sono cartelle, e il globo suggeriva un indirizzo pubblico.
+  cartella: 'M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z',
   globo: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z M3 12h18 M12 3c2.5 2.7 2.5 15.3 0 18 M12 3c-2.5 2.7-2.5 15.3 0 18',
   documento: 'M6 3h7l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z M13 3v5h5 M8 13h8 M8 17h5',
   persone: 'M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z M2.5 20a6.5 6.5 0 0 1 13 0 M17 11.5a3 3 0 1 0 0-6 M17.5 14.2a6 6 0 0 1 4 5.8',
@@ -205,7 +208,7 @@ const categorie = computed<Categoria[]>(() =>
             >
               <span
                 class="pastiglia"
-                :style="{ '--tinta': 'var(--tinta-pubblicazioni)' }"
+                :style="{ '--tinta': 'var(--tinta-file)' }"
                 aria-hidden="true"
               >
                 <svg
@@ -216,7 +219,7 @@ const categorie = computed<Categoria[]>(() =>
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
-                  <path :d="ICONE.globo" />
+                  <path :d="ICONE.cartella" />
                 </svg>
               </span>
               <span class="voce__testo">{{ s.label }}</span>
@@ -312,7 +315,7 @@ const categorie = computed<Categoria[]>(() =>
             >
               <span
                 class="pastiglia"
-                :style="{ '--tinta': 'var(--tinta-pubblicazioni)' }"
+                :style="{ '--tinta': 'var(--tinta-file)' }"
                 aria-hidden="true"
               >
                 <svg
@@ -323,7 +326,7 @@ const categorie = computed<Categoria[]>(() =>
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
-                  <path :d="ICONE.globo" />
+                  <path :d="ICONE.cartella" />
                 </svg>
               </span>
               <span class="voce__testo">{{ t('menu.tuttePubblicazioni') }}</span>

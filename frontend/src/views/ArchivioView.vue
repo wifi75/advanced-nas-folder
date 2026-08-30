@@ -1233,9 +1233,16 @@ chiudiConEsc(
   opacity: 1;
 }
 
-/* Le cartelle non hanno miniatura: il nome deve restare sempre leggibile. */
+/* Le cartelle non hanno miniatura: il nome deve restare sempre leggibile.
+   E la sfumatura scura non ha senso qui — esiste per staccare il testo bianco
+   da una fotografia, e sopra il riquadro chiaro di una cartella resta solo una
+   macchia grigia. Il nome torna del colore del testo, sotto l'icona. */
 .voci--galleria .voce:has(.voce__icona--cartella) .voce__nome {
   opacity: 1;
+  padding: 0.35rem 0.4rem;
+  color: var(--testo);
+  background: none;
+  text-align: center;
 }
 
 .voci--galleria .voce__icona {
@@ -1310,13 +1317,6 @@ chiudiConEsc(
   overflow-wrap: anywhere;
   font-size: 0.85rem;
   line-height: 1.3;
-}
-
-.voci--galleria .voce__apri {
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.4rem;
-  text-align: left;
 }
 
 /* In griglia la miniatura non riempie la scheda: accanto al nome ci deve

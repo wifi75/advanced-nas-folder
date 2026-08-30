@@ -10,6 +10,25 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.27.2] - 2026-08-30
+
+### Corretto
+
+- **Il nome delle cartelle nella vista Miniature era tagliato.** Due blocchi
+  di stile con lo stesso selettore si annullavano a vicenda: il secondo
+  rimetteva `align-items: flex-start` sull'etichetta, che restava larga
+  quanto il testo — trenta pixel in un riquadro da centoventi — invece di
+  occupare la riga. Non dipendeva dal browser: succedeva anche su Chromium.
+- **Via la sfumatura scura dalle cartelle.** Serve a staccare il testo bianco
+  da una fotografia; sopra il riquadro chiaro di una cartella era solo una
+  macchia grigia. Ora il nome e' del colore del testo, centrato sotto
+  l'icona.
+
+### Modificato
+
+- Nel menu di chi non amministra le voci hanno l'icona di una **cartella**:
+  il mappamondo suggeriva un indirizzo pubblico.
+
 ## [0.27.1] - 2026-08-30
 
 ### Corretto
