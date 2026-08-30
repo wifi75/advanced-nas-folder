@@ -1247,7 +1247,40 @@ function quando(iso: string | null): string {
   border-radius: var(--raggio);
 }
 
-.voci--griglia .voce__apri,
+/* In griglia l'icona ha lo stesso spazio di una miniatura: prima era grande
+   come quella di un elenco, persa in una scheda alta il triplo, e il nome
+   restava schiacciato in fondo. */
+.voci--griglia .voce__apri {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 0.45rem;
+  width: 100%;
+  padding: 0;
+  text-align: center;
+}
+
+.voci--griglia .voce__icona {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  max-height: 5.5rem;
+  justify-self: center;
+  align-self: center;
+}
+
+/* Due righe e poi i puntini: un nome lungo non deve allungare la scheda e
+   sfalsare la griglia. */
+.voci--griglia .voce__nome {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  font-size: 0.85rem;
+  line-height: 1.3;
+}
+
 .voci--galleria .voce__apri {
   flex-direction: column;
   align-items: flex-start;
@@ -1262,7 +1295,6 @@ function quando(iso: string | null): string {
   aspect-ratio: 4 / 3;
 }
 
-.voci--griglia .voce__nome,
 .voci--galleria .voce__nome {
   overflow-wrap: anywhere;
 }
@@ -1275,7 +1307,17 @@ function quando(iso: string | null): string {
 
 /* La casella di selezione sta sopra la miniatura invece che accanto: in una
    scheda stretta rubberebbe larghezza al nome. */
-.voci--griglia .voce__scelta,
+.voci--griglia .voce__scelta {
+  position: absolute;
+  top: 0.45rem;
+  left: 0.45rem;
+  z-index: 1;
+}
+
+.voci--griglia .voce {
+  position: relative;
+}
+
 .voci--galleria .voce__scelta {
   justify-self: start;
 }

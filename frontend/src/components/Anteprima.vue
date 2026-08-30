@@ -794,15 +794,56 @@ watch(
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+/* A schermo intero c'e' solo l'immagine. Le regole non stanno in una media
+   query sulla larghezza: un telefono in orizzontale e' piu' largo di 40rem, e
+   li' non si applicavano — cioe' proprio dove si guardano le panoramiche. */
 .finestra--intera .corpo {
   flex: 1;
+  min-height: 0;
+  padding: 0;
   align-content: center;
   background: #0b0f14;
+  overflow: hidden;
 }
 
+/* L'immagine prende tutto lo spazio disponibile, non una frazione fissa
+   dell'altezza della finestra: `70vh` la lasciava piccola in mezzo al nero. */
 .finestra--intera .media {
-  max-height: 88vh;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
 }
+
+/* Intestazione sopra l'immagine invece che accanto: non deve rubarle spazio.
+   Dati di scatto e piede spariscono: a schermo intero si guarda, non si
+   lavora. */
+.finestra--intera .testa {
+  position: absolute;
+  inset: env(safe-area-inset-top) 0 auto 0;
+  z-index: 3;
+  border: 0;
+  background: linear-gradient(to bottom, rgb(0 0 0 / 62%), transparent);
+  color: #e8eef6;
+}
+
+.finestra--intera .scatto,
+.finestra--intera .piede {
+  display: none;
+}
+
+.finestra--intera .chiudi {
+  color: #e8eef6;
+  border-color: rgb(255 255 255 / 28%);
+  background: rgb(255 255 255 / 12%);
+}
+
+.finestra--intera .nome,
+.finestra--intera .posizione {
+  color: #e8eef6;
+}
+
+
 
 /* Non `display: none`: sparendo di colpo l'immagine salterebbe per riempire lo
    spazio lasciato libero. Restano dove sono, semplicemente invisibili e non

@@ -18,6 +18,23 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.23.1] - 2026-08-30
+
+### Corretto
+- **Lo schermo intero non era intero.** L'immagine restava piccola in mezzo al
+  nero, con intestazione, dati di scatto e piede tutt'intorno. Due cause: le
+  regole stavano in una condizione sulla larghezza — e **un telefono in
+  orizzontale e' piu' largo di 40rem**, quindi non si applicavano proprio dove
+  si guardano le panoramiche — e l'immagine era limitata a una frazione fissa
+  dell'altezza invece che allo spazio disponibile.
+
+  Ora a schermo intero c'e' **solo l'immagine**: l'intestazione le passa sopra
+  invece di rubarle spazio, dati di scatto e piede spariscono.
+- **In griglia l'icona della cartella era minuscola** e il nome le finiva
+  accanto, schiacciato in fondo a una scheda alta il triplo. L'icona ha ora lo
+  stesso spazio di una miniatura, il nome sta sotto su due righe al massimo, e
+  la casella di selezione sta nell'angolo invece di occupare una riga propria.
+
 ## [0.23.0] - 2026-08-30
 
 Il pannello sul telefono.
