@@ -10,6 +10,7 @@ import { useI18n } from 'vue-i18n'
 
 import { mountsApi, type Esportazione, type NuovoMount } from '@/api/mounts'
 import { ApiError } from '@/api/client'
+import GruppoCampi from '@/components/GruppoCampi.vue'
 import { useMountsStore } from '@/stores/mounts'
 
 const emit = defineEmits<{ chiudi: []; creato: [] }>()
@@ -161,66 +162,76 @@ async function salva(): Promise<void> {
         v-if="form.export_path"
         class="passo"
       >
-        <div class="doppio">
-          <label class="campo">
-            <span>{{ t('nuovoMount.nome') }}</span>
-            <input
-              v-model="form.label"
-              type="text"
-              maxlength="128"
-            >
-          </label>
-          <label class="campo">
-            <span>{{ t('nuovoMount.identificatore') }}</span>
-            <input
-              v-model="form.slug"
-              type="text"
-              pattern="[a-z0-9][a-z0-9-]*"
-              maxlength="63"
-            >
-          </label>
-        </div>
+        <GruppoCampi
+          :titolo="t('nuovoMount.gruppoNome')"
+          :descrizione="t('nuovoMount.gruppoNomeAiuto')"
+        >
+          <div class="doppio">
+            <label class="campo">
+              <span>{{ t('nuovoMount.nome') }}</span>
+              <input
+                v-model="form.label"
+                type="text"
+                maxlength="128"
+              >
+            </label>
+            <label class="campo">
+              <span>{{ t('nuovoMount.identificatore') }}</span>
+              <input
+                v-model="form.slug"
+                type="text"
+                pattern="[a-z0-9][a-z0-9-]*"
+                maxlength="63"
+              >
+            </label>
+          </div>
+        </GruppoCampi>
 
-        <div class="doppio">
-          <label class="campo">
-            <span>{{ t('nuovoMount.versioneNfs') }}</span>
-            <select v-model="form.nfs_version">
-              <option value="3">
-                3
-              </option>
-              <option
-                value="4.1"
-                :disabled="versioni.length > 0 && !supportaV4"
+        <GruppoCampi
+          :titolo="t('nuovoMount.gruppoMontaggio')"
+          :descrizione="t('nuovoMount.gruppoMontaggioAiuto')"
+        >
+          <div class="doppio">
+            <label class="campo">
+              <span>{{ t('nuovoMount.versioneNfs') }}</span>
+              <select v-model="form.nfs_version">
+                <option value="3">
+                  3
+                </option>
+                <option
+                  value="4.1"
+                  :disabled="versioni.length > 0 && !supportaV4"
+                >
+                  4.1
+                </option>
+                <option
+                  value="4.2"
+                  :disabled="versioni.length > 0 && !supportaV4"
+                >
+                  4.2
+                </option>
+              </select>
+            </label>
+            <label class="campo interruttore">
+              <input
+                v-model="form.automount"
+                type="checkbox"
               >
-                4.1
-              </option>
-              <option
-                value="4.2"
-                :disabled="versioni.length > 0 && !supportaV4"
-              >
-                4.2
-              </option>
-            </select>
-          </label>
-          <label class="campo interruttore">
+              <span>{{ t('nuovoMount.montaARichiesta') }}</span>
+            </label>
+          </div>
+
+          <label class="campo interruttore rischio">
             <input
-              v-model="form.automount"
+              v-model="form.consenti_scrittura"
               type="checkbox"
             >
-            <span>{{ t('nuovoMount.montaARichiesta') }}</span>
+            <span>
+              <strong>{{ t('nuovoMount.consentiScrittura') }}</strong>
+              <em>{{ t('nuovoMount.consentiScritturaDettaglio') }}</em>
+            </span>
           </label>
-        </div>
-
-        <label class="campo interruttore rischio">
-          <input
-            v-model="form.consenti_scrittura"
-            type="checkbox"
-          >
-          <span>
-            <strong>{{ t('nuovoMount.consentiScrittura') }}</strong>
-            <em>{{ t('nuovoMount.consentiScritturaDettaglio') }}</em>
-          </span>
-        </label>
+        </GruppoCampi>
       </div>
 
       <p

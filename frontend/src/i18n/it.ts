@@ -105,6 +105,11 @@ export default {
   },
 
   nuovoMount: {
+    gruppoNome: 'Come chiamarla',
+    gruppoNomeAiuto: 'Serve a riconoscerla nel pannello. Non è ancora un indirizzo pubblico: quello nasce dalla pubblicazione.',
+    gruppoMontaggio: 'Come montarla',
+    gruppoMontaggioAiuto: 'Versione del protocollo e comportamento del montaggio. In caso di dubbio lascia i valori proposti.',
+    identificatore: 'Identificatore',
     titolo: 'Nuova condivisione',
     indirizzoNas: 'Indirizzo del NAS',
     cerca: 'Cerca condivisioni',
@@ -115,6 +120,21 @@ export default {
     soloVersioni:
       'Il NAS espone solo NFS {versioni}: la versione 4 non è disponibile e chiederla farebbe fallire il montaggio.',
     nome: 'Nome',
+    versioneNfs: 'Versione NFS',
+    montaARichiesta: 'Monta alla prima richiesta',
+    consentiScrittura: 'Consenti la scrittura',
+    consentiScritturaDettaglio:
+      'Il pannello potrà modificare ed eliminare file sul NAS. Va abilitata anche nei permessi NFS della cartella condivisa, altrimenti resterà in sola lettura.',
+    creando: 'Creo…',
+  },
+
+  share: {
+    gruppoCosa: 'Quale cartella',
+    gruppoCosaAiuto: 'Da quale condivisione NFS, e quale parte di essa.',
+    gruppoNome: 'Come si chiama',
+    gruppoNomeAiuto: 'Il nome che leggi nel pannello, e quello che finisce nell’indirizzo pubblico.',
+    gruppoAccesso: 'Chi può accedere',
+    gruppoAccessoAiuto: 'Vale per l’intera pubblicazione. Dopo potrai fare eccezioni per singola sottocartella.',
     modifica: 'Modifica',
     modificaTitolo: 'Modifica «{nome}»',
     identificatoreImmutabile:
@@ -125,15 +145,6 @@ export default {
     identificatoreAiuto:
       'Lo scegli tu. Viene proposto dal nome, ma puoi riscriverlo: lettere, numeri, - e _.',
     anteprimaIndirizzo: 'Sarà raggiungibile qui:',
-    versioneNfs: 'Versione NFS',
-    montaARichiesta: 'Monta alla prima richiesta',
-    consentiScrittura: 'Consenti la scrittura',
-    consentiScritturaDettaglio:
-      'Il pannello potrà modificare ed eliminare file sul NAS. Va abilitata anche nei permessi NFS della cartella condivisa, altrimenti resterà in sola lettura.',
-    creando: 'Creo…',
-  },
-
-  share: {
     titolo: 'Pubblicazioni',
     sottotitolo:
       'Passo 2. Decidi quali cartelle montate sono raggiungibili dal web, con che nome e da chi. È qui che nasce l’indirizzo da condividere.',
@@ -151,7 +162,6 @@ export default {
     sottopercorso: 'Sottocartella',
     sottopercorsoAiuto: 'Vuoto per pubblicare la radice della condivisione',
     nome: 'Nome',
-    identificatore: 'Identificatore',
     descrizione: 'Descrizione',
     visibilitaPredefinita: 'Chi può accedere',
     attiva: 'Pubblicazione attiva',
@@ -432,6 +442,7 @@ export default {
     erroreServer: 'Errore del server.',
     richiestaNonValida: 'Richiesta non valida.',
     imprevisto: 'Errore imprevisto.',
+    generico: 'Errore imprevisto.',
   },
 
   nonTrovata: {

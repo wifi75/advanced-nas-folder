@@ -6,6 +6,7 @@ import { RouterLink } from 'vue-router'
 
 import type { Share, Visibilita } from '@/api/shares'
 import DettaglioShare from '@/components/DettaglioShare.vue'
+import GruppoCampi from '@/components/GruppoCampi.vue'
 import IndirizziPubblicazione from '@/components/IndirizziPubblicazione.vue'
 import { useMountsStore } from '@/stores/mounts'
 import { useSharesStore } from '@/stores/shares'
@@ -254,20 +255,36 @@ function alterna(s: Share): void {
       >
         <h2>{{ t('share.nuova') }}</h2>
 
-        <label class="campo">
-          <span>{{ t('share.condivisione') }}</span>
-          <select v-model.number="form.mount_id">
-            <option
-              v-for="m in mounts.elenco"
-              :key="m.id"
-              :value="m.id"
+        <GruppoCampi
+          :titolo="t('share.gruppoCosa')"
+          :descrizione="t('share.gruppoCosaAiuto')"
+        >
+          <label class="campo">
+            <span>{{ t('share.condivisione') }}</span>
+            <select v-model.number="form.mount_id">
+              <option
+                v-for="m in mounts.elenco"
+                :key="m.id"
+                :value="m.id"
+              >
+                {{ m.label }}
+              </option>
+            </select>
+          </label>
+          <label class="campo">
+            <span>{{ t('share.sottopercorso') }}</span>
+            <input
+              v-model="form.subpath"
+              type="text"
+              :placeholder="t('share.sottopercorsoAiuto')"
             >
-              {{ m.label }}
-            </option>
-          </select>
-        </label>
+          </label>
+        </GruppoCampi>
 
-        <div class="doppio">
+        <GruppoCampi
+          :titolo="t('share.gruppoNome')"
+          :descrizione="t('share.gruppoNomeAiuto')"
+        >
           <label class="campo">
             <span>{{ t('share.nome') }}</span>
             <input
@@ -286,37 +303,36 @@ function alterna(s: Share): void {
             >
             <small class="aiuto">{{ t('share.identificatoreAiuto') }}</small>
           </label>
-        </div>
-
-        <p
-          v-if="indirizzoPrevisto"
-          class="previsto"
-        >
-          {{ t('share.anteprimaIndirizzo') }}
-          <span class="previsto__valore">{{ indirizzoPrevisto }}</span>
-        </p>
-
-        <label class="campo">
-          <span>{{ t('share.sottopercorso') }}</span>
-          <input
-            v-model="form.subpath"
-            type="text"
-            :placeholder="t('share.sottopercorsoAiuto')"
+          <p
+            v-if="indirizzoPrevisto"
+            class="previsto"
           >
-        </label>
+            {{ t('share.anteprimaIndirizzo') }}
+            <span class="previsto__valore">{{ indirizzoPrevisto }}</span>
+          </p>
+        </GruppoCampi>
 
-        <label class="campo">
-          <span>{{ t('share.visibilitaPredefinita') }}</span>
-          <select v-model="form.default_visibility">
-            <option
-              v-for="v in VISIBILITA"
-              :key="v"
-              :value="v"
-            >
-              {{ t(`visibilita.${v}`) }}
-            </option>
-          </select>
-        </label>
+        <GruppoCampi
+          :titolo="t('share.gruppoAccesso')"
+          :descrizione="t('share.gruppoAccessoAiuto')"
+        >
+          <label class="campo">
+            <span>{{ t('share.visibilitaPredefinita') }}</span>
+            <select v-model="form.default_visibility">
+              <option
+                v-for="v in VISIBILITA"
+                :key="v"
+                :value="v"
+              >
+                {{ t(`visibilita.${v}`) }}
+              </option>
+            </select>
+          </label>
+        </GruppoCampi>
+
+
+
+
 
         <p
           v-if="shares.errore"

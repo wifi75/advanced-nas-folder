@@ -104,6 +104,11 @@ export default {
   },
 
   nuovoMount: {
+    gruppoNome: 'What to call it',
+    gruppoNomeAiuto: 'Used to recognise it in the panel. It is not a public address yet: that comes from the publication.',
+    gruppoMontaggio: 'How to mount it',
+    gruppoMontaggioAiuto: 'Protocol version and mount behaviour. When in doubt, leave the proposed values.',
+    identificatore: 'Identifier',
     titolo: 'New share',
     indirizzoNas: 'NAS address',
     cerca: 'Find shares',
@@ -114,6 +119,21 @@ export default {
     soloVersioni:
       'This NAS only offers NFS {versioni}: version 4 is unavailable, and asking for it would make the mount fail.',
     nome: 'Name',
+    versioneNfs: 'NFS version',
+    montaARichiesta: 'Mount on first access',
+    consentiScrittura: 'Allow writing',
+    consentiScritturaDettaglio:
+      'The panel will be able to modify and delete files on the NAS. It must also be allowed in the NFS permissions of the shared folder, otherwise the share stays read only.',
+    creando: 'Creating…',
+  },
+
+  share: {
+    gruppoCosa: 'Which folder',
+    gruppoCosaAiuto: 'From which NFS share, and which part of it.',
+    gruppoNome: 'What it is called',
+    gruppoNomeAiuto: 'The name you read in the panel, and the one that ends up in the public address.',
+    gruppoAccesso: 'Who can access',
+    gruppoAccessoAiuto: 'Applies to the whole publication. You can make per-subfolder exceptions afterwards.',
     modifica: 'Edit',
     modificaTitolo: 'Edit “{nome}”',
     identificatoreImmutabile:
@@ -124,15 +144,6 @@ export default {
     identificatoreAiuto:
       'You choose it. It is proposed from the name, but you can rewrite it: letters, numbers, - and _.',
     anteprimaIndirizzo: 'It will be reachable here:',
-    versioneNfs: 'NFS version',
-    montaARichiesta: 'Mount on first access',
-    consentiScrittura: 'Allow writing',
-    consentiScritturaDettaglio:
-      'The panel will be able to modify and delete files on the NAS. It must also be allowed in the NFS permissions of the shared folder, otherwise the share stays read only.',
-    creando: 'Creating…',
-  },
-
-  share: {
     titolo: 'Published folders',
     sottotitolo:
       'Step 2. Decide which mounted folders are reachable from the web, under what name and by whom. This is where the address to share comes from.',
@@ -148,7 +159,6 @@ export default {
     sottopercorso: 'Subfolder',
     sottopercorsoAiuto: 'Leave empty to publish the root of the share',
     nome: 'Name',
-    identificatore: 'Identifier',
     descrizione: 'Description',
     visibilitaPredefinita: 'Who can access',
     attiva: 'Publication enabled',
@@ -426,6 +436,7 @@ export default {
     erroreServer: 'Server error.',
     richiestaNonValida: 'Invalid request.',
     imprevisto: 'Unexpected error.',
+    generico: 'Unexpected error.',
   },
 
   nonTrovata: {
