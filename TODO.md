@@ -124,17 +124,30 @@ Richieste del 2026-08-29 rimaste aperte alla chiusura della v0.3.0:
       e `agent/README.en.md`.
 - [x] **PWA**: manifest, icone (comprese quelle ritagliabili), service worker con
       precache e API sempre escluse dalla cache, avviso di aggiornamento.
-- [ ] **Da confermare su un browser vero**: la registrazione del service worker non
-      è verificabile nel browser incorporato dello strumento di sviluppo, che la
-      blocca — verificato che fallisca anche con un service worker di una riga.
-      Tutto il resto (manifest, icone, contenuto della precache, esclusione
-      dell'API, colori della barra) è stato controllato sul build.
-- [ ] **Pubblicazione sul server.** Era la scelta di farla a sviluppo concluso, e
-      con la v0.6.0 lo è. Il comando documentato nel README funziona: verificato
-      scaricando `install.sh` e il pacchetto dalla release, checksum confermato e
-      `dist/` compilato dalla CI presente. Da eseguire con `--dry-run` prima, poi
-      per davvero. **Prima di pubblicare** vedere la voce sui test dell'agent
-      qui sotto: vhost e fstab non sono mai stati provati su Linux.
+- [x] **Confermato su un browser vero** con l'installazione su
+      `folder.iu3cyv.eu`: il service worker si registra. Nel browser incorporato
+      dello strumento di sviluppo falliva anche con un service worker di una riga:
+      era quello a bloccarlo.
+- [x] **Pubblicazione sul server**, fatta il 2026-08-30 su
+      `folder.iu3cyv.eu`. Ha fatto emergere quattro errori che nessun test poteva
+      cogliere, corretti nelle 0.6.7-0.6.9: i permessi della cartella creata da
+      systemd per il socket, il percorso di `.env` risolto dalla cartella
+      corrente, l'unit dell'agent, e `update.sh` che cercava l'ambiente Python
+      nel percorso di sviluppo.
+
+### Richieste del 2026-08-30
+
+- [x] **Indirizzi corti** per le cartelle pubblicate: `sito/documenti` invece di
+      `sito/pannello/archivio/documenti`. Fatto nella v0.7.0, solo su Apache.
+- [ ] **Indirizzi corti su Nginx.** Richiedono di rigenerare il vhost, perché le
+      `location` devono stare dentro il blocco `server`: non basta un file a sé
+      come su Apache. Oggi il pannello lo dichiara invece di scrivere
+      configurazione che non funziona.
+- [ ] **Indirizzo corto anche nella barra del browser.** Oggi è una redirezione:
+      l'indirizzo corto funziona ovunque lo si scriva, ma il browser prosegue su
+      quello lungo. Tenerlo corto richiede che il router del pannello riconosca
+      un percorso che parte dalla radice del sito, quindi una riscrittura interna
+      lato web server *e* una rotta in più nel frontend.
 
 ## Emerso durante i rilasci
 
