@@ -7,15 +7,34 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non rilasciato]
 
+### Da fare
+Vedere [TODO.md](TODO.md).
+
+## [0.6.2] - 2026-08-30
+
+Rilasciata perché l'installer della 0.6.1 non parte su una macchina dove la porta 8100
+è già occupata — cioè su qualunque server che ospiti già altre applicazioni.
+
+### Aggiunto
+- **L'installer sceglie la porta da solo.** Parte dalla 8100 e sale finché non ne trova
+  una libera, dicendo quale ha scelto. Verificato su un server reale dove la 8100 era
+  occupata: è passato alla 8101.
+- Con `--porta` si indica una porta precisa, e se è occupata l'installer **si ferma**
+  invece di spostarsi da solo: chi l'ha scritta aveva un motivo, e ritrovarsi il
+  pannello altrove sarebbe peggio di un errore. Le porte fuori intervallo o non
+  numeriche vengono rifiutate dicendo cosa serve.
+
 ### Corretto
+- **L'installer poteva lasciare `mod_xsendfile` spento.** Il controllo era sul
+  *pacchetto*, non sul modulo: su una macchina dove il pacchetto era già installato ma
+  il modulo non attivo, l'intero blocco veniva saltato — compresi `mod_remoteip` e i
+  moduli proxy — e i download rispondevano vuoti senza dire perché. Ora pacchetto e
+  moduli si verificano separatamente, e vengono abilitati solo quelli che mancano.
 - Il pacchetto della release non conteneva `README.en.md`: chi scaricava il progetto
   senza passare da GitHub aveva solo la versione italiana.
 - Il banner di stato del README riportava un numero di versione fisso, che sarebbe
   invecchiato a ogni rilascio. Ora dice «dalla v0.6.0», che è un fatto storico e resta
   vero: il numero corrente lo mostra già il badge dinamico.
-
-### Da fare
-Vedere [TODO.md](TODO.md).
 
 ## [0.6.1] - 2026-08-30
 
