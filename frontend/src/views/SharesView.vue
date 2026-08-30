@@ -1,8 +1,8 @@
 <script setup lang="ts">
 /** Elenco delle cartelle pubblicate. */
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import type { Share, Visibilita } from '@/api/shares'
 import DettaglioShare from '@/components/DettaglioShare.vue'
@@ -12,6 +12,8 @@ import { useMountsStore } from '@/stores/mounts'
 import { useSharesStore } from '@/stores/shares'
 
 const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
 const shares = useSharesStore()
 const mounts = useMountsStore()
 
@@ -79,6 +81,20 @@ const form = ref({
   is_enabled: true,
 })
 
+// `?nuova=<id>` apre la creazione gia' legata a quella condivisione: e' il
+// «+ pubblica» dell'albero, che deve creare la cartella dove e' stato premuto
+// senza far riscegliere l'origine.
+watch(
+  () => route.query.nuova,
+  async (valore) => {
+    if (valore === undefined) return
+    if (mounts.elenco.length === 0) await mounts.carica()
+    apriNuovo(Number(valore))
+    await router.replace({ query: {} })
+  },
+  { immediate: true },
+)
+
 onMounted(async () => {
   await Promise.all([shares.carica(), mounts.carica()])
 })
@@ -87,8 +103,8 @@ const puoCreare = computed(
   () => form.value.slug !== '' && form.value.label !== '' && form.value.mount_id > 0,
 )
 
-function apriNuovo(): void {
-  form.value.mount_id = mounts.elenco[0]?.id ?? 0
+function apriNuovo(mountId?: number): void {
+  form.value.mount_id = mountId ?? mounts.elenco[0]?.id ?? 0
   nuovoAperto.value = true
 }
 
@@ -155,7 +171,7 @@ function alterna(s: Share): void {
         class="bottone bottone--principale"
         type="button"
         :disabled="mounts.elenco.length === 0"
-        @click="apriNuovo"
+        @click="apriNuovo()"
       >
         {{ t('share.nuova') }}
       </button>

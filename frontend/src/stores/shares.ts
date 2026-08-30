@@ -60,14 +60,17 @@ export const useSharesStore = defineStore('shares', () => {
     }
   }
 
-  async function modifica(id: number, dati: Partial<NuovaShare>): Promise<void> {
+  /** Restituisce l'esito: chi chiama deve poter distinguere riuscita da errore. */
+  async function modifica(id: number, dati: Partial<NuovaShare>): Promise<boolean> {
     errore.value = ''
     try {
       await sharesApi.modifica(id, dati)
       await carica()
       if (aperta.value?.id === id) await apri(id)
+      return true
     } catch (e) {
       errore.value = messaggio(e)
+      return false
     }
   }
 

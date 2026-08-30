@@ -45,6 +45,8 @@ export interface NuovaShare {
   description: string | null
   default_visibility: Visibilita
   is_enabled: boolean
+  /** Nomi da non mostrare, uno per riga. Solo in modifica: alla creazione li propone il server. */
+  hidden_patterns?: string
 }
 
 export interface EsitoAccesso {

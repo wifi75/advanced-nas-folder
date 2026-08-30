@@ -32,6 +32,12 @@ const routes: RouteRecordRaw[] = [
     meta: { titolo: 'menu.pubblicazioni' },
   },
   {
+    path: '/pubblicazioni/:id',
+    name: 'pubblicazione',
+    component: () => import('@/views/PubblicazioneView.vue'),
+    meta: { titolo: 'menu.pubblicazioni' },
+  },
+  {
     // Pubblica per scelta: chi riceve il collegamento a una cartella aperta a
     // tutti non ha un account, e il controllo vero lo fa comunque l'API a ogni
     // richiesta. Il carattere jolly regge i percorsi annidati.

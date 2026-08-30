@@ -21,6 +21,8 @@ export default {
   },
 
   menu: {
+    pubblica: 'Pubblica una cartella',
+    tutteCondivisioni: 'Nuova condivisione',
     archivio: 'Archivio',
     accessi: 'Accessi',
     sistema: 'Sistema',
@@ -196,6 +198,14 @@ export default {
     confermaTitolo: 'Eliminare «{nome}»?',
     confermaTesto:
       'La pubblicazione, le sue regole e i permessi vengono rimossi. I file sul NAS non vengono toccati.',
+  },
+
+  pubblicazione: {
+    indirizzo: 'Indirizzo e nome',
+    accesso: 'Chi accede',
+    contenuto: 'Contenuto',
+    rimozioneAiuto:
+      'Toglie la pubblicazione: l’indirizzo smette di rispondere e i link creati non funzionano più. La cartella sul NAS non viene toccata.',
   },
 
   visibilita: {

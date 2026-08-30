@@ -8,10 +8,19 @@ export default defineConfig({
   plugins: [
     vue(),
     VitePWA({
-      // 'prompt' e non 'autoUpdate': su un pannello di amministrazione il
-      // codice non deve cambiare sotto le mani di chi ci sta lavorando. Si
-      // avvisa e si aggiorna quando la persona è pronta.
-      registerType: 'prompt',
+      // 'autoUpdate' e non 'prompt'. La scelta era l'opposta, con un
+      // ragionamento sensato: su un pannello che monta filesystem, ricaricare
+      // il codice mentre qualcuno sta configurando un mount è peggio che
+      // restare indietro di qualche minuto.
+      //
+      // Alla prova dei fatti produceva solo il difetto opposto, e più grave:
+      // chi aggiornava il server continuava a vedere la versione precedente e
+      // concludeva che l'aggiornamento non avesse funzionato. L'avviso c'era,
+      // ma in fondo alla pagina, e non veniva letto.
+      //
+      // Un pannello che non si aggiorna da solo è un pannello che sembra
+      // rotto. Il rischio teorico vale meno del difetto reale.
+      registerType: 'autoUpdate',
       includeAssets: ['apple-touch-icon.png'],
       manifest: {
         name: 'Advanced NAS Folder',

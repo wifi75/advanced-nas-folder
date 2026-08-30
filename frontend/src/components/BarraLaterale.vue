@@ -13,11 +13,12 @@
  */
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRoute } from 'vue-router'
 
 import SelettoreLingua from '@/components/SelettoreLingua.vue'
 import SelettoreTema from '@/components/SelettoreTema.vue'
 import { useAppStore } from '@/stores/app'
+import { useMountsStore } from '@/stores/mounts'
 import { useSharesStore } from '@/stores/shares'
 import { useImpostazioniStore } from '@/stores/impostazioni'
 import { useAuthStore } from '@/stores/auth'
@@ -41,10 +42,31 @@ const app = useAppStore()
 const impostazioni = useImpostazioniStore()
 const auth = useAuthStore()
 const shares = useSharesStore()
+const mounts = useMountsStore()
+const route = useRoute()
 
 // L'archivio si apre sempre su una pubblicazione: se non ce ne sono, la voce
 // porta all'elenco delle pubblicazioni, che e' il posto da cui si comincia.
-const primaPubblicazione = computed(() => shares.elenco[0]?.slug)
+/**
+ * L'albero delle condivisioni: ognuna con sotto le proprie cartelle pubblicate.
+ *
+ * E' la struttura vera del sistema — una cartella pubblicata nasce sempre da
+ * una condivisione — e mostrarla nel menu evita di doverla ricostruire a mente
+ * saltando fra due elenchi separati.
+ */
+const albero = computed(() =>
+  mounts.elenco.map((m) => ({
+    mount: m,
+    pubblicazioni: shares.elenco.filter((s) => s.mount_id === m.id),
+  })),
+)
+
+/** Se la voce aperta appartiene a questa condivisione, i figli si vedono. */
+function espansa(idMount: number): boolean {
+  if (route.path === `/condivisioni/${idMount}`) return true
+  const pubblicata = shares.elenco.find((s) => route.path === `/pubblicazioni/${s.id}`)
+  return pubblicata?.mount_id === idMount
+}
 const { t } = useI18n()
 
 // Tracciati delle icone: linee semplici, disegnate sulla stessa griglia 24×24
@@ -62,32 +84,6 @@ const ICONE = {
 } as const
 
 const categorie = computed<Categoria[]>(() => [
-  {
-    titolo: t('menu.archivio'),
-    voci: [
-      {
-        etichetta: t('menu.condivisioni'),
-        a: '/condivisioni',
-        tinta: 'var(--tinta-nfs)',
-        icona: ICONE.cartellaRete,
-      },
-      {
-        etichetta: t('menu.pubblicazioni'),
-        a: '/pubblicazioni',
-        tinta: 'var(--tinta-pubblicazioni)',
-        icona: ICONE.globo,
-      },
-      // L'archivio si apre da una pubblicazione, perche' e' la pubblicazione a
-      // decidere cosa si vede: una voce di menu slegata dovrebbe chiedere
-      // "quale?" prima di mostrare qualcosa.
-      {
-        etichetta: t('menu.file'),
-        a: primaPubblicazione.value ? `/archivio/${primaPubblicazione.value}` : '/pubblicazioni',
-        tinta: 'var(--tinta-file)',
-        icona: ICONE.documento,
-      },
-    ],
-  },
   {
     titolo: t('menu.accessi'),
     voci: [
@@ -150,6 +146,91 @@ const categorie = computed<Categoria[]>(() => [
     </div>
 
     <nav class="menu">
+      <section
+        v-if="auth.utente?.is_admin"
+        class="categoria"
+      >
+        <h2 class="categoria__titolo">
+          {{ t('menu.condivisioni') }}
+        </h2>
+        <ul class="voci">
+          <li
+            v-for="ramo in albero"
+            :key="ramo.mount.id"
+          >
+            <RouterLink
+              class="voce"
+              :to="`/condivisioni/${ramo.mount.id}`"
+              @click="emit('naviga')"
+            >
+              <span
+                class="pastiglia"
+                :style="{ '--tinta': 'var(--tinta-nfs)' }"
+                aria-hidden="true"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path :d="ICONE.cartellaRete" />
+                </svg>
+              </span>
+              <span class="voce__testo">{{ ramo.mount.label }}</span>
+            </RouterLink>
+
+            <!-- I figli compaiono solo per la condivisione aperta: mostrarli
+                 tutti sempre allungherebbe il menu oltre lo schermo appena le
+                 condivisioni diventano qualcuna in piu'. -->
+            <ul
+              v-if="espansa(ramo.mount.id)"
+              class="voci voci--figlie"
+            >
+              <li
+                v-for="p in ramo.pubblicazioni"
+                :key="p.id"
+              >
+                <RouterLink
+                  class="voce voce--figlia"
+                  :to="`/pubblicazioni/${p.id}`"
+                  @click="emit('naviga')"
+                >
+                  <span class="punto" />
+                  <span class="voce__testo">{{ p.label }}</span>
+                </RouterLink>
+              </li>
+              <li>
+                <RouterLink
+                  class="voce voce--figlia voce--aggiungi"
+                  :to="`/pubblicazioni?nuova=${ramo.mount.id}`"
+                  @click="emit('naviga')"
+                >
+                  <span class="punto punto--vuoto" />
+                  <span class="voce__testo">{{ t('menu.pubblica') }}</span>
+                </RouterLink>
+              </li>
+            </ul>
+          </li>
+
+          <li>
+            <RouterLink
+              class="voce voce--aggiungi"
+              to="/condivisioni"
+              @click="emit('naviga')"
+            >
+              <span
+                class="pastiglia pastiglia--vuota"
+                aria-hidden="true"
+              />
+              <span class="voce__testo">{{ t('menu.tutteCondivisioni') }}</span>
+            </RouterLink>
+          </li>
+        </ul>
+      </section>
+
       <section
         v-for="c in categorie"
         :key="c.titolo"
@@ -276,6 +357,41 @@ const categorie = computed<Categoria[]>(() => [
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--testo-tenue);
+}
+
+.voci--figlie {
+  margin: .1rem 0 .3rem;
+  padding-left: 1.5rem;
+  border-left: 1px solid var(--bordo);
+  margin-left: .85rem;
+}
+
+.voce--figlia {
+  font-size: .82rem;
+  padding-block: .25rem;
+}
+
+.punto {
+  flex: none;
+  width: .5rem;
+  height: .5rem;
+  border-radius: 2px;
+  background: var(--tinta-pubblicazioni);
+}
+
+.punto--vuoto {
+  background: none;
+  border: 1px dashed var(--bordo);
+}
+
+.voce--aggiungi {
+  color: var(--testo-tenue);
+}
+
+.pastiglia--vuota {
+  background: none;
+  border: 1px dashed var(--bordo);
+  box-shadow: none;
 }
 
 .voci {

@@ -18,6 +18,35 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.14.0] - 2026-08-30
+
+L'impianto scelto fra quattro proposte: **l'albero nel menu**.
+
+### Aggiunto
+- **Le condivisioni e le loro cartelle pubblicate stanno nel menu, annidate.**
+  Il legame fra le due si vede senza aprire niente: era il punto in cui il
+  pannello risultava incomprensibile, perche' quel legame andava ricostruito a
+  mente saltando fra due elenchi separati.
+
+  I figli compaiono solo per la condivisione aperta: mostrarli tutti sempre
+  allungherebbe il menu oltre lo schermo appena le condivisioni diventano
+  qualcuna in piu'.
+- **«Pubblica una cartella» sotto ogni condivisione**: la nuova pubblicazione
+  nasce gia' legata a quella, senza far riscegliere l'origine.
+- **Pagina della singola pubblicazione**, con sottomenu: *Indirizzo e nome*
+  (indirizzi, nome, origine), *Chi accede* (visibilita', regole per cartella,
+  permessi, link, verifica), *Contenuto* (nomi da nascondere, rimozione).
+
+### Modificato
+- **Gli aggiornamenti si applicano da soli.** Il service worker chiedeva
+  conferma con un avviso in fondo alla pagina, e chi non lo notava restava sulla
+  versione precedente convinto che l'aggiornamento non avesse funzionato. La
+  scelta iniziale — non cambiare il codice sotto le mani di chi sta lavorando —
+  aveva un senso, ma il difetto che produceva era peggio del rischio che
+  evitava: un pannello che non si aggiorna da solo sembra rotto.
+- `shares.modifica` restituisce l'esito: prima chi la chiamava non poteva
+  distinguere una modifica riuscita da una fallita.
+
 ## [0.13.1] - 2026-08-30
 
 ### Corretto

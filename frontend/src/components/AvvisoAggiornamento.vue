@@ -1,46 +1,33 @@
 <script setup lang="ts">
 /**
- * Avviso di aggiornamento disponibile.
+ * Avviso che il pannello funziona anche senza rete.
  *
- * Il service worker scarica la versione nuova ma **non la applica da solo**:
- * su un pannello che monta filesystem, ricaricare il codice mentre qualcuno
- * sta configurando un mount è peggio che restare una versione indietro per
- * qualche minuto. Si avvisa, e decide chi sta lavorando.
+ * Non c'è più un avviso di aggiornamento da premere: il service worker applica
+ * da solo la versione nuova al caricamento successivo. Prima chiedeva
+ * conferma, e chi non notava l'avviso — in fondo alla pagina — restava sulla
+ * versione vecchia convinto che l'aggiornamento non avesse funzionato.
  */
 import { useI18n } from 'vue-i18n'
 import { useRegisterSW } from 'virtual:pwa-register/vue'
 
 const { t } = useI18n()
 
-const { needRefresh, offlineReady, updateServiceWorker } = useRegisterSW()
-
-function aggiorna(): void {
-  void updateServiceWorker(true)
-}
+const { offlineReady } = useRegisterSW()
 
 function chiudi(): void {
-  needRefresh.value = false
   offlineReady.value = false
 }
 </script>
 
 <template>
   <div
-    v-if="needRefresh || offlineReady"
+    v-if="offlineReady"
     class="avviso"
     role="status"
   >
     <span class="testo">
-      {{ needRefresh ? t('pwa.aggiornamento') : t('pwa.prontoOffline') }}
+      {{ t('pwa.prontoOffline') }}
     </span>
-    <button
-      v-if="needRefresh"
-      type="button"
-      class="bottone bottone--principale"
-      @click="aggiorna"
-    >
-      {{ t('pwa.ricarica') }}
-    </button>
     <button
       type="button"
       class="chiudi"

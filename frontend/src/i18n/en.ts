@@ -21,6 +21,8 @@ export default {
   },
 
   menu: {
+    pubblica: 'Publish a folder',
+    tutteCondivisioni: 'New share',
     archivio: 'Storage',
     accessi: 'Access',
     sistema: 'System',
@@ -193,6 +195,14 @@ export default {
     confermaTitolo: 'Delete “{nome}”?',
     confermaTesto:
       'The publication, its rules and its permissions are removed. Files on the NAS are left untouched.',
+  },
+
+  pubblicazione: {
+    indirizzo: 'Address and name',
+    accesso: 'Who can access',
+    contenuto: 'Content',
+    rimozioneAiuto:
+      'Removes the publication: the address stops answering and the links created no longer work. The folder on the NAS is not touched.',
   },
 
   visibilita: {
