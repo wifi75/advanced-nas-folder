@@ -387,6 +387,7 @@ export default {
   },
 
   anteprima: {
+    schermoIntero: 'Full screen',
     posizione: '{n} of {tot}',
     precedente: 'Previous image',
     successiva: 'Next image',
@@ -457,7 +458,7 @@ export default {
     vista: 'View',
     vistaElenco: 'List',
     vistaGriglia: 'Grid',
-    vistaGalleria: 'Gallery',
+    vistaGalleria: 'Thumbnails',
     azioniSu: 'Actions on {nome}',
     titolo: 'Files',
     apri: 'Browse',

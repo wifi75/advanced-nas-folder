@@ -51,6 +51,29 @@ function daTastiera(evento: KeyboardEvent): void {
   if (evento.key === 'Escape') emit('chiudi')
 }
 
+/** Schermo intero vero, quello del browser: la finestra del pannello resta
+ *  comunque dentro la pagina, e per guardare una panoramica non basta. */
+const finestra = ref<HTMLElement | null>(null)
+const aSchermoIntero = ref(false)
+
+async function alternaSchermoIntero(): Promise<void> {
+  try {
+    if (document.fullscreenElement) {
+      await document.exitFullscreen()
+    } else if (finestra.value) {
+      await finestra.value.requestFullscreen()
+    }
+  } catch {
+    // Alcuni browser lo negano se non arriva da un gesto diretto, e su iPhone
+    // non esiste affatto per un elemento qualunque: il pulsante non fa nulla,
+    // ma l'anteprima continua a funzionare.
+  }
+}
+
+function segnaSchermoIntero(): void {
+  aSchermoIntero.value = document.fullscreenElement !== null
+}
+
 let partenzaX = 0
 
 function inizioTocco(evento: TouchEvent): void {
@@ -66,8 +89,18 @@ function fineTocco(evento: TouchEvent): void {
   if (spostamento < 0 && haSuccessiva.value) emit('successiva')
 }
 
-onMounted(() => window.addEventListener('keydown', daTastiera))
-onBeforeUnmount(() => window.removeEventListener('keydown', daTastiera))
+onMounted(() => {
+  window.addEventListener('keydown', daTastiera)
+  document.addEventListener('fullscreenchange', segnaSchermoIntero)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', daTastiera)
+  document.removeEventListener('fullscreenchange', segnaSchermoIntero)
+  // Uscendo dall'anteprima mentre si e' a schermo intero, il browser
+  // resterebbe cosi' su una pagina che non lo prevede.
+  if (document.fullscreenElement) void document.exitFullscreen()
+})
 
 const { t } = useI18n()
 
@@ -184,8 +217,6 @@ async function prepara(): Promise<void> {
   }
 }
 
-watch(() => props.voce.percorso, prepara, { immediate: true })
-
 // --- modifica del testo ---
 // Solo per i file di testo e solo dove si può scrivere: aprire un editor su
 // un file che poi non si riesce a salvare è un modo di far perdere tempo.
@@ -245,6 +276,12 @@ async function calcolaImpronta(): Promise<void> {
     calcolando.value = false
   }
 }
+
+// In fondo, non accanto a `prepara`: con `immediate` il controllo parte
+// subito, e `prepara` azzera anche `testo` e `salvato`, dichiarati piu' sotto.
+// Eseguito prima della loro inizializzazione, il componente moriva con
+// «Cannot access ... before initialization» e l'anteprima restava su «Carico...».
+watch(() => props.voce.percorso, prepara, { immediate: true })
 </script>
 
 <template>
@@ -253,7 +290,9 @@ async function calcolaImpronta(): Promise<void> {
     @click.self="emit('chiudi')"
   >
     <section
+      ref="finestra"
       class="finestra"
+      :class="{ 'finestra--intera': aSchermoIntero }"
       role="dialog"
       :aria-label="voce.nome"
     >
@@ -263,6 +302,16 @@ async function calcolaImpronta(): Promise<void> {
           v-if="quante > 1 && posizione > 0"
           class="posizione"
         >{{ t('anteprima.posizione', { n: posizione, tot: quante }) }}</span>
+        <button
+          v-if="genere === 'immagine' || genere === 'video'"
+          type="button"
+          class="chiudi"
+          :aria-label="t('anteprima.schermoIntero')"
+          :title="t('anteprima.schermoIntero')"
+          @click="alternaSchermoIntero"
+        >
+          {{ aSchermoIntero ? '⤡' : '⤢' }}
+        </button>
         <button
           type="button"
           class="chiudi"
@@ -472,6 +521,30 @@ async function calcolaImpronta(): Promise<void> {
   white-space: nowrap;
 }
 
+/* A schermo intero la foto prende tutto: il fondo scuro toglie di mezzo
+   l'ambiente e lascia solo l'immagine, che e' il punto. */
+.finestra--intera {
+  width: 100vw;
+  max-width: none;
+  height: 100vh;
+  max-height: none;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  background: #0b0f14;
+  color: #e8eef6;
+}
+
+.finestra--intera .corpo {
+  flex: 1;
+  align-content: center;
+  background: #0b0f14;
+}
+
+.finestra--intera .media {
+  max-height: 88vh;
+}
+
 .posizione {
   font-size: 0.8rem;
   color: var(--testo-tenue);
@@ -629,13 +702,29 @@ async function calcolaImpronta(): Promise<void> {
 }
 @media (width <= 40rem) {
   /* A tutto schermo: su un telefono una finestra con i margini spreca proprio
-     lo spazio che serve a guardare la foto. */
+     lo spazio che serve a guardare la foto. Il velo ha un margine suo, che
+     lasciava 16 pixel di bordo per lato: va tolto anche quello. */
+  .velo {
+    padding: 0;
+  }
+
   .finestra {
     width: 100%;
     max-width: none;
     height: 100dvh;
     max-height: none;
     border-radius: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Senza, il corpo resta alto quanto il suo contenuto — 192 pixel su uno
+     schermo da 812 — e la foto si guarda in un francobollo con sotto un
+     pannello bianco vuoto. */
+  .corpo {
+    flex: 1;
+    align-content: center;
+    overflow: auto;
   }
 
   /* Bersagli piu' grandi e piu' in basso: in alto il pollice non arriva. */

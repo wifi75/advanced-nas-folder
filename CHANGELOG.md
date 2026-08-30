@@ -18,6 +18,29 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.19.1] - 2026-08-30
+
+### Corretto
+- **L'anteprima restava su «Carico…» e non mostrava mai la foto.** Il controllo
+  che prepara il contenuto partiva subito, prima che le variabili che azzera
+  fossero inizializzate: il componente moriva con «Cannot access … before
+  initialization» e non disegnava piu' niente — nemmeno le frecce, che quindi
+  sembravano assenti. Il difetto era latente e si e' manifestato aggiungendo
+  l'evidenziazione del codice.
+- **Su telefono l'anteprima non era davvero a tutto schermo**: il velo lasciava
+  16 pixel di bordo per lato, e il corpo restava alto quanto il suo contenuto —
+  192 pixel su uno schermo da 812 — cosi' la foto si guardava in un francobollo
+  con sotto un pannello bianco vuoto.
+
+### Aggiunto
+- **Schermo intero vero**, quello del browser, con il fondo scuro: la finestra
+  del pannello resta comunque dentro la pagina, e per guardare una panoramica
+  non basta. Uscendo dall'anteprima si esce anche dallo schermo intero.
+
+### Modificato
+- **La vista si chiama «Miniature»**, non piu' «Galleria»: e' quello che
+  mostra, ed e' il nome con cui la si cerca.
+
 ## [0.19.0] - 2026-08-30
 
 ### Aggiunto

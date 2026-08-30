@@ -390,6 +390,7 @@ export default {
   },
 
   anteprima: {
+    schermoIntero: 'Schermo intero',
     posizione: '{n} di {tot}',
     precedente: 'Immagine precedente',
     successiva: 'Immagine successiva',
@@ -463,7 +464,7 @@ export default {
     vista: 'Vista',
     vistaElenco: 'Elenco',
     vistaGriglia: 'Griglia',
-    vistaGalleria: 'Galleria',
+    vistaGalleria: 'Miniature',
     azioniSu: 'Azioni su {nome}',
     titolo: 'Archivio',
     apri: 'Sfoglia',
