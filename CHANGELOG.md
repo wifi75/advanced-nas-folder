@@ -10,6 +10,31 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.7.3] - 2026-08-30
+
+### Corretto
+- **`update.sh` si fermava con «curl: (23) Failure writing output».** Il comando
+  che risolve il tag dell'ultima versione era `curl … | grep -m1 …`: `grep -m1`
+  chiude la pipe appena trova la riga, curl non riesce più a scrivere ed esce con
+  23, e `pipefail` fa fallire l'aggiornamento. Il messaggio fa pensare a un disco
+  pieno, che non c'entrava nulla. Introdotto nella 0.7.2, insieme alla
+  risoluzione del tag.
+
+### Modificato
+- **`update.sh` e `uninstall.sh` vivono ora nella cartella dell'applicazione.**
+  Sono strumenti dell'applicazione, e il posto dove cercarli è la sua cartella,
+  non `/root`. Per aggiornare basta quindi:
+
+  ```bash
+  cd /var/www/advanced-nas-folder && sudo bash update.sh
+  ```
+
+  Perché sia possibile, `update.sh` **si ricopia da solo in una cartella
+  temporanea e riparte da lì** quando viene lanciato da dentro l'installazione:
+  è proprio quella la cartella che riscrive, e bash legge lo script mentre lo
+  esegue — sostituirlo a metà corsa interromperebbe l'aggiornamento in un punto
+  qualunque.
+
 ## [0.7.2] - 2026-08-30
 
 ### Corretto

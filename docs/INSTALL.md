@@ -278,7 +278,22 @@ corrispondono all'impianto reale.
 
 ## Aggiornare
 
-Riesegui l'installer: è idempotente e **non tocca `.env` né il database**.
+`update.sh` viene installato **nella cartella dell'applicazione**: è uno strumento
+dell'applicazione, e il posto dove cercarlo è la sua cartella.
+
+```bash
+cd /var/www/advanced-nas-folder && sudo bash update.sh
+```
+
+Lo script si ricopia da solo in una cartella temporanea e riparte da lì, perché è
+proprio la cartella dell'applicazione che riscrive: bash legge lo script mentre lo
+esegue, e sostituirlo a metà corsa interromperebbe l'aggiornamento in un punto
+qualunque.
+
+Non tocca `.env` né il database, ricarica le unit systemd e verifica che l'API
+risponda. **Se qualcosa fallisce rimette la versione precedente e la riavvia.**
+
+In alternativa si può rieseguire l'installer, che è idempotente:
 
 ```bash
 curl -fsSLO https://github.com/wifi75/advanced-nas-folder/releases/latest/download/install.sh && sudo bash install.sh

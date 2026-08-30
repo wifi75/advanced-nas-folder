@@ -130,10 +130,15 @@ da cui leggere.
 
 ### Aggiornare e disinstallare
 
+`update.sh` è già installato nella cartella dell'applicazione:
+
 ```bash
-curl -fsSLO https://github.com/wifi75/advanced-nas-folder/releases/latest/download/update.sh
-sudo bash update.sh
+cd /var/www/advanced-nas-folder && sudo bash update.sh
 ```
+
+Lo script si ricopia da solo altrove prima di partire, perché è proprio quella la
+cartella che riscrive: bash legge lo script mentre lo esegue, e sostituirlo a metà
+corsa interromperebbe l'aggiornamento in un punto qualunque.
 
 `update.sh` mette la nuova versione accanto a quella in uso e scambia le due cartelle
 solo dopo che la nuova ha risposto: se qualcosa non va, la precedente torna in

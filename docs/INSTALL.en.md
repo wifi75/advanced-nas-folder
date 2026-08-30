@@ -277,8 +277,22 @@ pretends to manage them would produce files that don't match the real setup.
 
 ## Upgrading
 
-Run the installer again: it is idempotent and **touches neither `.env` nor the
-database**.
+`update.sh` is installed **in the application folder**: it is a tool of the
+application, and its folder is where you look for it.
+
+```bash
+cd /var/www/advanced-nas-folder && sudo bash update.sh
+```
+
+The script copies itself into a temporary directory and restarts from there, because
+the application folder is exactly what it rewrites: bash reads a script as it runs
+it, and replacing it midway would break the update at an arbitrary point.
+
+It touches neither `.env` nor the database, reloads the systemd units and checks that
+the API answers. **If anything fails it puts the previous version back and restarts
+it.**
+
+Alternatively you can run the installer again, which is idempotent:
 
 ```bash
 curl -fsSLO https://github.com/wifi75/advanced-nas-folder/releases/latest/download/install.sh && sudo bash install.sh

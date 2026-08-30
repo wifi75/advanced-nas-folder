@@ -37,6 +37,9 @@ jobs:
           mkdir -p pacchetto
           cp -r backend agent deploy docs pacchetto/
           cp README.md README.en.md CHANGELOG.md LICENSE .env.example pacchetto/
+          # Gli script stanno anche nella radice del pacchetto: sono strumenti
+          # dell'applicazione, e il posto dove cercarli e la sua cartella.
+          cp deploy/update.sh deploy/uninstall.sh pacchetto/
           mkdir -p pacchetto/frontend
           cp -r frontend/dist pacchetto/frontend/dist
           tar -czf advanced-nas-folder.tar.gz -C pacchetto .

@@ -21,6 +21,29 @@ VERSIONE="ultima"
 DRY_RUN=0
 LINGUA="${ANF_LANG:-it}"
 
+# --- lo script si toglie di mezzo da solo ------------------------------------
+#
+# Il posto naturale di questo file e la cartella dell'applicazione: e uno
+# strumento dell'applicazione, non un file sparso in /root. Ma e proprio quella
+# cartella che l'aggiornamento riscrive, e bash legge lo script mentre lo
+# esegue: sostituirlo a meta corsa interromperebbe l'aggiornamento in un punto
+# qualunque.
+#
+# Quindi, se e in esecuzione da dentro l'installazione, la prima cosa che fa e
+# ricopiarsi altrove e ripartire da li. Da quel momento la cartella si puo
+# riscrivere in pace.
+if [ "${ANF_RILOCATO:-0}" != 1 ] && [ -f "${BASH_SOURCE[0]}" ]; then
+    _sorgente="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+    case "$_sorgente" in
+        "$RADICE"/*)
+            _copia="$(mktemp)"
+            cp "$_sorgente" "$_copia"
+            export ANF_RILOCATO=1
+            exec bash "$_copia" "$@"
+            ;;
+    esac
+fi
+
 # --- messaggi ---------------------------------------------------------------
 
 msg() {
@@ -78,8 +101,13 @@ if [ "$VERSIONE" = "ultima" ]; then
     # GitHub serve da una cache: subito dopo una pubblicazione quell'indirizzo
     # restituisce ancora il pacchetto precedente, e l'aggiornamento riesce
     # installando in silenzio la versione di prima.
-    TAG="$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" |
-        grep -m1 '"tag_name"' | cut -d'"' -f4)"
+    # La risposta si mette in una variabile invece di darla in pasto a una
+    # pipe: `grep -m1` chiude la pipe appena trova la riga, curl non riesce piu
+    # a scrivere ed esce con 23 «failure writing output». Con `pipefail`
+    # l'aggiornamento si fermava li, con un messaggio che fa pensare al disco
+    # pieno.
+    RISPOSTA="$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest")"
+    TAG="$(printf '%s' "$RISPOSTA" | grep -m1 '"tag_name"' | cut -d'"' -f4)"
     [ -n "$TAG" ] ||
         errore "$(msg 'Non riesco a sapere qual e l ultima versione.'                        'Cannot determine the latest version.')"
     URL="https://github.com/${REPO}/releases/download/${TAG}/${APP}.tar.gz"

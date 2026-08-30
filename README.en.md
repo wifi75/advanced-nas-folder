@@ -131,10 +131,15 @@ terminal to read from.
 
 ### Updating and uninstalling
 
+`update.sh` is already installed in the application folder:
+
 ```bash
-curl -fsSLO https://github.com/wifi75/advanced-nas-folder/releases/latest/download/update.sh
-sudo bash update.sh
+cd /var/www/advanced-nas-folder && sudo bash update.sh
 ```
+
+The script copies itself elsewhere before starting, because that folder is exactly
+what it rewrites: bash reads a script as it runs it, and replacing it midway would
+break the update at an arbitrary point.
 
 `update.sh` puts the new version next to the running one and swaps the two folders
 only after the new one has answered: if something goes wrong, the previous one comes
