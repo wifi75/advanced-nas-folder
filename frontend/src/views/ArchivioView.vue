@@ -1005,18 +1005,117 @@ function quando(iso: string | null): string {
 .voci--griglia,
 .voci--galleria {
   display: grid;
-  gap: 0.6rem;
   background: none;
   border: 0;
   overflow: visible;
 }
 
 .voci--griglia {
+  gap: 0.6rem;
+}
+
+.voci--griglia {
   grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
 }
 
+/* La galleria e' un mosaico di immagini, non un elenco con le miniature
+   dentro: quadrati affiancati, nessun nome, nessun pulsante. E' il modo in cui
+   si guardano le foto — il nome di uno scatto non dice niente, la foto si'. */
 .voci--galleria {
-  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+  gap: 3px;
+}
+
+.voci--galleria .voce {
+  position: relative;
+  aspect-ratio: 1;
+  padding: 0;
+  gap: 0;
+  border: 0;
+  border-radius: 4px;
+  background: var(--superficie-alt);
+  box-shadow: none;
+  overflow: hidden;
+  grid-template-columns: 1fr;
+}
+
+.voci--galleria .voce:hover {
+  border: 0;
+}
+
+/* Il pulsante copre l'intero riquadro: si clicca la foto, non un'etichetta. */
+.voci--galleria .voce__apri {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: stretch;
+  gap: 0;
+}
+
+.voci--galleria .miniatura {
+  position: absolute;
+  inset: 0;
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+
+/* Il nome resta, ma solo al passaggio del mouse e solo per le cartelle, che
+   senza non si distinguerebbero l'una dall'altra. */
+.voci--galleria .voce__nome {
+  position: relative;
+  z-index: 1;
+  padding: 1.5rem 0.4rem 0.35rem;
+  font-size: 0.72rem;
+  color: #fff;
+  text-align: left;
+  background: linear-gradient(to top, rgb(0 0 0 / 68%), transparent);
+  opacity: 0;
+  transition: opacity 0.12s ease;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.voci--galleria .voce:hover .voce__nome,
+.voci--galleria .voce__apri:focus-visible .voce__nome {
+  opacity: 1;
+}
+
+/* Le cartelle non hanno miniatura: il nome deve restare sempre leggibile. */
+.voci--galleria .voce:has(.voce__icona--cartella) .voce__nome {
+  opacity: 1;
+}
+
+.voci--galleria .voce__icona {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 42%;
+  height: 42%;
+}
+
+.voci--galleria .voce__dimensione,
+.voci--galleria .voce__data,
+.voci--galleria .voce__azioni {
+  display: none;
+}
+
+/* La casella di selezione compare al passaggio, o resta se e' gia' scelta. */
+.voci--galleria .voce__scelta {
+  position: absolute;
+  top: 0.3rem;
+  left: 0.3rem;
+  z-index: 2;
+  opacity: 0;
+  accent-color: var(--accento);
+}
+
+.voci--galleria .voce:hover .voce__scelta,
+.voci--galleria .voce__scelta:checked,
+.voci--galleria .voce__scelta:focus-visible {
+  opacity: 1;
 }
 
 .voci--griglia .voce,

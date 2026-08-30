@@ -18,6 +18,21 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.18.1] - 2026-08-30
+
+### Modificato
+- **La galleria e' un mosaico di immagini**, non un elenco con le miniature
+  dentro: quadrati affiancati con tre pixel di distanza, nessun nome, nessun
+  pulsante, nessuna dimensione. E' il modo in cui si guardano le foto — il nome
+  di uno scatto non dice niente, la foto si'.
+
+  Il nome compare al passaggio del mouse, in sovrimpressione; per le cartelle
+  resta sempre, perche' senza non si distinguerebbero l'una dall'altra. La
+  casella di selezione appare al passaggio e resta se l'elemento e' scelto.
+
+  La vista a griglia resta com'era: schede con miniatura, nome e comandi. Sono
+  due cose diverse, e servono a momenti diversi.
+
 ## [0.18.0] - 2026-08-30
 
 ### Aggiunto
