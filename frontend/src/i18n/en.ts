@@ -148,6 +148,12 @@ export default {
   },
 
   share: {
+    gruppoNascosti: 'What not to show',
+    gruppoNascostiAiuto:
+      'NAS devices create folders of their own — the recycle bin, thumbnails — that are not content to publish. One name per line; * and ? work. Empty it to show everything.',
+    nascosti: 'Names to hide',
+    origineAvviso:
+      'Changing the origin means the same address will serve different content. Permissions, rules and links stay where they are.',
     gruppoCosa: 'Which folder',
     gruppoCosaAiuto: 'From which NFS share, and which part of it.',
     gruppoNome: 'What it is called',
@@ -156,8 +162,8 @@ export default {
     gruppoAccessoAiuto: 'Applies to the whole publication. You can make per-subfolder exceptions afterwards.',
     modifica: 'Edit',
     modificaTitolo: 'Edit “{nome}”',
-    identificatoreImmutabile:
-      'The name in the address cannot be changed: links already shared would stop working. To change it, create a new publication.',
+    identificatoreAvviso:
+      'Changing it changes the public address: links already shared will stop working.',
     attivaAzione: 'Enable',
     disattivaAzione: 'Disable',
     identificatore: 'Name in the address',

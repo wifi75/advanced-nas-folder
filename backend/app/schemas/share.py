@@ -19,7 +19,18 @@ class ShareCreate(BaseModel):
 
 
 class ShareUpdate(BaseModel):
+    #: Cambiare lo slug cambia l'indirizzo pubblico, e i collegamenti gia
+    #: condivisi smettono di funzionare. E' una conseguenza che deve essere
+    #: chiara a chi lo fa, non un motivo per impedirglielo.
+    slug: str | None = Field(default=None, pattern=SLUG)
     label: str | None = Field(default=None, min_length=1, max_length=128)
+    #: L'origine: da quale condivisione NFS e da quale sua sottocartella. Si
+    #: cambia come tutto il resto — quello che c'era di sbagliato prima non era
+    #: la modifica, ma doverla rifare da capo per correggere un percorso.
+    mount_id: int | None = None
+    subpath: str | None = None
+    #: Nomi da non mostrare, uno per riga. Stringa vuota = mostra tutto.
+    hidden_patterns: str | None = None
     description: str | None = None
     default_visibility: Visibilita | None = None
     is_enabled: bool | None = None
@@ -72,6 +83,7 @@ class ShareOut(BaseModel):
     description: str | None
     mount_id: int
     subpath: str
+    hidden_patterns: str
     is_enabled: bool
     default_visibility: Visibilita
 

@@ -23,6 +23,13 @@ class Share(Base, TimestampMixin):
     #: Sottopercorso dentro il mount. Vuoto = radice del mount.
     subpath: Mapped[str] = mapped_column(String(1024), default="")
 
+    #: Nomi da non mostrare, uno per riga. I NAS espongono cartelle proprie —
+    #: il cestino di Synology, le miniature — che non sono contenuto e che chi
+    #: riceve l'indirizzo non deve nemmeno vedere. Quali siano pero' dipende dal
+    #: NAS e da chi pubblica, quindi e' un elenco modificabile e non una
+    #: costante nel codice.
+    hidden_patterns: Mapped[str] = mapped_column(Text, default="")
+
     is_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
     #: Visibilita applicata dove nessuna regola piu specifica corrisponde.
     default_visibility: Mapped[Visibilita] = mapped_column(

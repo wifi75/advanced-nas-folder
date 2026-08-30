@@ -18,6 +18,29 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.13.0] - 2026-08-30
+
+Di una pubblicazione si poteva cambiare quasi niente. Ora tutto quello che la
+definisce e' modificabile.
+
+### Aggiunto
+- **Il nome nell'indirizzo si puo' cambiare.** Era fisso per scelta mia, per non
+  rompere i collegamenti gia' condivisi: ma e' una conseguenza che va spiegata a
+  chi decide, non un motivo per decidere al posto suo. Il pannello avvisa
+  soltanto quando il nome e' stato davvero toccato, e rifiuta un nome gia' usato.
+- **L'origine si puo' cambiare**: da quale condivisione NFS e da quale sua
+  sottocartella. Correggere un percorso sbagliato non costringe piu' a rifare
+  tutto: permessi, regole e link restano al loro posto.
+- **Elenco dei nomi da non mostrare, per pubblicazione.** I NAS creano cartelle
+  proprie — `#recycle` di Synology, `@eaDir`, le istantanee — che non sono
+  contenuto da pubblicare e che chi riceve l'indirizzo non deve nemmeno vedere.
+  Alla creazione l'elenco viene **proposto** con i nomi tipici, e si modifica:
+  quali siano dipende dal NAS, quindi non e' una costante nel codice. Accetta i
+  caratteri jolly (`@ea*`), e svuotarlo mostra di nuovo tutto.
+
+  Vale anche per i **link di condivisione**: chi riceve un link non deve vedere
+  il cestino del NAS piu' di chi entra dal pannello.
+
 ## [0.12.3] - 2026-08-30
 
 ### Modificato

@@ -9,9 +9,10 @@ comunque via API, e sarebbe leggibile da chiunque sappia aprirla.
 from __future__ import annotations
 
 import os
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from fnmatch import fnmatch
 from pathlib import Path, PurePosixPath
 
 import anyio
@@ -65,7 +66,41 @@ async def permessi_di(
     return list(risultato.scalars().all())
 
 
-def _leggi_cartella(reale: Path, base: PurePosixPath, nascosti: bool) -> list[Voce]:
+#: Nomi proposti alla creazione di una pubblicazione: sono cartelle che i NAS
+#: creano per conto proprio — cestino, miniature, istantanee — e che non sono
+#: contenuto da pubblicare. Sono un *suggerimento*, non una regola: l'elenco si
+#: modifica per ogni pubblicazione, perche' quali siano dipende dal NAS.
+NASCOSTI_PROPOSTI = "\n".join(
+    (
+        "#recycle",  # cestino Synology
+        "#snapshot",  # istantanee Synology
+        "@eaDir",  # miniature e metadati Synology
+        ".DS_Store",  # macOS
+        "Thumbs.db",  # Windows
+        "$RECYCLE.BIN",  # cestino Windows
+    )
+)
+
+
+def schemi_da(testo: str) -> list[str]:
+    """Trasforma l'elenco scritto dall'utente in schemi utilizzabili."""
+    return [riga.strip() for riga in testo.splitlines() if riga.strip()]
+
+
+def da_nascondere(nome: str, schemi: Sequence[str]) -> bool:
+    """Vero se il nome corrisponde a uno degli schemi.
+
+    Il confronto ignora maiuscole e minuscole e accetta i caratteri jolly di
+    una riga di comando (`*`, `?`): scrivere `@ea*` deve bastare, senza dover
+    conoscere le espressioni regolari.
+    """
+    minuscolo = nome.lower()
+    return any(fnmatch(minuscolo, schema.lower()) for schema in schemi)
+
+
+def _leggi_cartella(
+    reale: Path, base: PurePosixPath, nascosti: bool, schemi: Sequence[str]
+) -> list[Voce]:
     """Legge le voci dal disco. Sincrona: la chiama un thread separato.
 
     Una `stat` su NFS puo' fermarsi per secondi se il NAS non risponde, e
@@ -75,6 +110,8 @@ def _leggi_cartella(reale: Path, base: PurePosixPath, nascosti: bool) -> list[Vo
     with os.scandir(reale) as elenco:
         for elemento in elenco:
             if elemento.name.startswith(".") and not nascosti:
+                continue
+            if da_nascondere(elemento.name, schemi):
                 continue
             # I file parziali di un caricamento in corso non sono file: non si
             # mostrano nemmeno quando i nascosti sono visibili.
@@ -106,6 +143,7 @@ async def elenca(
     consentito: Callable[[str], bool],
     *,
     nascosti: bool = False,
+    schemi: Sequence[str] = (),
 ) -> list[Voce]:
     """Voci della cartella che chi guarda puo' vedere, cartelle prima.
 
@@ -120,7 +158,7 @@ async def elenca(
 
     base = normalizza_relativo(percorso)
     try:
-        voci = await anyio.to_thread.run_sync(_leggi_cartella, reale, base, nascosti)
+        voci = await anyio.to_thread.run_sync(_leggi_cartella, reale, base, nascosti, schemi)
     except OSError as exc:
         raise ArchivioNonDisponibile("La cartella non e' leggibile.") from exc
 

@@ -153,7 +153,11 @@ async def contenuto(
 
     try:
         voci = await archivio.elenca(
-            reale, percorso, consentito, nascosti=await _mostra_nascosti(sessione)
+            reale,
+            percorso,
+            consentito,
+            nascosti=await _mostra_nascosti(sessione),
+            schemi=archivio.schemi_da(share.hidden_patterns),
         )
     except archivio.ArchivioNonDisponibile as exc:
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, str(exc)) from exc

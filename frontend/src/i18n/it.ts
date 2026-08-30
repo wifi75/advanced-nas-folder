@@ -149,6 +149,12 @@ export default {
   },
 
   share: {
+    gruppoNascosti: 'Cosa non mostrare',
+    gruppoNascostiAiuto:
+      'I NAS creano cartelle proprie — il cestino, le miniature — che non sono contenuto da pubblicare. Un nome per riga; si possono usare * e ?. Svuota per mostrare tutto.',
+    nascosti: 'Nomi da nascondere',
+    origineAvviso:
+      'Cambiando l’origine, allo stesso indirizzo si troverà un altro contenuto. Permessi, regole e link restano al loro posto.',
     gruppoCosa: 'Quale cartella',
     gruppoCosaAiuto: 'Da quale condivisione NFS, e quale parte di essa.',
     gruppoNome: 'Come si chiama',
@@ -157,8 +163,8 @@ export default {
     gruppoAccessoAiuto: 'Vale per l’intera pubblicazione. Dopo potrai fare eccezioni per singola sottocartella.',
     modifica: 'Modifica',
     modificaTitolo: 'Modifica «{nome}»',
-    identificatoreImmutabile:
-      'Il nome nell’indirizzo non si cambia: i collegamenti già condivisi smetterebbero di funzionare. Per cambiarlo, crea una nuova pubblicazione.',
+    identificatoreAvviso:
+      'Cambiandolo, l’indirizzo pubblico cambia: i collegamenti già condivisi smetteranno di funzionare.',
     attivaAzione: 'Attiva',
     disattivaAzione: 'Disattiva',
     identificatore: 'Nome nell’indirizzo',

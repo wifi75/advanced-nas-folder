@@ -25,7 +25,7 @@ from app.schemas.share import (
     ShareOut,
     ShareUpdate,
 )
-from app.services import acl, scorciatoie
+from app.services import acl, archivio, scorciatoie
 from app.services import link as servizio_link
 from app.services.percorsi import PercorsoNonValido, normalizza_relativo
 
@@ -99,6 +99,9 @@ async def crea(dati: ShareCreate, sessione: Sessione, _: Amministratore) -> Shar
         subpath=_normalizza(dati.subpath),
         default_visibility=dati.default_visibility,
         is_enabled=dati.is_enabled,
+        # Proposti, non imposti: sono le cartelle che i NAS creano per conto
+        # proprio, e chi pubblica puo' toglierle dall'elenco se le vuole vedere.
+        hidden_patterns=archivio.NASCOSTI_PROPOSTI,
     )
     sessione.add(share)
     await sessione.commit()
@@ -123,8 +126,25 @@ async def modifica(
     share_id: int, dati: ShareUpdate, sessione: Sessione, _: Amministratore
 ) -> Share:
     share = await _carica(sessione, share_id)
+
+    if dati.slug is not None and dati.slug != share.slug:
+        occupato = await sessione.execute(select(Share).where(Share.slug == dati.slug))
+        if occupato.scalar_one_or_none() is not None:
+            raise HTTPException(
+                status.HTTP_409_CONFLICT, f"Esiste già una pubblicazione {dati.slug!r}."
+            )
+        share.slug = dati.slug
+
     if dati.label is not None:
         share.label = dati.label
+    if dati.mount_id is not None and dati.mount_id != share.mount_id:
+        if await sessione.get(Mount, dati.mount_id) is None:
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, "La condivisione indicata non esiste.")
+        share.mount_id = dati.mount_id
+    if dati.subpath is not None:
+        share.subpath = _normalizza(dati.subpath)
+    if dati.hidden_patterns is not None:
+        share.hidden_patterns = dati.hidden_patterns
     if dati.description is not None:
         share.description = dati.description
     if dati.default_visibility is not None:

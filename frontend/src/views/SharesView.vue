@@ -25,15 +25,36 @@ const daEliminare = ref<Share | null>(null)
 // esattamente cio che una pubblicazione serve a produrre.
 const inModifica = ref<Share | null>(null)
 const modifiche = ref({
+  slug: '',
   label: '',
+  mount_id: 0,
+  subpath: '',
+  hidden_patterns: '',
   description: null as string | null,
   default_visibility: 'utenti' as Visibilita,
 })
 
+/** Vero quando l'origine e' stata toccata: l'avviso compare solo allora. */
+const origineCambiata = computed(
+  () =>
+    inModifica.value !== null &&
+    (modifiche.value.mount_id !== inModifica.value.mount_id ||
+      modifiche.value.subpath !== (inModifica.value.subpath ?? '')),
+)
+
+/** L'indirizzo che uscira' dal nome scritto nella finestra di modifica. */
+const indirizzoModificato = computed(() =>
+  modifiche.value.slug ? `${window.location.origin}/${modifiche.value.slug}` : '',
+)
+
 function apriModifica(s: Share): void {
   inModifica.value = s
   modifiche.value = {
+    slug: s.slug,
     label: s.label,
+    mount_id: s.mount_id,
+    subpath: s.subpath ?? '',
+    hidden_patterns: s.hidden_patterns ?? '',
     description: s.description,
     default_visibility: s.default_visibility,
   }
@@ -381,12 +402,80 @@ function alterna(s: Share): void {
         </label>
 
         <label class="campo">
+          <span>{{ t('share.identificatore') }}</span>
+          <input
+            v-model="modifiche.slug"
+            type="text"
+            maxlength="63"
+          >
+          <small
+            v-if="inModifica && modifiche.slug !== inModifica.slug"
+            class="aiuto aiuto--attenzione"
+          >{{ t('share.identificatoreAvviso') }}</small>
+        </label>
+
+        <p
+          v-if="indirizzoModificato"
+          class="previsto"
+        >
+          {{ t('share.anteprimaIndirizzo') }}
+          <span class="previsto__valore">{{ indirizzoModificato }}</span>
+        </p>
+
+        <label class="campo">
           <span>{{ t('share.descrizione') }}</span>
           <input
             v-model="modifiche.description"
             type="text"
           >
         </label>
+
+        <GruppoCampi
+          :titolo="t('share.gruppoCosa')"
+          :descrizione="t('share.gruppoCosaAiuto')"
+        >
+          <label class="campo">
+            <span>{{ t('share.condivisione') }}</span>
+            <select v-model.number="modifiche.mount_id">
+              <option
+                v-for="m in mounts.elenco"
+                :key="m.id"
+                :value="m.id"
+              >
+                {{ m.label }}
+              </option>
+            </select>
+          </label>
+          <label class="campo">
+            <span>{{ t('share.sottopercorso') }}</span>
+            <input
+              v-model="modifiche.subpath"
+              type="text"
+              :placeholder="t('share.sottopercorsoAiuto')"
+            >
+          </label>
+          <p
+            v-if="origineCambiata"
+            class="aiuto aiuto--attenzione"
+          >
+            {{ t('share.origineAvviso') }}
+          </p>
+        </GruppoCampi>
+
+        <GruppoCampi
+          :titolo="t('share.gruppoNascosti')"
+          :descrizione="t('share.gruppoNascostiAiuto')"
+        >
+          <label class="campo">
+            <span>{{ t('share.nascosti') }}</span>
+            <textarea
+              v-model="modifiche.hidden_patterns"
+              rows="5"
+              spellcheck="false"
+              class="elenco-nascosti"
+            />
+          </label>
+        </GruppoCampi>
 
         <label class="campo">
           <span>{{ t('share.visibilitaPredefinita') }}</span>
@@ -400,10 +489,6 @@ function alterna(s: Share): void {
             </option>
           </select>
         </label>
-
-        <p class="aiuto">
-          {{ t('share.identificatoreImmutabile') }}
-        </p>
 
         <p
           v-if="shares.errore"
@@ -424,7 +509,7 @@ function alterna(s: Share): void {
           <button
             class="bottone bottone--principale"
             type="button"
-            :disabled="!modifiche.label || salvataggio"
+            :disabled="!modifiche.label || !modifiche.slug || salvataggio"
             @click="salvaModifiche"
           >
             {{ salvataggio ? t('comune.carico') : t('comune.salva') }}
@@ -632,9 +717,22 @@ h1 {
 
 
 
+.elenco-nascosti {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.82rem;
+  resize: vertical;
+}
+
 .aiuto {
   color: var(--testo-tenue);
   font-size: 0.78rem;
+}
+
+/* L'avviso compare solo quando il nome e' stato davvero cambiato: mostrarlo
+   sempre lo renderebbe sfondo, e nessuno lo leggerebbe nel momento in cui
+   conta. */
+.aiuto--attenzione {
+  color: var(--attenzione);
 }
 
 .previsto {

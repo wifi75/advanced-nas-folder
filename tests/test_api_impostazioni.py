@@ -188,3 +188,43 @@ def test_si_cerca_sia_nella_radice_sia_in_backend() -> None:
 
     nomi = {Path(p).parent.name for p in _FILE_ENV}
     assert "backend" in nomi
+
+
+# --- nomi nascosti per pubblicazione ---------------------------------------
+
+
+async def test_una_cartella_nellelenco_dei_nascosti_non_compare(
+    admin: AsyncClient, share_id: int, cartella: Path
+) -> None:
+    """E' il caso vero che ha originato la funzione: `#recycle` del Synology
+    compariva fra i contenuti pubblicati."""
+    (cartella / "#recycle").mkdir()
+    await admin.patch(f"/api/v1/shares/{share_id}", json={"hidden_patterns": "#recycle"})
+
+    nomi = [v["nome"] for v in (await admin.get("/api/v1/archivio/documenti")).json()["voci"]]
+
+    assert "#recycle" not in nomi
+    assert "visibile.txt" in nomi
+
+
+async def test_i_caratteri_jolly_funzionano(
+    admin: AsyncClient, share_id: int, cartella: Path
+) -> None:
+    """Scrivere `@ea*` deve bastare, senza conoscere le espressioni regolari."""
+    (cartella / "@eaDir").mkdir()
+    await admin.patch(f"/api/v1/shares/{share_id}", json={"hidden_patterns": "@ea*"})
+
+    nomi = [v["nome"] for v in (await admin.get("/api/v1/archivio/documenti")).json()["voci"]]
+
+    assert "@eaDir" not in nomi
+
+
+async def test_svuotando_lelenco_tutto_torna_visibile(
+    admin: AsyncClient, share_id: int, cartella: Path
+) -> None:
+    (cartella / "#recycle").mkdir()
+    await admin.patch(f"/api/v1/shares/{share_id}", json={"hidden_patterns": ""})
+
+    nomi = [v["nome"] for v in (await admin.get("/api/v1/archivio/documenti")).json()["voci"]]
+
+    assert "#recycle" in nomi

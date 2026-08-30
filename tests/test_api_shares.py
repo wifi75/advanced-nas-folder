@@ -242,3 +242,112 @@ async def test_percorso_con_risalita_nella_prova(admin: AsyncClient, share_id: i
 
 async def test_pubblicazione_inesistente(admin: AsyncClient) -> None:
     assert (await admin.get("/api/v1/shares/99999")).status_code == 404
+
+
+# --- cambio del nome nell'indirizzo ----------------------------------------
+
+
+async def test_il_nome_nellindirizzo_si_puo_cambiare(admin: AsyncClient, share_id: int) -> None:
+    """Chi pubblica deve poter scegliere l'indirizzo, anche dopo."""
+    risposta = await admin.patch(f"/api/v1/shares/{share_id}", json={"slug": "ricette"})
+
+    assert risposta.status_code == 200
+    assert risposta.json()["slug"] == "ricette"
+
+
+async def test_il_vecchio_indirizzo_smette_di_rispondere(admin: AsyncClient, share_id: int) -> None:
+    """E' la conseguenza del cambio, e il pannello la annuncia prima: qui si
+    verifica che accada davvero, invece di restare due indirizzi validi."""
+    vecchio = (await admin.get(f"/api/v1/shares/{share_id}")).json()["slug"]
+    await admin.patch(f"/api/v1/shares/{share_id}", json={"slug": "ricette"})
+
+    assert (await admin.get(f"/api/v1/archivio/{vecchio}")).status_code == 404
+
+
+async def test_non_si_puo_prendere_un_nome_gia_usato(admin: AsyncClient, share_id: int) -> None:
+    altra = await admin.post(
+        "/api/v1/shares",
+        json={
+            "slug": "occupato",
+            "label": "Occupato",
+            "mount_id": (await admin.get(f"/api/v1/shares/{share_id}")).json()["mount_id"],
+            "default_visibility": "utenti",
+        },
+    )
+    assert altra.status_code == 201
+
+    risposta = await admin.patch(f"/api/v1/shares/{share_id}", json={"slug": "occupato"})
+
+    assert risposta.status_code == 409
+
+
+async def test_un_nome_non_adatto_a_un_indirizzo_viene_rifiutato(
+    admin: AsyncClient, share_id: int
+) -> None:
+    assert (
+        await admin.patch(f"/api/v1/shares/{share_id}", json={"slug": "con spazio"})
+    ).status_code == 422
+
+
+# --- cambio dell'origine ----------------------------------------------------
+
+
+async def test_la_sottocartella_si_puo_cambiare(admin: AsyncClient, share_id: int) -> None:
+    """Correggere un percorso sbagliato non deve costringere a rifare tutto:
+    permessi, regole e link della pubblicazione restano dove sono."""
+    risposta = await admin.patch(f"/api/v1/shares/{share_id}", json={"subpath": "Ricette/Dolci"})
+
+    assert risposta.status_code == 200
+    assert (await admin.get(f"/api/v1/shares/{share_id}")).json()["subpath"] == "Ricette/Dolci"
+
+
+async def test_la_sottocartella_si_puo_svuotare(admin: AsyncClient, share_id: int) -> None:
+    """Vuoto significa «pubblica la radice della condivisione»."""
+    await admin.patch(f"/api/v1/shares/{share_id}", json={"subpath": "Ricette"})
+    await admin.patch(f"/api/v1/shares/{share_id}", json={"subpath": ""})
+
+    assert (await admin.get(f"/api/v1/shares/{share_id}")).json()["subpath"] == ""
+
+
+async def test_una_risalita_nella_sottocartella_viene_rifiutata(
+    admin: AsyncClient, share_id: int
+) -> None:
+    """Senza questo si pubblicherebbe una cartella fuori dal mount."""
+    risposta = await admin.patch(f"/api/v1/shares/{share_id}", json={"subpath": "../../etc"})
+
+    assert risposta.status_code in (400, 422)
+
+
+async def test_non_si_puo_puntare_a_una_condivisione_inesistente(
+    admin: AsyncClient, share_id: int
+) -> None:
+    risposta = await admin.patch(f"/api/v1/shares/{share_id}", json={"mount_id": 9999})
+
+    assert risposta.status_code == 400
+
+
+# --- nomi da nascondere -----------------------------------------------------
+
+
+async def test_le_cartelle_di_servizio_del_nas_sono_nascoste_da_subito(
+    admin: AsyncClient, share_id: int
+) -> None:
+    """Il cestino di un Synology non e' contenuto da pubblicare, e chi riceve
+    l'indirizzo non deve nemmeno vederlo. Proposto, non imposto: si toglie."""
+    elenco = (await admin.get(f"/api/v1/shares/{share_id}")).json()
+
+    assert "#recycle" in elenco["hidden_patterns"]
+    assert "@eaDir" in elenco["hidden_patterns"]
+
+
+async def test_lelenco_dei_nomi_nascosti_si_puo_cambiare(admin: AsyncClient, share_id: int) -> None:
+    risposta = await admin.patch(f"/api/v1/shares/{share_id}", json={"hidden_patterns": "vecchi"})
+
+    assert risposta.status_code == 200
+    assert (await admin.get(f"/api/v1/shares/{share_id}")).json()["hidden_patterns"] == "vecchi"
+
+
+async def test_si_puo_svuotare_per_mostrare_tutto(admin: AsyncClient, share_id: int) -> None:
+    await admin.patch(f"/api/v1/shares/{share_id}", json={"hidden_patterns": ""})
+
+    assert (await admin.get(f"/api/v1/shares/{share_id}")).json()["hidden_patterns"] == ""

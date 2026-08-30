@@ -26,6 +26,8 @@ export interface Share {
   description: string | null
   mount_id: number
   subpath: string
+  /** Nomi da non mostrare, uno per riga. Vuoto = mostra tutto. */
+  hidden_patterns: string
   is_enabled: boolean
   default_visibility: Visibilita
 }

@@ -104,7 +104,11 @@ async def contenuto(
         return servizio_link.verifica(collegamento, share, p).valido
 
     try:
-        voci = await archivio.elenca(reale, richiesto, consentito)
+        # Gli stessi nomi nascosti valgono anche qui: chi riceve un link non
+        # deve vedere il cestino del NAS piu' di chi entra dal pannello.
+        voci = await archivio.elenca(
+            reale, richiesto, consentito, schemi=archivio.schemi_da(share.hidden_patterns)
+        )
     except archivio.ArchivioNonDisponibile as exc:
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, str(exc)) from exc
 
