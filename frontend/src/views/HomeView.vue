@@ -28,7 +28,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="pagina">
+  <div class="pagina pagina--stretta">
     <header class="testata">
       <h1>{{ app.name }}</h1>
       <p class="sottotitolo">

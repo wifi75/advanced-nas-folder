@@ -79,7 +79,7 @@ function usato(disco: SpazioDisco): number | null {
 </script>
 
 <template>
-  <section class="pagina">
+  <section class="pagina pagina--stretta">
     <header>
       <h1>{{ t('impostazioni.titolo') }}</h1>
       <p class="spiega">

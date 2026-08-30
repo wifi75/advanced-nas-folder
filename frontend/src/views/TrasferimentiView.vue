@@ -101,7 +101,7 @@ function quando(iso: string): string {
 </script>
 
 <template>
-  <section class="pagina">
+  <section class="pagina pagina--larga">
     <header class="testa">
       <div>
         <h1>{{ t('trasferimenti.titolo') }}</h1>

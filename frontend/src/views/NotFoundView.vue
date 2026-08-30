@@ -6,7 +6,7 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <div class="pagina">
+  <div class="pagina-centrata">
     <h1>{{ t('nonTrovata.titolo') }}</h1>
     <p>{{ t('nonTrovata.testo') }}</p>
     <RouterLink to="/">
@@ -16,6 +16,19 @@ const { t } = useI18n()
 </template>
 
 <style scoped>
+/* Un messaggio solo, centrato: `.pagina` globale lo allineerebbe in alto a
+   sinistra come se fosse un elenco. */
+.pagina-centrata {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 3rem 1.25rem;
+  text-align: center;
+}
+
 
 h1 {
   margin: 0;

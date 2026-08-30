@@ -319,6 +319,17 @@ a {
   gap: 1.5rem;
 }
 
+/* Non tutte le pagine vogliono la stessa larghezza, e le due eccezioni sono
+   motivate: i trasferimenti sono tabelle, le impostazioni sono un modulo
+   stretto che a piena larghezza diventa illeggibile. */
+.pagina--larga {
+  width: min(1100px, 100% - 2.5rem);
+}
+
+.pagina--stretta {
+  width: min(760px, 100% - 2.5rem);
+}
+
 /* Titolo a sinistra, azione principale a destra, sempre nello stesso posto:
    e' cosi' che si impara dove cercare senza doverlo rileggere ogni volta. */
 .testata {

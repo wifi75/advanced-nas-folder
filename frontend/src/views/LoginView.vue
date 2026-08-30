@@ -22,7 +22,7 @@ async function accedi(): Promise<void> {
 </script>
 
 <template>
-  <div class="pagina">
+  <div class="pagina-accesso">
     <form
       class="riquadro"
       @submit.prevent="accedi"
@@ -76,6 +76,16 @@ async function accedi(): Promise<void> {
 </template>
 
 <style scoped>
+/* Non usa `.pagina` globale: quella impagina un elenco in colonna, larghezza
+   fissa e allineata in alto. Qui c'e' un solo riquadro, e va centrato nello
+   schermo. Usarle entrambe lo mandava in alto a sinistra. */
+.pagina-accesso {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 2rem 1.25rem;
+}
+
 
 .riquadro {
   width: min(380px, 100%);

@@ -18,6 +18,19 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.12.1] - 2026-08-30
+
+### Corretto
+- **La pagina di accesso finiva in alto a sinistra invece che al centro.**
+  Unificando l'impianto delle pagine nella 0.12.0 ho dato a tutte la stessa
+  `.pagina`, che impagina un elenco in colonna: ma accesso e «pagina non
+  trovata» hanno un solo riquadro, e vogliono essere centrate. Ora hanno un
+  impianto proprio.
+- **Trasferimenti e impostazioni avevano perso la loro larghezza.** I
+  trasferimenti sono tabelle e stavano su 1100px, le impostazioni sono un
+  modulo stretto e stavano su 760px: l'unificazione le aveva portate entrambe a
+  880. Sono due eccezioni motivate, ora dichiarate come tali.
+
 ## [0.12.0] - 2026-08-30
 
 Il pannello sapeva fare tutto ma era organizzato per **tipo di oggetto**, non
