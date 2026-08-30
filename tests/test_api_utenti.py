@@ -39,7 +39,9 @@ async def database_pulito():  # noqa: ANN201
             await sessione.execute(
                 update(User)
                 .where(User.username == "admin")
-                .values(is_admin=True, is_active=True, password_hash=hash_password(PASSWORD_INIZIALE))
+                .values(
+                    is_admin=True, is_active=True, password_hash=hash_password(PASSWORD_INIZIALE)
+                )
             )
         await sessione.commit()
 
@@ -212,7 +214,8 @@ async def test_cambio_password_richiede_quella_attuale(admin: AsyncClient) -> No
     assert sbagliata.status_code == 400
 
     giusta = await admin.post(
-        "/api/v1/utenti/me/password", json={"attuale": PASSWORD_INIZIALE, "nuova": "una-password-nuova"}
+        "/api/v1/utenti/me/password",
+        json={"attuale": PASSWORD_INIZIALE, "nuova": "una-password-nuova"},
     )
     assert giusta.status_code == 204
 
@@ -222,7 +225,8 @@ async def test_cambio_password_richiede_quella_attuale(admin: AsyncClient) -> No
     )
     admin.headers["Authorization"] = f"Bearer {accesso.json()['access_token']}"
     await admin.post(
-        "/api/v1/utenti/me/password", json={"attuale": "una-password-nuova", "nuova": PASSWORD_INIZIALE}
+        "/api/v1/utenti/me/password",
+        json={"attuale": "una-password-nuova", "nuova": PASSWORD_INIZIALE},
     )
 
 
