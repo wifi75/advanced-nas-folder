@@ -75,6 +75,7 @@ export default {
   },
 
   mount: {
+    stato: 'State',
     gestisci: 'Open and configure',
     titolo: 'NFS shares',
     sottotitolo:

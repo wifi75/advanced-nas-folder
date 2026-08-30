@@ -18,6 +18,13 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.15.3] - 2026-08-30
+
+### Modificato
+- **Lo stato del montaggio e' una scheda colorata fra i dati**, verde quando e'
+  montato, gialla in attesa, rossa in errore. Era una pillola in alto a destra,
+  lontana dai dati che descrive e facile da non guardare.
+
 ## [0.15.2] - 2026-08-30
 
 ### Corretto

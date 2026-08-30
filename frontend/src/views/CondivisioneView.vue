@@ -80,11 +80,11 @@ const etichettaStato = computed(() => {
 const classeStato = computed(() => {
   switch (mount.value?.state) {
     case 'montato':
-      return 'stato-pillola--ok'
+      return 'dato-stato--ok'
     case 'errore':
-      return 'stato-pillola--errore'
+      return 'dato-stato--errore'
     default:
-      return 'stato-pillola--attesa'
+      return 'dato-stato--attesa'
   }
 })
 
@@ -130,11 +130,6 @@ async function elimina(): Promise<void> {
           </p>
         </div>
       </div>
-      <span
-        v-if="mount"
-        class="stato-pillola"
-        :class="classeStato"
-      >{{ etichettaStato }}</span>
     </header>
 
     <p
@@ -152,6 +147,13 @@ async function elimina(): Promise<void> {
     >
       <template v-if="attiva === 'panoramica'">
         <dl class="dati">
+          <div
+            class="dato-stato"
+            :class="classeStato"
+          >
+            <dt>{{ t('mount.stato') }}</dt>
+            <dd>{{ etichettaStato }}</dd>
+          </div>
           <div>
             <dt>{{ t('mount.percorso') }}</dt>
             <dd><code class="percorso">{{ mount.mountpoint }}</code></dd>
@@ -403,6 +405,55 @@ async function elimina(): Promise<void> {
 </template>
 
 <style scoped>
+/* La scheda dello stato prende la tinta di cio' che dice: montato, in attesa,
+   errore. Prima era una pillola in alto a destra, lontana dai dati che
+   descrive e facile da non guardare. */
+.dato-stato dd {
+  font-weight: 600;
+}
+
+.dato-stato--ok {
+  border-color: color-mix(in srgb, var(--ok) 45%, var(--vetro-bordo)) !important;
+  background:
+    linear-gradient(
+      158deg,
+      color-mix(in srgb, var(--ok) 20%, transparent),
+      color-mix(in srgb, var(--ok) 8%, transparent)
+    ) !important;
+}
+
+.dato-stato--ok dd {
+  color: var(--ok);
+}
+
+.dato-stato--attesa {
+  border-color: color-mix(in srgb, var(--attenzione) 45%, var(--vetro-bordo)) !important;
+  background:
+    linear-gradient(
+      158deg,
+      color-mix(in srgb, var(--attenzione) 20%, transparent),
+      color-mix(in srgb, var(--attenzione) 8%, transparent)
+    ) !important;
+}
+
+.dato-stato--attesa dd {
+  color: var(--attenzione);
+}
+
+.dato-stato--errore {
+  border-color: color-mix(in srgb, var(--errore) 45%, var(--vetro-bordo)) !important;
+  background:
+    linear-gradient(
+      158deg,
+      color-mix(in srgb, var(--errore) 20%, transparent),
+      color-mix(in srgb, var(--errore) 8%, transparent)
+    ) !important;
+}
+
+.dato-stato--errore dd {
+  color: var(--errore);
+}
+
 .identita {
   display: flex;
   align-items: center;

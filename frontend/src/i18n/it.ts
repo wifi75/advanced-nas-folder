@@ -76,6 +76,7 @@ export default {
   },
 
   mount: {
+    stato: 'Stato',
     gestisci: 'Apri e configura',
     titolo: 'Condivisioni NFS',
     sottotitolo:
