@@ -7,6 +7,15 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non rilasciato]
 
+### Da fare
+Vedere [TODO.md](TODO.md).
+
+## [0.6.1] - 2026-08-30
+
+Nessun cambiamento di comportamento: solo documentazione. Rilasciata perché il
+pacchetto della 0.6.0 contiene i README con le affermazioni sbagliate, e chi lo
+scarica leggerebbe che manca la consegna dei file.
+
 ### Corretto
 - **Il README dichiarava cose non vere.** Il banner di stato diceva che mancava la
   consegna dei file, fatta dalla v0.6.0; le funzionalità elencavano viste a griglia e
@@ -21,9 +30,8 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
   i primi due sono dinamici e dicono la verità da soli.
 - README: sezione su `update.sh` e `uninstall.sh`, che esistevano senza essere
   documentati, e i comandi dei test e della formattazione fra quelli utili.
-
-### Da fare
-Vedere [TODO.md](TODO.md).
+- `update.sh` e `uninstall.sh` fra gli allegati della release: il primo si documenta
+  come scaricabile con `curl`, e senza allegato quel comando non funzionava.
 
 ## [0.6.0] - 2026-08-30
 

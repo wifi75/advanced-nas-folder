@@ -12,9 +12,11 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.6.0
+- Versione corrente: 0.6.1
 
-## Stato alla v0.6.0 — 30 agosto 2026
+## Stato alla v0.6.1 — 30 agosto 2026
+
+*(la 0.6.1 è di sola documentazione: lo stato del codice è quello della 0.6.0)*
 
 Il pannello fa tutto quello per cui era stato pensato. **375 test**, gate verde su
 ruff, mypy `strict`, ESLint, vue-tsc e build; la CI li esegue a ogni push.

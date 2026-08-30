@@ -1,6 +1,6 @@
 [project]
 name = "advanced-nas-folder"
-version = "0.6.0"
+version = "0.6.1"
 description = "Pannello self-hosted per mount NFS, pubblicazione e gestione file"
 authors = [{ name = "Tiziano Cassone" }]
 license = { text = "MIT" }
