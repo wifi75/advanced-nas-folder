@@ -21,6 +21,7 @@ export default {
   },
 
   menu: {
+    tuttePubblicazioni: 'All published folders',
     pubblica: 'Publish a folder',
     tutteCondivisioni: 'New share',
     archivio: 'Storage',
@@ -152,6 +153,7 @@ export default {
   },
 
   share: {
+    gestisci: 'Open and configure',
     gruppoNascosti: 'What not to show',
     gruppoNascostiAiuto:
       'NAS devices create folders of their own — the recycle bin, thumbnails — that are not content to publish. One name per line; * and ? work. Empty it to show everything.',

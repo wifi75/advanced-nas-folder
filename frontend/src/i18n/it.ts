@@ -21,6 +21,7 @@ export default {
   },
 
   menu: {
+    tuttePubblicazioni: 'Tutte le cartelle pubblicate',
     pubblica: 'Pubblica una cartella',
     tutteCondivisioni: 'Nuova condivisione',
     archivio: 'Archivio',
@@ -153,6 +154,7 @@ export default {
   },
 
   share: {
+    gestisci: 'Apri e configura',
     gruppoNascosti: 'Cosa non mostrare',
     gruppoNascostiAiuto:
       'I NAS creano cartelle proprie — il cestino, le miniature — che non sono contenuto da pubblicare. Un nome per riga; si possono usare * e ?. Svuota per mostrare tutto.',

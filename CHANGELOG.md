@@ -18,6 +18,27 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.16.0] - 2026-08-30
+
+### Corretto
+- **L'elenco delle pubblicazioni non era piu' raggiungibile.** Con l'albero nel
+  menu le cartelle pubblicate si aprono dalla loro condivisione, e nessuna voce
+  portava piu' alla pagina che le raccoglie tutte. Ora c'e' «Tutte le cartelle
+  pubblicate».
+- **Quella pagina ripeteva le funzioni della pagina di dettaglio** — modifica,
+  permessi, link, rimozione — con il risultato di doverle mantenere due volte e
+  di nasconderle a chi arriva dall'albero. Ora l'elenco porta al dettaglio, e
+  mostra da quale condivisione arriva ogni cartella: in un elenco che le mischia
+  tutte e' l'informazione che manca per orientarsi.
+
+### Modificato
+- **I pulsanti hanno un fondo tinto della propria funzione**, con la stessa
+  formula della scheda di stato: azzurro per le azioni, rosso per quelle
+  distruttive, grigio per le secondarie. Bianchi su una pagina chiara non si
+  distinguevano da un riquadro.
+- Anche la linguetta attiva di un sottomenu e' tinta: bianca su bianco non
+  diceva quale fosse.
+
 ## [0.15.3] - 2026-08-30
 
 ### Modificato

@@ -108,8 +108,16 @@ defineExpose({ attiva })
 }
 
 .scheda-voce--attiva {
-  color: var(--testo);
-  background: var(--superficie);
+  /* Stessa formula della scheda di stato: sfumatura leggera della tinta e
+     testo dello stesso colore. Bianco su bianco non diceva quale fosse
+     attiva. */
+  color: var(--accento);
+  background:
+    linear-gradient(
+      158deg,
+      color-mix(in srgb, var(--accento) 20%, var(--superficie)),
+      color-mix(in srgb, var(--accento) 8%, var(--superficie))
+    );
   box-shadow:
     inset 0 1px 0 var(--vetro-luce),
     var(--vetro-ombra);

@@ -250,17 +250,23 @@ a {
   align-items: center;
   gap: 0.4rem;
   padding: 0.45rem 0.9rem;
-  /* Lo stesso vetro delle voci di menu. Con un bianco pieno i pulsanti
-     secondari sparivano nella pagina: sembravano riquadri vuoti, non comandi. */
-  border: 1px solid var(--vetro-bordo);
+  /* Fondo tinto della propria funzione, con la stessa formula della scheda di
+     stato: una sfumatura leggera del colore piu' un bordo dello stesso. Un
+     pulsante bianco su una pagina chiara non si distingue da un riquadro. */
+  border: 1px solid color-mix(in srgb, var(--accento) 30%, var(--vetro-bordo));
   border-radius: 9px;
-  background: var(--vetro-sfondo);
+  background:
+    linear-gradient(
+      158deg,
+      color-mix(in srgb, var(--accento) 16%, transparent),
+      color-mix(in srgb, var(--accento) 6%, transparent)
+    );
   backdrop-filter: blur(14px) saturate(180%);
   -webkit-backdrop-filter: blur(14px) saturate(180%);
   box-shadow:
     inset 0 1px 0 var(--vetro-luce),
     var(--vetro-ombra);
-  color: var(--testo);
+  color: var(--accento);
   font: inherit;
   font-size: 0.875rem;
   font-weight: 500;
@@ -271,7 +277,13 @@ a {
 }
 
 .bottone:hover {
-  border-color: color-mix(in srgb, var(--accento) 35%, var(--vetro-bordo));
+  border-color: color-mix(in srgb, var(--accento) 55%, transparent);
+  background:
+    linear-gradient(
+      158deg,
+      color-mix(in srgb, var(--accento) 24%, transparent),
+      color-mix(in srgb, var(--accento) 10%, transparent)
+    );
 }
 
 .bottone:disabled,
@@ -315,26 +327,40 @@ a {
 /* Le azioni distruttive prendono lo stesso trattamento, con la propria tinta:
    un contorno rosso e' facile da non vedere in una fila di pulsanti. */
 .bottone--pericolo:hover {
-  color: #fff;
-  border-color: transparent;
+  border-color: color-mix(in srgb, var(--errore) 60%, transparent);
   background:
     linear-gradient(
-      165deg,
-      color-mix(in srgb, var(--errore) 100%, white 14%),
-      color-mix(in srgb, var(--errore) 82%, black 18%)
+      158deg,
+      color-mix(in srgb, var(--errore) 26%, transparent),
+      color-mix(in srgb, var(--errore) 10%, transparent)
     );
 }
 
 /* Secondario, non spento: il testo resta leggibile come quello del pulsante
    principale. Con il grigio tenue sembravano disattivati. */
+/* Secondario: la stessa forma, ma in grigio, cosi' l'azione principale della
+   riga resta riconoscibile. */
 .bottone--tenue {
+  border-color: var(--vetro-bordo);
+  background: var(--vetro-sfondo);
   color: var(--testo);
   font-weight: 400;
 }
 
+.bottone--tenue:hover {
+  border-color: color-mix(in srgb, var(--accento) 35%, var(--vetro-bordo));
+  background: var(--vetro-sfondo);
+}
+
 .bottone--pericolo {
+  border-color: color-mix(in srgb, var(--errore) 40%, var(--vetro-bordo));
+  background:
+    linear-gradient(
+      158deg,
+      color-mix(in srgb, var(--errore) 16%, transparent),
+      color-mix(in srgb, var(--errore) 6%, transparent)
+    );
   color: var(--errore);
-  border-color: var(--errore);
 }
 
 .bottone--pericolo:hover {

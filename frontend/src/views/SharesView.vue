@@ -4,8 +4,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
-import type { Share, Visibilita } from '@/api/shares'
-import DettaglioShare from '@/components/DettaglioShare.vue'
+import type { Visibilita } from '@/api/shares'
 import GruppoCampi from '@/components/GruppoCampi.vue'
 import IndirizziPubblicazione from '@/components/IndirizziPubblicazione.vue'
 import { useMountsStore } from '@/stores/mounts'
@@ -20,55 +19,17 @@ const mounts = useMountsStore()
 const VISIBILITA: Visibilita[] = ['pubblica', 'password', 'utenti', 'utenti_scelti', 'negata']
 
 const nuovoAperto = ref(false)
-const daEliminare = ref<Share | null>(null)
+
+/** Da quale condivisione arriva: in un elenco che le mischia tutte serve. */
+function nomeOrigine(idMount: number): string {
+  return mounts.elenco.find((m) => m.id === idMount)?.label ?? ''
+}
 
 // Modifica di una pubblicazione esistente. Il nome nell'indirizzo resta fuori
 // di proposito: cambiarlo romperebbe i collegamenti gia condivisi, che e
 // esattamente cio che una pubblicazione serve a produrre.
-const inModifica = ref<Share | null>(null)
-const modifiche = ref({
-  slug: '',
-  label: '',
-  mount_id: 0,
-  subpath: '',
-  hidden_patterns: '',
-  description: null as string | null,
-  default_visibility: 'utenti' as Visibilita,
-})
 
-/** Vero quando l'origine e' stata toccata: l'avviso compare solo allora. */
-const origineCambiata = computed(
-  () =>
-    inModifica.value !== null &&
-    (modifiche.value.mount_id !== inModifica.value.mount_id ||
-      modifiche.value.subpath !== (inModifica.value.subpath ?? '')),
-)
 
-/** L'indirizzo che uscira' dal nome scritto nella finestra di modifica. */
-const indirizzoModificato = computed(() =>
-  modifiche.value.slug ? `${window.location.origin}/${modifiche.value.slug}` : '',
-)
-
-function apriModifica(s: Share): void {
-  inModifica.value = s
-  modifiche.value = {
-    slug: s.slug,
-    label: s.label,
-    mount_id: s.mount_id,
-    subpath: s.subpath ?? '',
-    hidden_patterns: s.hidden_patterns ?? '',
-    description: s.description,
-    default_visibility: s.default_visibility,
-  }
-}
-
-async function salvaModifiche(): Promise<void> {
-  if (!inModifica.value) return
-  salvataggio.value = true
-  await shares.modifica(inModifica.value.id, modifiche.value)
-  salvataggio.value = false
-  inModifica.value = null
-}
 const salvataggio = ref(false)
 
 const form = ref({
@@ -145,17 +106,6 @@ async function salva(): Promise<void> {
     }
   }
 }
-
-async function conferma(): Promise<void> {
-  if (!daEliminare.value) return
-  await shares.elimina(daEliminare.value.id)
-  daEliminare.value = null
-}
-
-function alterna(s: Share): void {
-  if (shares.aperta?.id === s.id) shares.chiudi()
-  else void shares.apri(s.id)
-}
 </script>
 
 <template>
@@ -220,7 +170,11 @@ function alterna(s: Share): void {
       >
         <div class="intestazione">
           <div class="titoli">
-            <h2>{{ s.label }}</h2>
+            <h2>
+              <RouterLink :to="`/pubblicazioni/${s.id}`">
+                {{ s.label }}
+              </RouterLink>
+            </h2>
             <p class="origine">
               /{{ s.slug }}<template v-if="s.subpath">
                 · {{ s.subpath }}
@@ -236,47 +190,24 @@ function alterna(s: Share): void {
 
         <IndirizziPubblicazione :slug="s.slug" />
 
+        <!-- Modifica, permessi, link e rimozione stanno nella pagina della
+             pubblicazione: ripeterli qui significava mantenere due volte le
+             stesse funzioni, e nasconderle a chi arriva dall'albero. -->
         <div class="azioni">
+          <RouterLink
+            class="bottone bottone--principale"
+            :to="`/pubblicazioni/${s.id}`"
+          >
+            {{ t('share.gestisci') }}
+          </RouterLink>
           <RouterLink
             class="bottone"
             :to="`/archivio/${s.slug}`"
           >
             {{ t('archivio.apri') }}
           </RouterLink>
-          <button
-            type="button"
-            class="bottone bottone--tenue"
-            @click="alterna(s)"
-          >
-            {{ shares.aperta?.id === s.id ? t('comune.chiudi') : t('regole.titolo') }}
-          </button>
-          <button
-            type="button"
-            class="bottone bottone--tenue"
-            @click="apriModifica(s)"
-          >
-            {{ t('share.modifica') }}
-          </button>
-          <button
-            type="button"
-            class="bottone bottone--tenue"
-            @click="shares.modifica(s.id, { is_enabled: !s.is_enabled })"
-          >
-            {{ s.is_enabled ? t('share.disattivaAzione') : t('share.attivaAzione') }}
-          </button>
-          <button
-            type="button"
-            class="bottone bottone--pericolo"
-            @click="daEliminare = s"
-          >
-            {{ t('comune.elimina') }}
-          </button>
+          <span class="origine-nome">{{ nomeOrigine(s.mount_id) }}</span>
         </div>
-
-        <DettaglioShare
-          v-if="shares.aperta?.id === s.id"
-          :id="s.id"
-        />
       </li>
     </ul>
 
@@ -394,172 +325,6 @@ function alterna(s: Share): void {
             @click="salva"
           >
             {{ salvataggio ? t('share.creando') : t('comune.crea') }}
-          </button>
-        </footer>
-      </section>
-    </div>
-
-    <!-- modifica di una pubblicazione -->
-    <div
-      v-if="inModifica"
-      class="velo"
-      @click.self="inModifica = null"
-    >
-      <section class="pannello">
-        <h2>{{ t('share.modificaTitolo', { nome: inModifica.label }) }}</h2>
-
-        <label class="campo">
-          <span>{{ t('share.nome') }}</span>
-          <input
-            v-model="modifiche.label"
-            type="text"
-            maxlength="128"
-          >
-        </label>
-
-        <label class="campo">
-          <span>{{ t('share.identificatore') }}</span>
-          <input
-            v-model="modifiche.slug"
-            type="text"
-            maxlength="63"
-          >
-          <small
-            v-if="inModifica && modifiche.slug !== inModifica.slug"
-            class="aiuto aiuto--attenzione"
-          >{{ t('share.identificatoreAvviso') }}</small>
-        </label>
-
-        <p
-          v-if="indirizzoModificato"
-          class="previsto"
-        >
-          {{ t('share.anteprimaIndirizzo') }}
-          <span class="previsto__valore">{{ indirizzoModificato }}</span>
-        </p>
-
-        <label class="campo">
-          <span>{{ t('share.descrizione') }}</span>
-          <input
-            v-model="modifiche.description"
-            type="text"
-          >
-        </label>
-
-        <GruppoCampi
-          :titolo="t('share.gruppoCosa')"
-          :descrizione="t('share.gruppoCosaAiuto')"
-        >
-          <label class="campo">
-            <span>{{ t('share.condivisione') }}</span>
-            <select v-model.number="modifiche.mount_id">
-              <option
-                v-for="m in mounts.elenco"
-                :key="m.id"
-                :value="m.id"
-              >
-                {{ m.label }}
-              </option>
-            </select>
-          </label>
-          <label class="campo">
-            <span>{{ t('share.sottopercorso') }}</span>
-            <input
-              v-model="modifiche.subpath"
-              type="text"
-              :placeholder="t('share.sottopercorsoAiuto')"
-            >
-          </label>
-          <p
-            v-if="origineCambiata"
-            class="aiuto aiuto--attenzione"
-          >
-            {{ t('share.origineAvviso') }}
-          </p>
-        </GruppoCampi>
-
-        <GruppoCampi
-          :titolo="t('share.gruppoNascosti')"
-          :descrizione="t('share.gruppoNascostiAiuto')"
-        >
-          <label class="campo">
-            <span>{{ t('share.nascosti') }}</span>
-            <textarea
-              v-model="modifiche.hidden_patterns"
-              rows="5"
-              spellcheck="false"
-              class="elenco-nascosti"
-            />
-          </label>
-        </GruppoCampi>
-
-        <label class="campo">
-          <span>{{ t('share.visibilitaPredefinita') }}</span>
-          <select v-model="modifiche.default_visibility">
-            <option
-              v-for="v in VISIBILITA"
-              :key="v"
-              :value="v"
-            >
-              {{ t(`visibilita.${v}`) }}
-            </option>
-          </select>
-        </label>
-
-        <p
-          v-if="shares.errore"
-          class="errore"
-          role="alert"
-        >
-          {{ shares.errore }}
-        </p>
-
-        <footer class="azioni">
-          <button
-            type="button"
-            class="bottone bottone--tenue"
-            @click="inModifica = null"
-          >
-            {{ t('comune.annulla') }}
-          </button>
-          <button
-            class="bottone bottone--principale"
-            type="button"
-            :disabled="!modifiche.label || !modifiche.slug || salvataggio"
-            @click="salvaModifiche"
-          >
-            {{ salvataggio ? t('comune.carico') : t('comune.salva') }}
-          </button>
-        </footer>
-      </section>
-    </div>
-
-    <!-- conferma eliminazione -->
-    <div
-      v-if="daEliminare"
-      class="velo"
-      @click.self="daEliminare = null"
-    >
-      <section
-        class="pannello conferma"
-        role="alertdialog"
-      >
-        <h2>{{ t('share.confermaTitolo', { nome: daEliminare.label }) }}</h2>
-        <p>{{ t('share.confermaTesto') }}</p>
-        <footer class="azioni">
-          <button
-            type="button"
-            class="bottone bottone--tenue"
-            @click="daEliminare = null"
-          >
-            {{ t('comune.annulla') }}
-          </button>
-          <button
-            type="button"
-            class="bottone bottone--pericolo"
-            @click="conferma"
-          >
-            {{ t('comune.elimina') }}
           </button>
         </footer>
       </section>
@@ -737,6 +502,12 @@ h1 {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.82rem;
   resize: vertical;
+}
+
+.origine-nome {
+  margin-left: auto;
+  font-size: 0.82rem;
+  color: var(--testo-tenue);
 }
 
 .aiuto {

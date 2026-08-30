@@ -215,6 +215,36 @@ const categorie = computed<Categoria[]>(() => [
             </ul>
           </li>
 
+          <!-- L'elenco di tutte le cartelle pubblicate, di qualunque
+               condivisione: nell'albero si vedono solo quelle della
+               condivisione aperta, e senza questa voce la pagina non era
+               raggiungibile da nessuna parte. -->
+          <li>
+            <RouterLink
+              class="voce"
+              to="/pubblicazioni"
+              @click="emit('naviga')"
+            >
+              <span
+                class="pastiglia"
+                :style="{ '--tinta': 'var(--tinta-pubblicazioni)' }"
+                aria-hidden="true"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path :d="ICONE.globo" />
+                </svg>
+              </span>
+              <span class="voce__testo">{{ t('menu.tuttePubblicazioni') }}</span>
+            </RouterLink>
+          </li>
+
           <li>
             <RouterLink
               class="voce voce--aggiungi"
