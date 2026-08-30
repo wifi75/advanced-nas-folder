@@ -34,8 +34,7 @@ defineProps<{ titolo: string; descrizione?: string }>()
 .gruppo {
   margin: 0;
   padding: 0.9rem 1rem 1rem;
-  border: 1px solid var(--bordo);
-  border-radius: var(--raggio);
+  border: 0;
 }
 
 .gruppo__titolo {

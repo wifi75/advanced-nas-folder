@@ -62,6 +62,32 @@ async function salva(): Promise<void> {
   if (await mounts.modifica(id.value, opzioni.value)) salvato.value = true
 }
 
+/** Lo stato del montaggio, che mancava del tutto in questa pagina: era
+ *  visibile solo nell'elenco, cioe' nel posto da cui si e' appena usciti. */
+const etichettaStato = computed(() => {
+  switch (mount.value?.state) {
+    case 'montato':
+      return t('mount.statoMontato')
+    case 'smontato':
+      return t('mount.statoSmontato')
+    case 'errore':
+      return t('mount.statoErrore')
+    default:
+      return t('mount.statoInCorso')
+  }
+})
+
+const classeStato = computed(() => {
+  switch (mount.value?.state) {
+    case 'montato':
+      return 'stato-pillola--ok'
+    case 'errore':
+      return 'stato-pillola--errore'
+    default:
+      return 'stato-pillola--attesa'
+  }
+})
+
 const daEliminare = ref(false)
 
 async function elimina(): Promise<void> {
@@ -80,12 +106,35 @@ async function elimina(): Promise<void> {
     </p>
 
     <header class="testata">
-      <div>
-        <h1>{{ mount?.label ?? t('comune.carico') }}</h1>
-        <p v-if="mount">
-          {{ mount.server }}:{{ mount.export_path }}
-        </p>
+      <div class="identita">
+        <span
+          class="pastiglia-titolo"
+          :style="{ '--tinta': 'var(--tinta-nfs)' }"
+          aria-hidden="true"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z M12 11v3 M9 17h6" />
+          </svg>
+        </span>
+        <div>
+          <h1>{{ mount?.label ?? t('comune.carico') }}</h1>
+          <p v-if="mount">
+            {{ mount.server }}:{{ mount.export_path }}
+          </p>
+        </div>
       </div>
+      <span
+        v-if="mount"
+        class="stato-pillola"
+        :class="classeStato"
+      >{{ etichettaStato }}</span>
     </header>
 
     <p
@@ -102,12 +151,10 @@ async function elimina(): Promise<void> {
       :schede="schede"
     >
       <template v-if="attiva === 'panoramica'">
-        <dl class="dettagli">
+        <dl class="dati">
           <div>
             <dt>{{ t('mount.percorso') }}</dt>
-            <dd class="mono">
-              {{ mount.mountpoint }}
-            </dd>
+            <dd><code class="percorso">{{ mount.mountpoint }}</code></dd>
           </div>
           <div>
             <dt>{{ t('mount.versione') }}</dt>
@@ -346,6 +393,12 @@ async function elimina(): Promise<void> {
 </template>
 
 <style scoped>
+.identita {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .briciole {
   display: flex;
   gap: 0.4rem;
@@ -354,28 +407,9 @@ async function elimina(): Promise<void> {
   color: var(--testo-tenue);
 }
 
-.dettagli {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
-  gap: 0.9rem;
-  margin: 0;
-}
 
-.dettagli dt {
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--testo-tenue);
-}
 
-.dettagli dd {
-  margin: 0.15rem 0 0;
-}
 
-.mono {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  word-break: break-all;
-}
 
 .elenco {
   list-style: none;
@@ -398,10 +432,6 @@ async function elimina(): Promise<void> {
   font-size: 1.05rem;
 }
 
-.stato {
-  font-size: 0.8rem;
-  color: var(--testo-tenue);
-}
 
 .avviso {
   margin: 0;

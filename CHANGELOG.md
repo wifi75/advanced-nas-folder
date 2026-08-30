@@ -18,6 +18,25 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.14.1] - 2026-08-30
+
+### Modificato
+- **Le pagine usano lo stesso materiale della barra laterale**: vetro
+  traslucido, raggio di 11px, filo di luce in alto. Erano riquadri piatti
+  bianchi, e sembravano un'altra applicazione attaccata al menu.
+- **Le linguette dei sottomenu sono una barra segmentata** invece di testo nudo
+  su una linea: devono sembrare qualcosa su cui si clicca anche prima di
+  provarci.
+- **Ogni pagina di dettaglio ha la pastiglia colorata** della voce di menu
+  corrispondente, così si riconosce dove si è senza leggere le briciole.
+
+### Corretto
+- **Il percorso di montaggio andava a capo a metà parola**
+  (`/srv/nas/mnt-synology-f` poi `oto-cucina`): illeggibile, e impossibile da
+  copiare a occhio. Ora scorre invece di spezzarsi.
+- **Lo stato del montaggio non compariva** nella pagina della condivisione: era
+  visibile solo nell'elenco, cioè nel posto da cui si era appena usciti.
+
 ## [0.14.0] - 2026-08-30
 
 L'impianto scelto fra quattro proposte: **l'albero nel menu**.

@@ -370,3 +370,138 @@ a {
   color: var(--testo-tenue);
   text-align: center;
 }
+
+/* --- dati in sola lettura --------------------------------------------------
+   Etichetta sopra, valore sotto, in riquadri: prima erano coppie di testo
+   appoggiate sulla pagina, senza niente che dicesse dove finiva un dato e
+   cominciava il successivo. */
+
+.dati {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0.6rem;
+  margin: 0;
+}
+
+.dati > div {
+  padding: 0.7rem 0.85rem;
+  border-radius: 11px;
+  background: var(--vetro-sfondo);
+  border: 1px solid var(--vetro-bordo);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 var(--vetro-luce),
+    var(--vetro-ombra);
+  min-width: 0;
+}
+
+.dati dt {
+  margin: 0 0 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--testo-tenue);
+}
+
+.dati dd {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* Un percorso non si spezza a meta' parola: `/srv/nas/mnt-synology-f` a capo
+   `oto-cucina` e' illeggibile e non si puo' nemmeno copiare a occhio. Scorre
+   invece di andare a capo. */
+.percorso {
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+  padding-bottom: 0.15rem;
+}
+
+/* --- stato --------------------------------------------------------------- */
+
+.stato-pillola {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.6rem;
+  border: 1px solid var(--bordo);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  color: var(--testo-tenue);
+  white-space: nowrap;
+}
+
+.stato-pillola::before {
+  content: "";
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.stato-pillola--ok { color: var(--ok); border-color: currentColor; }
+.stato-pillola--attesa { color: var(--attenzione); border-color: currentColor; }
+.stato-pillola--errore { color: var(--errore); border-color: currentColor; }
+
+/* --- lo stesso vetro del menu, sulle pagine ------------------------------
+   Riquadri, schede e gruppi di campi usano il materiale della barra laterale:
+   raggio 11px, vetro traslucido, filo di luce in alto. Prima le pagine erano
+   riquadri piatti bianchi e sembravano un'altra applicazione. */
+
+.scheda,
+.gruppo,
+.riquadro-vetro {
+  border-radius: 11px;
+  background: var(--vetro-sfondo);
+  border: 1px solid var(--vetro-bordo);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 var(--vetro-luce),
+    var(--vetro-ombra);
+}
+
+/* Il titolo di una sezione ha lo stesso trattamento dei gruppi del menu. */
+.occhiello {
+  margin: 0 0 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--testo-tenue);
+}
+
+/* La pastiglia colorata delle voci di menu, riusabile nelle intestazioni. */
+.pastiglia-titolo {
+  flex: none;
+  inline-size: 34px;
+  block-size: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  color: #fff;
+  background:
+    linear-gradient(
+      165deg,
+      color-mix(in srgb, var(--tinta) 100%, white 18%),
+      color-mix(in srgb, var(--tinta) 78%, black 22%)
+    );
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 45%),
+    0 2px 5px -1px color-mix(in srgb, var(--tinta) 55%, transparent);
+}
+
+.pastiglia-titolo svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* I pulsanti prendono lo stesso raggio delle voci di menu. */
+.bottone {
+  border-radius: 9px;
+}

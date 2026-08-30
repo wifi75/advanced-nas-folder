@@ -103,11 +103,29 @@ async function elimina(): Promise<void> {
     </p>
 
     <header class="testata">
-      <div>
-        <h1>{{ share?.label ?? t('comune.carico') }}</h1>
-        <p v-if="share">
-          {{ t(`visibilita.${share.default_visibility}`) }}
-        </p>
+      <div class="identita">
+        <span
+          class="pastiglia-titolo"
+          :style="{ '--tinta': 'var(--tinta-pubblicazioni)' }"
+          aria-hidden="true"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z M3 12h18 M12 3c2.5 2.7 2.5 15.3 0 18 M12 3c-2.5 2.7-2.5 15.3 0 18" />
+          </svg>
+        </span>
+        <div>
+          <h1>{{ share?.label ?? t('comune.carico') }}</h1>
+          <p v-if="share">
+            {{ t(`visibilita.${share.default_visibility}`) }}
+          </p>
+        </div>
       </div>
       <span
         v-if="share && !share.is_enabled"
@@ -333,6 +351,12 @@ async function elimina(): Promise<void> {
 </template>
 
 <style scoped>
+.identita {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .briciole {
   display: flex;
   gap: 0.4rem;

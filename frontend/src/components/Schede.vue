@@ -69,27 +69,38 @@ defineExpose({ attiva })
 .schede {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.35rem;
 }
 
+/* Una barra segmentata, non testo nudo su una linea: le linguette devono
+   sembrare qualcosa su cui si clicca anche prima di provarci. */
 .schede__barra {
-  display: flex;
+  display: inline-flex;
   flex-wrap: wrap;
-  gap: 0.15rem;
-  border-bottom: 1px solid var(--bordo);
+  gap: 0.2rem;
+  padding: 0.25rem;
+  border: 1px solid var(--vetro-bordo);
+  border-radius: 12px;
+  background: var(--vetro-sfondo);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  box-shadow: inset 0 1px 0 var(--vetro-luce);
+  align-self: flex-start;
+  max-width: 100%;
 }
 
 .scheda-voce {
   border: 0;
-  border-bottom: 2px solid transparent;
+  border-radius: 9px;
   background: none;
   color: var(--testo-tenue);
   font: inherit;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   font-weight: 500;
-  padding: 0.5rem 0.9rem;
-  margin-bottom: -1px;
+  padding: 0.4rem 0.85rem;
   cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s ease, color 0.12s ease;
 }
 
 .scheda-voce:hover {
@@ -97,8 +108,11 @@ defineExpose({ attiva })
 }
 
 .scheda-voce--attiva {
-  color: var(--accento);
-  border-bottom-color: var(--accento);
+  color: var(--testo);
+  background: var(--superficie);
+  box-shadow:
+    inset 0 1px 0 var(--vetro-luce),
+    var(--vetro-ombra);
 }
 
 .schede__corpo {
