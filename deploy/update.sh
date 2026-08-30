@@ -218,9 +218,15 @@ if [ "$DRY_RUN" = 0 ]; then
     # aggiornamento riuscito e uno che non ha toccato niente sono
     # indistinguibili, ed e proprio la domanda che ci si fa dopo averlo lanciato.
     CAMBIAMENTI="$(mktemp)"
+    # Bytecode e metadati del pacchetto restano fuori: Python li rigenera da
+    # solo, e senza escluderli venivano cancellati e ricreati a ogni
+    # aggiornamento — il resoconto delle modifiche annegava in decine di righe
+    # che non dicevano niente.
     rsync -a --delete --itemize-changes \
         --exclude '.env' \
         --exclude 'venv' \
+        --exclude '__pycache__' \
+        --exclude '*.egg-info' \
         "$TEMPORANEA/nuova/" "$RADICE/" >"$CAMBIAMENTI"
 
     passo "$(msg 'File cambiati' 'Changed files')"

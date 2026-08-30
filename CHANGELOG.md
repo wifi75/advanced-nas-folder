@@ -10,6 +10,14 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.10.1] - 2026-08-30
+
+### Corretto
+- **Il resoconto dell'aggiornamento annegava nel rumore.** `__pycache__` e
+  `.egg-info` venivano cancellati e ricreati a ogni aggiornamento, e l'elenco
+  dei file cambiati si apriva con decine di righe che non dicevano niente. Ora
+  restano fuori: Python li rigenera da solo.
+
 ## [0.10.0] - 2026-08-30
 
 Pagine più coerenti, e le cose che mancavano per governare una pubblicazione.
