@@ -108,7 +108,10 @@ defineProps<{ titolo: string; descrizione?: string; tinta?: string; icona?: stri
      quanto la pagina. I campi corti stanno affiancati, quelli che hanno
      bisogno di spazio lo chiedono con `.campo--largo`. */
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  /* `auto-fill` e non `auto-fit`: con `auto-fit` le colonne vuote collassano e
+     un gruppo con un solo campo lo allarga per tutta la pagina — che e'
+     esattamente il difetto che si voleva togliere. */
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
   gap: 0.55rem;
   align-items: start;
 }

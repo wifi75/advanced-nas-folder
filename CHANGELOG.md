@@ -18,6 +18,14 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.15.1] - 2026-08-30
+
+### Corretto
+- **Un gruppo con un solo campo lo allargava ancora per tutta la pagina.** La
+  griglia usava `auto-fit`, che fa collassare le colonne vuote: l'unico campo
+  presente le occupava tutte. Con `auto-fill` le colonne restano, e il campo
+  tiene la propria larghezza.
+
 ## [0.15.0] - 2026-08-30
 
 ### Modificato
