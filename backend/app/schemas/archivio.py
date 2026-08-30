@@ -20,6 +20,9 @@ class VoceOut(BaseModel):
     #: percorrerle tutte, cosa che su NFS costa quanto l'elenco stesso.
     dimensione: int | None = None
     modificato: datetime | None = None
+    #: Quando la foto e' stata scattata. Presente solo se richiesta con
+    #: `scatti=true`: leggerla significa aprire ogni immagine.
+    scattata: datetime | None = None
 
 
 class ContenutoOut(BaseModel):

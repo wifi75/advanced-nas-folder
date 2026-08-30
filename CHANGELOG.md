@@ -18,6 +18,30 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.22.0] - 2026-08-30
+
+Ultima delle cinque funzioni fotografiche scelte.
+
+### Aggiunto
+- **Le foto sono raggruppate per mese di scatto**, dalla piu' recente, nella
+  vista Miniature. La data usata e' quella scritta dalla macchina, non quella
+  del file: sul NAS quest'ultima e' quasi sempre la data della copia, e
+  raggruppare per quella metterebbe insieme foto di anni diversi travasate lo
+  stesso giorno.
+
+  Chi non ha una data finisce in un gruppo a parte in fondo, invece di essere
+  infilato in un mese qualunque: una foto senza data non e' una foto di
+  gennaio.
+
+  **La data si legge una volta sola per foto** e resta accanto alla miniatura,
+  con la stessa regola: dipende da percorso, data e dimensione dell'originale,
+  quindi una foto sostituita ottiene una voce nuova. Aprire ogni immagine e'
+  l'operazione piu' lenta che facciamo su NFS, e rifarla a ogni apertura di
+  cartella renderebbe la funzione inutilizzabile.
+
+  Le date vengono chieste **solo** in Miniature: in elenco e griglia non
+  servono, e pagarle senza usarle rallenterebbe le viste piu' frequenti.
+
 ## [0.21.1] - 2026-08-30
 
 ### Corretto

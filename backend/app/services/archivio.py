@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import os
 from collections.abc import Callable, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from fnmatch import fnmatch
 from pathlib import Path, PurePosixPath
@@ -35,6 +35,9 @@ class Voce:
     cartella: bool
     dimensione: int | None
     modificato: datetime | None
+    #: Quando la foto e' stata scattata, se lo sappiamo. Diversa da
+    #: `modificato`, che sul NAS e' quasi sempre la data della copia.
+    scattata: datetime | None = None
 
 
 async def radice(sessione: AsyncSession, share: Share) -> Path:
@@ -144,6 +147,7 @@ async def elenca(
     *,
     nascosti: bool = False,
     schemi: Sequence[str] = (),
+    cache_scatti: Path | None = None,
 ) -> list[Voce]:
     """Voci della cartella che chi guarda puo' vedere, cartelle prima.
 
@@ -163,8 +167,28 @@ async def elenca(
         raise ArchivioNonDisponibile("La cartella non e' leggibile.") from exc
 
     visibili = [v for v in voci if consentito(v.percorso)]
+
+    # La data di scatto solo se chi chiama la usa davvero: leggerla significa
+    # aprire ogni immagine, ed e' l'operazione piu' lenta che facciamo su NFS.
+    if cache_scatti is not None:
+        visibili = await anyio.to_thread.run_sync(_con_date, visibili, reale, cache_scatti)
+
     visibili.sort(key=lambda v: (not v.cartella, v.nome.casefold()))
     return visibili
+
+
+def _con_date(voci: list[Voce], reale: Path, cache: Path) -> list[Voce]:
+    """Aggiunge la data di scatto alle immagini. Sincrona: la chiama un thread."""
+    from app.services import exif, miniature
+
+    arricchite = []
+    for voce in voci:
+        if voce.cartella or not miniature.e_immagine(voce.nome):
+            arricchite.append(voce)
+            continue
+        quando = exif.data_conservata(reale / PurePosixPath(voce.percorso).name, cache)
+        arricchite.append(replace(voce, scattata=quando))
+    return arricchite
 
 
 def briciole(percorso: str) -> list[tuple[str, str]]:

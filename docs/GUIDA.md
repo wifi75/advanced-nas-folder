@@ -188,6 +188,20 @@ Sul telefono la galleria mette tre foto per riga e l'anteprima occupa tutto lo
 schermo: i margini di una finestra sprecherebbero proprio lo spazio che serve a
 guardare l'immagine.
 
+### Le foto divise per mese
+
+Nella vista **Miniature** le foto sono raggruppate per **mese di scatto**, dalla
+più recente. Chi non ha una data finisce in un gruppo a parte in fondo: una
+foto senza data non è una foto di gennaio.
+
+La data usata è quella scritta dalla macchina fotografica, non quella del file.
+Il server la legge **una volta sola** per ogni foto e la conserva accanto alla
+miniatura: la prima apertura di una cartella con centinaia di scatti richiede
+qualche secondo, le successive no.
+
+Negli altri due modi — elenco e griglia — le foto restano in ordine
+alfabetico, e le date non vengono nemmeno lette.
+
 ### Guardare una foto da vicino
 
 Aperta un'immagine:

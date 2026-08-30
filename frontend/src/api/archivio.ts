@@ -16,6 +16,10 @@ export interface Voce {
   /** Assente per le cartelle: calcolarne la dimensione costerebbe quanto l'elenco. */
   dimensione: number | null
   modificato: string | null
+  /** Quando la foto e' stata scattata. Presente solo se chiesta con `scatti`:
+   *  leggerla significa aprire ogni immagine. Diversa da `modificato`, che sul
+   *  NAS e' quasi sempre la data della copia. */
+  scattata?: string | null
 }
 
 export interface Contenuto {
@@ -50,9 +54,10 @@ export const archivioApi = {
       `/archivio/${encodeURIComponent(slug)}/scatto?${new URLSearchParams({ percorso })}`,
     ),
 
-  contenuto: (slug: string, percorso = '', password?: string) => {
+  contenuto: (slug: string, percorso = '', password?: string, scatti = false) => {
     const q = new URLSearchParams({ percorso })
     if (password) q.set('password', password)
+    if (scatti) q.set('scatti', 'true')
     return api.get<Contenuto>(`/archivio/${encodeURIComponent(slug)}?${q}`)
   },
 

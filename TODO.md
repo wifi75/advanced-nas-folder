@@ -138,6 +138,9 @@ Richieste del 2026-08-29 rimaste aperte alla chiusura della v0.3.0:
 
 ### Richieste del 2026-08-30
 
+- [x] **Sistema fotografico completo**: dati di scatto (EXIF) con mappa,
+      ingrandimento e trascinamento, presentazione automatica, raggruppamento
+      per mese di scatto, miniature dei video con `ffmpeg`.
 - [x] **Miniature vere per le foto**: prodotte dal server con Pillow, chieste
       solo quando entrano nello schermo, in cache accanto al database e non sul
       NAS. Prima la galleria scaricava ogni scatto per intero per mostrarlo a

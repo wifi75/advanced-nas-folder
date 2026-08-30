@@ -464,6 +464,7 @@ export default {
   },
 
   archivio: {
+    senzaData: 'No date',
     apriCartella: 'Open',
     vediAnteprima: 'Preview',
     vista: 'View',

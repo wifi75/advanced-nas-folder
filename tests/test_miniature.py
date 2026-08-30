@@ -247,3 +247,54 @@ async def test_un_video_illeggibile_da_415(
     risposta = await admin.get("/api/v1/archivio/foto/miniatura", params={"percorso": "rotto.mp4"})
 
     assert risposta.status_code == 415
+
+
+# --- data di scatto conservata ----------------------------------------------
+
+
+def test_la_data_si_legge_una_volta_sola(
+    cartella: Path, cache: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Aprire ogni foto e' l'operazione piu' lenta su NFS: rifarla a ogni
+    apertura di cartella renderebbe il raggruppamento inutilizzabile."""
+    foto = _con_exif(cartella / "scatto.jpg")
+    letture = 0
+    vera = exif.leggi
+
+    def conta(percorso: Path) -> exif.DatiScatto:
+        nonlocal letture
+        letture += 1
+        return vera(percorso)
+
+    monkeypatch.setattr(exif, "leggi", conta)
+
+    prima = exif.data_conservata(foto, cache)
+    seconda = exif.data_conservata(foto, cache)
+
+    assert prima is not None
+    assert prima.year == 2021
+    assert seconda == prima
+    assert letture == 1, "il file e' stato riaperto invece di usare la memoria"
+
+
+def test_una_foto_senza_data_non_viene_riletta_ogni_volta(cartella: Path, cache: Path) -> None:
+    """Ricontrollarla a ogni giro significherebbe riaprirla per sempre."""
+    assert exif.data_conservata(cartella / "foto.jpg", cache) is None
+
+    assert len(list(cache.glob("*.data"))) == 1
+    assert exif.data_conservata(cartella / "foto.jpg", cache) is None
+
+
+async def test_lelenco_puo_portare_le_date(
+    admin: AsyncClient, share_id: int, cartella: Path
+) -> None:
+    _con_exif(cartella / "scatto.jpg")
+
+    senza = (await admin.get("/api/v1/archivio/foto")).json()["voci"]
+    con = (await admin.get("/api/v1/archivio/foto", params={"scatti": "true"})).json()["voci"]
+
+    def data(voci: list[dict[str, object]]) -> object:
+        return next(v["scattata"] for v in voci if v["nome"] == "scatto.jpg")
+
+    assert data(senza) is None
+    assert str(data(con)).startswith("2021-05-26")

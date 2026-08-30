@@ -13,6 +13,7 @@ in cui sono state travasate, che non è mai l'ordine che si ha in mente.
 
 from __future__ import annotations
 
+import hashlib
 from dataclasses import dataclass
 from datetime import datetime
 from fractions import Fraction
@@ -167,3 +168,46 @@ def leggi(percorso: Path) -> DatiScatto:
         larghezza=larghezza,
         altezza=altezza,
     )
+
+
+# --- data dello scatto, conservata ------------------------------------------
+#
+# Raggruppare una cartella per data richiede la data di *ogni* foto, cioe'
+# aprire ogni file. Su NFS e' l'operazione piu' lenta che facciamo, e rifarla a
+# ogni apertura della cartella renderebbe la funzione inutilizzabile.
+#
+# La si legge quindi una volta sola e la si conserva accanto alla miniatura,
+# con la stessa regola: il nome dipende da percorso, data e dimensione
+# dell'originale, quindi una foto sostituita ottiene una voce nuova invece di
+# ereditare quella vecchia.
+
+
+def data_conservata(originale: Path, cache: Path) -> datetime | None:
+    """La data di scatto, letta dal file solo la prima volta."""
+    try:
+        info = originale.stat()
+    except OSError:
+        return None
+
+    impronta = hashlib.sha256(f"{originale}|{info.st_mtime}|{info.st_size}".encode()).hexdigest()
+    memoria = cache / f"{impronta}.data"
+
+    try:
+        salvata = memoria.read_text(encoding="utf-8").strip()
+        # Riga vuota: gia' letta, e questa foto non ha una data. Ricontrollarla
+        # a ogni giro significherebbe riaprirla per sempre.
+        return datetime.fromisoformat(salvata) if salvata else None
+    except OSError, ValueError:
+        pass
+
+    scattata = leggi(originale).scattata
+    try:
+        cache.mkdir(parents=True, exist_ok=True)
+        parziale = memoria.with_suffix(".parziale")
+        parziale.write_text(scattata.isoformat() if scattata else "", encoding="utf-8")
+        parziale.replace(memoria)
+    except OSError:
+        # Non poter scrivere la cache non deve impedire di rispondere: si
+        # rileggera' la prossima volta.
+        pass
+    return scattata

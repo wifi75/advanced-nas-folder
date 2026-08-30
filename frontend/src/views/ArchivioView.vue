@@ -45,10 +45,14 @@ async function carica(): Promise<void> {
   carico.value = true
   errore.value = null
   try {
+    // Le date di scatto solo in miniature, dove servono a raggruppare: la
+    // prima volta il server deve aprire ogni immagine, e chiederle anche in
+    // elenco significherebbe pagarle senza usarle.
     contenuto.value = await archivioApi.contenuto(
       slug.value,
       percorso.value,
       password.value || undefined,
+      vista.value === 'galleria',
     )
     chiedePassword.value = false
   } catch (e) {
@@ -114,7 +118,9 @@ function vistaSalvata(): Vista {
 const vista = ref<Vista>(vistaSalvata())
 
 function cambiaVista(nuova: Vista): void {
+  const servonoDate = nuova === 'galleria' && vista.value !== 'galleria'
   vista.value = nuova
+  if (servonoDate) void carica()
   try {
     localStorage.setItem(CHIAVE_VISTA, nuova)
   } catch {
@@ -160,6 +166,44 @@ const inAnteprima = ref<Voce | null>(null)
 
 /** Le sole immagini della cartella, nell'ordine in cui si vedono. */
 const immagini = computed(() => voci.value.filter(eImmagine))
+
+/**
+ * Le voci divise per mese di scatto, come in una raccolta di fotografie.
+ *
+ * Chi non ha una data finisce in un gruppo a parte in fondo, invece di essere
+ * infilato in un mese qualunque: una foto senza data non e' una foto di
+ * gennaio.
+ */
+const gruppi = computed(() => {
+  if (vista.value !== 'galleria') return [{ titolo: '', voci: voci.value }]
+
+  const perMese = new Map<string, Voce[]>()
+  const senzaData: Voce[] = []
+
+  for (const voce of voci.value) {
+    if (!voce.scattata) {
+      senzaData.push(voce)
+      continue
+    }
+    const quando = new Date(voce.scattata)
+    const chiave = `${quando.getFullYear()}-${String(quando.getMonth() + 1).padStart(2, '0')}`
+    const gruppo = perMese.get(chiave)
+    if (gruppo) gruppo.push(voce)
+    else perMese.set(chiave, [voce])
+  }
+
+  const titolo = (chiave: string): string => {
+    const [anno, mese] = chiave.split('-')
+    const data = new Date(Number(anno), Number(mese) - 1, 1)
+    return data.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
+  }
+
+  // Dal piu' recente: e' l'ordine in cui si cercano le foto.
+  const ordinati = [...perMese.keys()].sort().reverse()
+  const elenco = ordinati.map((chiave) => ({ titolo: titolo(chiave), voci: perMese.get(chiave)! }))
+  if (senzaData.length > 0) elenco.push({ titolo: t('archivio.senzaData'), voci: senzaData })
+  return elenco
+})
 
 const posizione = computed(() => {
   if (!inAnteprima.value) return 0
@@ -587,114 +631,131 @@ function quando(iso: string | null): string {
       </button>
     </div>
 
-    <ul
-      v-if="contenuto && voci.length"
-      class="voci"
-      :class="`voci--${vista}`"
-    >
-      <li
-        v-for="voce in voci"
-        :key="voce.percorso"
-        class="voce"
-        @contextmenu.prevent="apriMenu(voce, $event)"
+    <!-- In miniature le foto sono divise per mese di scatto, come in una
+         raccolta: negli altri modi il gruppo e' uno solo e il titolo non
+         compare. -->
+    <template v-if="contenuto && voci.length">
+      <section
+        v-for="gruppo in gruppi"
+        :key="gruppo.titolo"
+        class="gruppo-date"
       >
-        <input
-          type="checkbox"
-          class="voce__scelta"
-          :checked="scelti.has(voce.percorso)"
-          :aria-label="t('selezione.scegli', { nome: voce.nome })"
-          @change="alternaScelta(voce)"
+        <h2
+          v-if="gruppo.titolo"
+          class="gruppo-date__titolo"
         >
-
-        <button
-          v-if="voce.cartella"
-          type="button"
-          class="voce__apri"
-          @click="apri(voce)"
+          {{ gruppo.titolo }}
+        </h2>
+        <ul
+          v-if="gruppo.voci.length"
+          class="voci"
+          :class="`voci--${vista}`"
         >
-          <svg
-            class="voce__icona"
-            :class="`voce__icona--${famiglia(voce)}`"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
+          <li
+            v-for="voce in gruppo.voci"
+            :key="voce.percorso"
+            class="voce"
+            @contextmenu.prevent="apriMenu(voce, $event)"
           >
-            <path :d="TRACCIATI[famiglia(voce)]" />
-          </svg>
-          <span class="voce__nome">{{ risultati ? voce.percorso : voce.nome }}</span>
-        </button>
+            <input
+              type="checkbox"
+              class="voce__scelta"
+              :checked="scelti.has(voce.percorso)"
+              :aria-label="t('selezione.scegli', { nome: voce.nome })"
+              @change="alternaScelta(voce)"
+            >
 
-        <button
-          v-else
-          type="button"
-          class="voce__apri"
-          @click="inAnteprima = voce"
-        >
-          <MiniaturaVoce
-            v-if="vista !== 'elenco' && haMiniatura(voce)"
-            :slug="slug"
-            :percorso="voce.percorso"
-            :nome="voce.nome"
-          >
-            <svg
-              class="voce__icona"
-              :class="`voce__icona--${famiglia(voce)}`"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
+            <button
+              v-if="voce.cartella"
+              type="button"
+              class="voce__apri"
+              @click="apri(voce)"
             >
-              <path :d="TRACCIATI[famiglia(voce)]" />
-            </svg>
-          </MiniaturaVoce>
-          <svg
-            v-else
-            class="voce__icona"
-            :class="`voce__icona--${famiglia(voce)}`"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <path :d="TRACCIATI[famiglia(voce)]" />
-          </svg>
-          <span class="voce__nome">{{ risultati ? voce.percorso : voce.nome }}</span>
-        </button>
+              <svg
+                class="voce__icona"
+                :class="`voce__icona--${famiglia(voce)}`"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path :d="TRACCIATI[famiglia(voce)]" />
+              </svg>
+              <span class="voce__nome">{{ risultati ? voce.percorso : voce.nome }}</span>
+            </button>
 
-        <span class="voce__dimensione">{{ dimensione(voce.dimensione) }}</span>
-        <span class="voce__data">{{ quando(voce.modificato) }}</span>
+            <button
+              v-else
+              type="button"
+              class="voce__apri"
+              @click="inAnteprima = voce"
+            >
+              <MiniaturaVoce
+                v-if="vista !== 'elenco' && haMiniatura(voce)"
+                :slug="slug"
+                :percorso="voce.percorso"
+                :nome="voce.nome"
+              >
+                <svg
+                  class="voce__icona"
+                  :class="`voce__icona--${famiglia(voce)}`"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path :d="TRACCIATI[famiglia(voce)]" />
+                </svg>
+              </MiniaturaVoce>
+              <svg
+                v-else
+                class="voce__icona"
+                :class="`voce__icona--${famiglia(voce)}`"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path :d="TRACCIATI[famiglia(voce)]" />
+              </svg>
+              <span class="voce__nome">{{ risultati ? voce.percorso : voce.nome }}</span>
+            </button>
 
-        <div class="voce__azioni">
-          <button
-            v-if="!voce.cartella"
-            type="button"
-            class="bottone bottone--tenue"
-            :disabled="inPreparazione === voce.percorso"
-            @click="scarica(voce)"
-          >
-            {{ inPreparazione === voce.percorso ? t('comune.carico') : t('archivio.scarica') }}
-          </button>
-          <template v-if="puoScrivere">
-            <button
-              type="button"
-              class="bottone bottone--tenue"
-              @click="apriRinomina(voce)"
-            >
-              {{ t('operazioni.rinomina') }}
-            </button>
-            <button
-              type="button"
-              class="bottone bottone--tenue"
-              @click="apriSposta(voce)"
-            >
-              {{ t('operazioni.sposta') }}
-            </button>
-            <button
-              type="button"
-              class="bottone bottone--pericolo"
-              @click="daEliminare = voce"
-            >
-              {{ t('comune.elimina') }}
-            </button>
-          </template>
-        </div>
-      </li>
-    </ul>
+            <span class="voce__dimensione">{{ dimensione(voce.dimensione) }}</span>
+            <span class="voce__data">{{ quando(voce.modificato) }}</span>
+
+            <div class="voce__azioni">
+              <button
+                v-if="!voce.cartella"
+                type="button"
+                class="bottone bottone--tenue"
+                :disabled="inPreparazione === voce.percorso"
+                @click="scarica(voce)"
+              >
+                {{ inPreparazione === voce.percorso ? t('comune.carico') : t('archivio.scarica') }}
+              </button>
+              <template v-if="puoScrivere">
+                <button
+                  type="button"
+                  class="bottone bottone--tenue"
+                  @click="apriRinomina(voce)"
+                >
+                  {{ t('operazioni.rinomina') }}
+                </button>
+                <button
+                  type="button"
+                  class="bottone bottone--tenue"
+                  @click="apriSposta(voce)"
+                >
+                  {{ t('operazioni.sposta') }}
+                </button>
+                <button
+                  type="button"
+                  class="bottone bottone--pericolo"
+                  @click="daEliminare = voce"
+                >
+                  {{ t('comune.elimina') }}
+                </button>
+              </template>
+            </div>
+          </li>
+        </ul>
+      </section>
+    </template>
 
     <div
       v-if="menu"
@@ -985,6 +1046,20 @@ function quando(iso: string | null): string {
 
 .menu__pericolo {
   color: var(--errore);
+}
+
+/* Il mese come intestazione, non come etichetta su ogni foto: si legge una
+   volta e vale per tutte quelle che seguono. */
+.gruppo-date + .gruppo-date {
+  margin-top: 1.4rem;
+}
+
+.gruppo-date__titolo {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--testo-tenue);
+  text-transform: capitalize;
 }
 
 .viste {

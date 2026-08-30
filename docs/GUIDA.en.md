@@ -187,6 +187,20 @@ On a phone the gallery fits three photos per row and the preview takes the whole
 screen: a window's margins would waste exactly the space needed to look at the
 image.
 
+### Photos grouped by month
+
+In the **Thumbnails** view photos are grouped by **month taken**, newest first.
+Those without a date go into a separate group at the end: a photo with no date
+is not a January photo.
+
+The date used is the one written by the camera, not the file's. The server
+reads it **once** per photo and keeps it next to the thumbnail: the first time
+a folder with hundreds of shots is opened takes a few seconds, the next times
+do not.
+
+In the other two views — list and grid — photos stay in alphabetical order, and
+the dates are not even read.
+
 ### Looking closely at a photo
 
 With an image open:

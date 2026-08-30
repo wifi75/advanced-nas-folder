@@ -142,6 +142,10 @@ async def contenuto(
     utente: UtenteFacoltativo,
     percorso: str = Query(default="", max_length=1024),
     password: str | None = None,
+    scatti: bool = Query(
+        default=False,
+        description="Aggiunge la data di scatto delle foto: costa la lettura di ogni immagine.",
+    ),
 ) -> ContenutoOut:
     """Elenco della cartella, limitato alle voci che chi guarda puo' vedere."""
     share = await _pubblicazione(sessione, slug)
@@ -163,6 +167,7 @@ async def contenuto(
             consentito,
             nascosti=await _mostra_nascosti(sessione),
             schemi=archivio.schemi_da(share.hidden_patterns),
+            cache_scatti=get_settings().cartella_miniature if scatti else None,
         )
     except archivio.ArchivioNonDisponibile as exc:
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, str(exc)) from exc

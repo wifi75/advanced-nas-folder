@@ -470,6 +470,7 @@ export default {
   },
 
   archivio: {
+    senzaData: 'Senza data',
     apriCartella: 'Apri',
     vediAnteprima: 'Anteprima',
     vista: 'Vista',
