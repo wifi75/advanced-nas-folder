@@ -10,6 +10,14 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.27.1] - 2026-08-30
+
+### Corretto
+
+- Un utente normale che chiedeva una pagina di amministrazione per indirizzo
+  diretto trovava una pagina **bianca**: ora torna alla propria pagina
+  iniziale, che gli mostra le cartelle a cui ha diritto.
+
 ## [0.27.0] - 2026-08-30
 
 ### Aggiunto

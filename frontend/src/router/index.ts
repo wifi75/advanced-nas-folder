@@ -116,7 +116,10 @@ router.beforeEach((to) => {
   // questo controllo restavano raggiungibili scrivendo l'indirizzo, e chi ci
   // arrivava trovava una pagina rotta invece di una porta chiusa.
   if (to.meta.admin && !auth.utente?.is_admin) {
-    return { name: 'nonTrovata', params: { pathMatch: to.path.slice(1).split('/') } }
+    // A casa propria, non a una pagina di errore: chi e' entrato con le sue
+    // credenziali non ha sbagliato indirizzo, ha chiesto una cosa che non gli
+    // spetta — e la sua pagina iniziale gli mostra cosa gli spetta invece.
+    return { name: 'home' }
   }
   return true
 })
