@@ -7,6 +7,24 @@ unverified `latest`, no numbers written from memory.
 
 ---
 
+## System dependencies
+
+Not everything comes from a registry. These are installed with `apt`, and the
+installer adds them alongside the rest:
+
+| Program | What it is for | If missing |
+|---|---|---|
+| `ffmpeg` | video thumbnails: extracts one frame | videos keep the type icon, the rest works |
+| `nfs-common` | mounting the shares | no mounts, so nothing to publish |
+| `openssl` | generating the secrets in `.env` | the installation does not start |
+
+`ffmpeg` has no pinned version: the distribution's own is used. The command we
+need — extract a frame and resize it — has not changed in any recent version,
+and pinning it would force a manual build on distributions carrying another.
+
+**Pillow needs no system packages**: its Linux distribution already bundles the
+compression libraries. Verified on the real installation.
+
 ## How to check them (the only valid way)
 
 **Query the official registries.** Neither memory nor web searches are reliable
@@ -31,7 +49,7 @@ becomes `%40vitejs%2Fplugin-vue`.
 
 ---
 
-## State as of 2026-08-29
+## State as of 2026-08-30
 
 ### Backend (PyPI)
 
@@ -48,6 +66,7 @@ becomes `%40vitejs%2Fplugin-vue`.
 | pyjwt | 2.13.0 |
 | python-multipart | 0.0.32 |
 | zipstream-ng | 1.9.3 |
+| pillow | 12.3.0 |
 | pytest | 9.1.1 |
 | pytest-asyncio | 1.4.0 |
 | httpx | 0.28.1 |

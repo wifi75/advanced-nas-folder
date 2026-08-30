@@ -4,7 +4,7 @@
 
 [![Release](https://img.shields.io/github/v/release/wifi75/advanced-nas-folder?label=Release&color=2B7489&logo=github)](https://github.com/wifi75/advanced-nas-folder/releases/latest)
 [![Controlli](https://img.shields.io/github/actions/workflow/status/wifi75/advanced-nas-folder/controlli.yml?branch=main&label=Controlli&logo=githubactions&logoColor=white)](https://github.com/wifi75/advanced-nas-folder/actions/workflows/controlli.yml)
-[![Test](https://img.shields.io/badge/Test-414-6E9F18?logo=pytest&logoColor=white)](tests)
+[![Test](https://img.shields.io/badge/Test-431-6E9F18?logo=pytest&logoColor=white)](tests)
 [![Platform](https://img.shields.io/badge/Platform-Linux%20%2B%20systemd-FCC624?logo=linux&logoColor=black)](https://systemd.io)
 [![Backend](https://img.shields.io/badge/Backend-FastAPI%200.141-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![Python](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white)](https://www.python.org)
@@ -16,6 +16,7 @@
 [![Database](https://img.shields.io/badge/DB-SQLite%20(WAL)-003B57?logo=sqlite&logoColor=white)](https://www.sqlite.org/wal.html)
 [![Storage](https://img.shields.io/badge/Storage-NFS%20v3%20%7C%20v4-EE0000?logo=redhat&logoColor=white)](https://linux-nfs.org)
 [![Immagini](https://img.shields.io/badge/Miniature-Pillow%2012.3-4B8BBE?logo=python&logoColor=white)](https://python-pillow.github.io)
+[![Video](https://img.shields.io/badge/Video-ffmpeg-007808?logo=ffmpeg&logoColor=white)](https://ffmpeg.org)
 [![Web server](https://img.shields.io/badge/Web%20server-Apache%20%7C%20Nginx-D22128?logo=apache&logoColor=white)](https://httpd.apache.org)
 [![Sicurezza](https://img.shields.io/badge/Privilegi-agent%20root%20isolato-4B0082)](docs/PIANO.md#nodo-1--montare-filesystem-richiede-root)
 [![License](https://img.shields.io/badge/License-MIT-3DA639?logo=opensourceinitiative&logoColor=white)](LICENSE)

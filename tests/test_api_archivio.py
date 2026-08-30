@@ -224,3 +224,45 @@ async def test_gettone_manomesso_rifiutato(admin: AsyncClient, share_id: int) ->
         params={"percorso": "contabilita/bilancio.txt", "g": "non-e-un-gettone"},
     )
     assert risposta.status_code == 403
+
+
+# --- cosa serve per entrare -------------------------------------------------
+
+
+async def test_una_cartella_a_password_lo_dice(admin: AsyncClient, anonimo, share_id: int) -> None:  # noqa: ANN001
+    """Un 403 uguale in tutti i casi obbliga il pannello a indovinare, e chi
+    arrivava si vedeva chiedere una parola d'ordine anche dove serviva un
+    account."""
+    await admin.patch(f"/api/v1/shares/{share_id}", json={"default_visibility": "password"})
+    await admin.post(
+        f"/api/v1/shares/{share_id}/regole",
+        json={"path_prefix": "", "visibility": "password", "password": "segreto"},
+    )
+
+    risposta = await anonimo("/api/v1/archivio/documenti")
+
+    assert risposta.status_code == 403
+    assert risposta.headers.get("X-Anf-Richiede") == "password"
+
+
+async def test_una_cartella_per_utenti_chiede_di_accedere(
+    admin: AsyncClient, anonimo, share_id: int
+) -> None:  # noqa: ANN001
+    await admin.patch(f"/api/v1/shares/{share_id}", json={"default_visibility": "utenti"})
+
+    risposta = await anonimo("/api/v1/archivio/documenti")
+
+    assert risposta.status_code in (401, 403)
+    if risposta.status_code == 403:
+        assert risposta.headers.get("X-Anf-Richiede") == "accesso"
+
+
+async def test_a_chi_e_gia_dentro_non_si_chiede_altro(admin: AsyncClient, share_id: int) -> None:
+    """Autenticato e comunque respinto: nessuna credenziale cambierebbe
+    l'esito, e proporre un accesso sarebbe un giro a vuoto."""
+    await admin.patch(f"/api/v1/shares/{share_id}", json={"default_visibility": "negata"})
+
+    risposta = await admin.get("/api/v1/archivio/documenti")
+
+    assert risposta.status_code == 403
+    assert risposta.headers.get("X-Anf-Richiede") == "niente"

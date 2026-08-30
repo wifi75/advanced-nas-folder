@@ -21,6 +21,7 @@ import {
 import { ApiError, tokenCorrente } from '@/api/client'
 import Anteprima from '@/components/Anteprima.vue'
 import MiniaturaVoce from '@/components/MiniaturaVoce.vue'
+import AccessoCartella from '@/components/AccessoCartella.vue'
 import Caricamenti from '@/components/Caricamenti.vue'
 
 const route = useRoute()
@@ -30,7 +31,8 @@ const { t, locale } = useI18n()
 const contenuto = ref<Contenuto | null>(null)
 const errore = ref<string | null>(null)
 /** Vero quando il percorso è protetto da password e non l'abbiamo ancora. */
-const chiedePassword = ref(false)
+/** Quale schermata di accesso mostrare, se serve. `null` = nessuna. */
+const modoAccesso = ref<'password' | 'utenti' | null>(null)
 const password = ref('')
 const carico = ref(false)
 const inPreparazione = ref<string | null>(null)
@@ -122,6 +124,11 @@ function chiudiMenu(): void {
   menu.value = null
 }
 
+function sbloccaConPassword(valore: string): void {
+  password.value = valore
+  void carica()
+}
+
 async function carica(): Promise<void> {
   carico.value = true
   errore.value = null
@@ -135,14 +142,18 @@ async function carica(): Promise<void> {
       password.value || undefined,
       vista.value === 'galleria',
     )
-    chiedePassword.value = false
+    modoAccesso.value = null
   } catch (e) {
     contenuto.value = null
-    if (e instanceof ApiError && e.status === 403) {
-      // Un 403 su un percorso pubblicato è quasi sempre una password
-      // mancante: offrirla subito evita un vicolo cieco. Se la password non
-      // c'entra, il messaggio del server resta comunque visibile.
-      chiedePassword.value = true
+    // Il server dice cosa servirebbe: una parola d'ordine o un account. Prima
+    // il pannello chiedeva sempre la password, anche dove serviva un accesso —
+    // e chi non l'aveva restava in un vicolo cieco.
+    if (e instanceof ApiError && e.status === 403 && e.richiede === 'password') {
+      modoAccesso.value = 'password'
+    } else if (e instanceof ApiError && (e.status === 401 || e.richiede === 'accesso')) {
+      modoAccesso.value = 'utenti'
+    } else {
+      modoAccesso.value = null
     }
     errore.value = e instanceof Error ? e.message : t('errori.generico')
   } finally {
@@ -539,32 +550,15 @@ function quando(iso: string | null): string {
       </button>
     </form>
 
-    <form
-      v-if="chiedePassword"
-      class="password"
-      @submit.prevent="carica"
-    >
-      <label
-        class="password__etichetta"
-        for="anf-password-cartella"
-      >{{ t('archivio.passwordRichiesta') }}</label>
-      <div class="password__riga">
-        <input
-          id="anf-password-cartella"
-          v-model="password"
-          type="password"
-          class="campo"
-          autocomplete="current-password"
-        >
-        <button
-          type="submit"
-          class="bottone"
-          :disabled="password === ''"
-        >
-          {{ t('archivio.sblocca') }}
-        </button>
-      </div>
-    </form>
+    <!-- Prima di tutto il resto: chi arriva su una cartella protetta deve
+         vedere come entrare, non un errore in fondo alla pagina. -->
+    <AccessoCartella
+      v-if="modoAccesso"
+      :cartella="contenuto?.label ?? slug"
+      :modo="modoAccesso"
+      @password="sbloccaConPassword"
+      @entrato="carica"
+    />
 
     <p
       v-if="errore && !carico"
@@ -1554,22 +1548,8 @@ function quando(iso: string | null): string {
   gap: 0.5rem;
 }
 
-.password {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  max-width: 24rem;
-}
 
-.password__riga {
-  display: flex;
-  gap: 0.5rem;
-}
 
-.password__etichetta {
-  color: var(--testo-tenue);
-  font-size: 0.9rem;
-}
 
 .avviso {
   margin: 0;

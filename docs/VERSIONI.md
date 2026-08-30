@@ -7,6 +7,25 @@ niente `latest` non verificato, niente numeri scritti a memoria.
 
 ---
 
+## Dipendenze di sistema
+
+Non tutto arriva da un registro. Queste si installano con `apt`, e l'installer
+le mette insieme alle altre:
+
+| Programma | A cosa serve | Se manca |
+|---|---|---|
+| `ffmpeg` | miniature dei video: estrae un fotogramma | i video restano con l'icona del tipo, il resto funziona |
+| `nfs-common` | montare le condivisioni | niente mount, il pannello non ha nulla da pubblicare |
+| `openssl` | generare i segreti in `.env` | l'installazione non parte |
+
+`ffmpeg` non ha una versione fissata: si usa quella della distribuzione. Il
+comando che serve — estrarre un fotogramma e ridimensionarlo — non e' cambiato
+in nessuna versione recente, e vincolarla costringerebbe a compilarlo a mano
+sulle distribuzioni che ne portano un'altra.
+
+**Pillow non richiede pacchetti di sistema**: la sua distribuzione per Linux
+include gia' le librerie di compressione. Verificato sull'installazione reale.
+
 ## Come si verificano (l'unico modo valido)
 
 **Interrogare i registri ufficiali.** Né la memoria né le ricerche web sono fonti
@@ -31,7 +50,7 @@ Per i pacchetti con scope, codificare i caratteri speciali:
 
 ---
 
-## Stato al 2026-08-29
+## Stato al 2026-08-30
 
 ### Backend (PyPI)
 
@@ -48,6 +67,7 @@ Per i pacchetti con scope, codificare i caratteri speciali:
 | pyjwt | 2.13.0 |
 | python-multipart | 0.0.32 |
 | zipstream-ng | 1.9.3 |
+| pillow | 12.3.0 |
 | pytest | 9.1.1 |
 | pytest-asyncio | 1.4.0 |
 | httpx | 0.28.1 |

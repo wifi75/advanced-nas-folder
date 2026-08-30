@@ -65,7 +65,32 @@ router = APIRouter(prefix="/archivio", tags=["archivio"])
 #: il download, troppo poco perche' un collegamento copiato resti utile.
 _MINUTI_GETTONE = 5
 
-_NEGATO = HTTPException(status.HTTP_403_FORBIDDEN, "Accesso non consentito a questo percorso.")
+
+def _negato(decisione: acl.Decisione | None = None, utente: User | None = None) -> HTTPException:
+    """Rifiuta, dicendo **cosa servirebbe** per entrare.
+
+    Un 403 uguale in tutti i casi obbliga il pannello a indovinare: chi arriva
+    su una cartella protetta si vedeva chiedere una parola d'ordine anche
+    quando serviva un account, e viceversa. L'informazione sta in
+    un'intestazione e non nel messaggio, perche' e' per il programma e non per
+    chi legge.
+    """
+    if decisione is not None and decisione.visibilita is Visibilita.PASSWORD:
+        richiede = "password"
+    elif utente is None:
+        richiede = "accesso"
+    else:
+        # Autenticato e comunque respinto: nessuna credenziale lo cambia.
+        richiede = "niente"
+
+    return HTTPException(
+        status.HTTP_403_FORBIDDEN,
+        "Accesso non consentito a questo percorso.",
+        headers={"X-Anf-Richiede": richiede},
+    )
+
+
+_NEGATO = _negato()
 
 
 async def _pubblicazione(sessione: Sessione, slug: str) -> Share:
@@ -103,7 +128,7 @@ async def _autorizza(
         password_fornita=_password_valida(share, percorso, password),
     )
     if not decisione.consentito or not acl.dentro_ambito(utente, percorso):
-        raise _NEGATO
+        raise _negato(decisione, utente)
     return decisione
 
 

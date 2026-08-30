@@ -55,6 +55,30 @@ async def admin(client):  # noqa: ANN001, ANN201 - tipo fornito dalla fixture cl
     return client
 
 
+@pytest.fixture
+def anonimo(admin):  # noqa: ANN001, ANN201 - tipo fornito dalla fixture client
+    """Un modo di fare richieste senza credenziali.
+
+    Serve una funzione e non un secondo client: `admin` e `client` sono lo
+    **stesso oggetto** — la fixture ci aggiunge l'intestazione — quindi
+    chiedere entrambi in un test dava una richiesta «anonima» in realta'
+    autenticata, e il test passava per il motivo sbagliato.
+    """
+
+    async def senza_credenziali(percorso: str, **kwargs: object):  # noqa: ANN003, ANN202
+        # Le intestazioni passate alla singola richiesta si *sommano* a quelle
+        # del client: per non mandare l'autorizzazione bisogna toglierla e poi
+        # rimetterla, non sovrascriverla.
+        token = admin.headers.pop("Authorization", None)
+        try:
+            return await admin.get(percorso, **kwargs)
+        finally:
+            if token is not None:
+                admin.headers["Authorization"] = token
+
+    return senza_credenziali
+
+
 @pytest.fixture(autouse=True)
 async def registro_pulito():  # noqa: ANN201
     """Svuota il registro dei trasferimenti dopo ogni test.

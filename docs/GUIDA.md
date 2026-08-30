@@ -101,6 +101,27 @@ chi lo riceve senza che debba avere un account. Se invece vuoi dare accesso a
 **una persona sola**, senza aprire la cartella a tutti, non condividere questo
 indirizzo: usa un **link di condivisione**, che scade e si può revocare.
 
+### Entrare in una cartella protetta
+
+Chi apre l'indirizzo di una cartella protetta vede **come prima cosa una
+schermata di accesso**, non un errore. Cosa chiede dipende da come l'hai
+pubblicata:
+
+| Visibilità | Chiede |
+|---|---|
+| Chi conosce la password | solo la parola d'ordine |
+| Tutti gli utenti autenticati | nome utente e password |
+| Solo gli utenti autorizzati | nome utente e password |
+
+È una schermata **diversa** da quella con cui entri tu ad amministrare: colore
+proprio, e parla della cartella invece che del sistema. Chi arriva ha ricevuto
+un indirizzo, non è un amministratore, e spesso non sa nemmeno che dietro ci
+sia un pannello.
+
+Se la cartella è vietata a quella persona anche da autenticata, la schermata
+non compare: nessuna credenziale cambierebbe l'esito, e chiederle sarebbe un
+giro a vuoto.
+
 ### Chi può vederla
 
 La **visibilità** si sceglie a parole, non con termini tecnici:

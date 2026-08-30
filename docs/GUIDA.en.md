@@ -101,6 +101,26 @@ whoever receives it, with no account needed. If instead you want to give access
 to **one person only**, without opening the folder to everyone, do not share this
 address: use a **share link**, which expires and can be revoked.
 
+### Entering a protected folder
+
+Whoever opens the address of a protected folder sees **a sign-in screen first**,
+not an error. What it asks depends on how you published it:
+
+| Visibility | Asks for |
+|---|---|
+| Anyone with the password | the password only |
+| All signed-in users | user name and password |
+| Only authorised users | user name and password |
+
+It is a **different** screen from the one you use to administer: its own
+colour, and it talks about the folder rather than the system. Whoever arrives
+was given an address, is not an administrator, and often does not even know a
+panel exists behind it.
+
+If the folder is denied to that person even when signed in, the screen does not
+appear: no credentials would change the outcome, and asking for them would be a
+dead end.
+
 ### Who can see it
 
 **Visibility** is chosen in plain words, not technical terms:

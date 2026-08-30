@@ -471,6 +471,14 @@ export default {
       'Non riesco a leggere /etc/fstab: il servizio di sistema non risponde.',
   },
 
+  accessoCartella: {
+    titolo: 'Cartella protetta',
+    servePassword: 'Per aprirla serve la parola d’ordine che ti è stata data.',
+    serveAccount: 'Per aprirla serve un account su questo pannello.',
+    entra: 'Entra',
+    credenzialiErrate: 'Nome utente o password non corretti.',
+  },
+
   archivio: {
     comandiNelMenu: 'Tocca a lungo, o tasto destro, per rinominare, spostare ed eliminare.',
     senzaData: 'Senza data',

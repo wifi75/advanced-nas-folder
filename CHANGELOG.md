@@ -18,6 +18,43 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.25.0] - 2026-08-30
+
+### Aggiunto
+- **Chi apre una cartella protetta vede per prima cosa una schermata di
+  accesso**, non un errore in fondo alla pagina. Chiede la parola d'ordine dove
+  basta quella, e **nome utente e password** dove serve un account.
+
+  E' deliberatamente diversa dall'accesso al pannello — colore proprio, e parla
+  della cartella invece che del sistema. Chi arriva ha ricevuto un indirizzo,
+  non e' un amministratore, e vedersi davanti la stessa pagina con cui entra
+  chi amministra il server fa pensare di essere finiti nel posto sbagliato.
+
+### Corretto
+- **Il pannello chiedeva sempre una parola d'ordine**, anche dove serviva un
+  account: il rifiuto del server era identico in ogni caso e non restava che
+  indovinare. Ora il server dice **cosa servirebbe** — parola d'ordine,
+  accesso, o niente quando nessuna credenziale cambierebbe l'esito — e la
+  schermata si adatta.
+
+  Nell'ultimo caso non compare affatto: proporre un accesso a chi verrebbe
+  respinto comunque e' un giro a vuoto.
+
+### Interno
+- **Nei test `admin` e `client` sono lo stesso oggetto**, perche' la fixture
+  aggiunge l'intestazione a quel client: chiederli entrambi dava una richiesta
+  «anonima» in realta' autenticata, e i test passavano per il motivo sbagliato.
+  Aggiunta una fixture che toglie davvero le credenziali — le intestazioni
+  passate alla singola richiesta si *sommano* a quelle del client, non le
+  sostituiscono.
+
+### Documentazione
+- Guida utente: come si entra in una cartella protetta, nelle due lingue.
+- `docs/VERSIONI`: le dipendenze **di sistema** — `ffmpeg`, `nfs-common`,
+  `openssl` — con cosa succede se mancano. Prima il documento copriva solo i
+  pacchetti dei registri, e `ffmpeg` non compariva da nessuna parte.
+- Badge: `ffmpeg`, e il conteggio dei test a 431.
+
 ## [0.24.0] - 2026-08-30
 
 ### Aggiunto

@@ -1,0 +1,234 @@
+<script setup lang="ts">
+/**
+ * La schermata che chiede le credenziali per entrare in una cartella protetta.
+ *
+ * È deliberatamente diversa dall'accesso al pannello: chi arriva qui ha
+ * ricevuto un indirizzo, non è un amministratore, e spesso non sa nemmeno che
+ * esista un pannello dietro. Vedersi davanti la stessa pagina con cui entra
+ * chi amministra il server confonde, e fa sembrare di essere finiti nel posto
+ * sbagliato.
+ *
+ * Cambiano il colore, il tono e ciò che si chiede: qui si parla della
+ * *cartella*, non del sistema.
+ */
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+import { useAuthStore } from '@/stores/auth'
+
+const props = defineProps<{
+  /** Il nome della cartella, per dire dove si sta entrando. */
+  cartella: string
+  /** `password`: basta la parola d'ordine. `utenti`: serve un account. */
+  modo: 'password' | 'utenti'
+}>()
+
+const emit = defineEmits<{ password: [valore: string]; entrato: [] }>()
+
+const { t } = useI18n()
+const auth = useAuthStore()
+
+const utente = ref('')
+const password = ref('')
+const inCorso = ref(false)
+const errore = ref('')
+
+const puoProcedere = computed(() =>
+  props.modo === 'password' ? password.value !== '' : utente.value !== '' && password.value !== '',
+)
+
+async function invia(): Promise<void> {
+  errore.value = ''
+
+  // Con la sola parola d'ordine non c'è nessuna sessione da aprire: la
+  // password viaggia con la richiesta della cartella, e vale solo per quella.
+  if (props.modo === 'password') {
+    emit('password', password.value)
+    return
+  }
+
+  inCorso.value = true
+  const riuscito = await auth.accedi(utente.value, password.value)
+  inCorso.value = false
+
+  if (riuscito) emit('entrato')
+  else errore.value = t('accessoCartella.credenzialiErrate')
+}
+</script>
+
+<template>
+  <div class="accesso">
+    <form
+      class="riquadro"
+      @submit.prevent="invia"
+    >
+      <span
+        class="lucchetto"
+        aria-hidden="true"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M6 10h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1Z" />
+          <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+        </svg>
+      </span>
+
+      <h1>{{ t('accessoCartella.titolo') }}</h1>
+      <p class="cartella">
+        {{ cartella }}
+      </p>
+      <p class="spiega">
+        {{ modo === 'password' ? t('accessoCartella.servePassword') : t('accessoCartella.serveAccount') }}
+      </p>
+
+      <label
+        v-if="modo === 'utenti'"
+        class="campo"
+      >
+        <span>{{ t('accesso.utente') }}</span>
+        <input
+          v-model="utente"
+          type="text"
+          autocomplete="username"
+          autocapitalize="none"
+          spellcheck="false"
+        >
+      </label>
+
+      <label class="campo">
+        <span>{{ t('accesso.password') }}</span>
+        <input
+          v-model="password"
+          type="password"
+          autocomplete="current-password"
+        >
+      </label>
+
+      <p
+        v-if="errore"
+        class="errore"
+        role="alert"
+      >
+        {{ errore }}
+      </p>
+
+      <button
+        type="submit"
+        class="bottone bottone--principale entra"
+        :disabled="!puoProcedere || inCorso"
+      >
+        {{ inCorso ? t('accesso.inCorso') : t('accessoCartella.entra') }}
+      </button>
+    </form>
+  </div>
+</template>
+
+<style scoped>
+/* Una tinta propria, diversa dall'azzurro del pannello: chi arriva qui non sta
+   amministrando niente, sta aprendo una cartella che qualcuno gli ha
+   mandato. */
+.accesso {
+  --tinta-accesso: #8a5a2b;
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 2rem 1.25rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .accesso {
+    --tinta-accesso: #d9a066;
+  }
+}
+
+:root[data-theme='dark'] .accesso {
+  --tinta-accesso: #d9a066;
+}
+
+.riquadro {
+  width: min(24rem, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: 1.6rem 1.4rem;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--tinta-accesso) 35%, var(--bordo));
+  background:
+    linear-gradient(
+      158deg,
+      color-mix(in srgb, var(--tinta-accesso) 12%, var(--superficie)),
+      var(--superficie)
+    );
+  box-shadow: var(--ombra);
+  text-align: center;
+}
+
+.lucchetto {
+  inline-size: 44px;
+  block-size: 44px;
+  margin-inline: auto;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  color: #fff;
+  background:
+    linear-gradient(
+      165deg,
+      color-mix(in srgb, var(--tinta-accesso) 100%, white 16%),
+      color-mix(in srgb, var(--tinta-accesso) 80%, black 20%)
+    );
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 40%);
+}
+
+.lucchetto svg {
+  width: 24px;
+  height: 24px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.25rem;
+  letter-spacing: -0.015em;
+}
+
+.cartella {
+  margin: 0;
+  font-weight: 600;
+  color: var(--tinta-accesso);
+  overflow-wrap: anywhere;
+}
+
+.spiega {
+  margin: 0 0 0.3rem;
+  font-size: 0.875rem;
+  color: var(--testo-tenue);
+}
+
+.campo {
+  text-align: left;
+}
+
+.entra {
+  margin-top: 0.3rem;
+  justify-content: center;
+  background:
+    linear-gradient(
+      165deg,
+      color-mix(in srgb, var(--tinta-accesso) 100%, white 14%),
+      color-mix(in srgb, var(--tinta-accesso) 82%, black 18%)
+    );
+  border-color: transparent;
+}
+
+.errore {
+  margin: 0;
+  color: var(--errore);
+  font-size: 0.875rem;
+}
+</style>

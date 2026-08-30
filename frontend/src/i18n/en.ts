@@ -465,6 +465,14 @@ export default {
     nonDisponibile: 'Cannot read /etc/fstab: the system service is not responding.',
   },
 
+  accessoCartella: {
+    titolo: 'Protected folder',
+    servePassword: 'Opening it needs the password you were given.',
+    serveAccount: 'Opening it needs an account on this panel.',
+    entra: 'Enter',
+    credenzialiErrate: 'Wrong user name or password.',
+  },
+
   archivio: {
     comandiNelMenu: 'Long press, or right click, to rename, move and delete.',
     senzaData: 'No date',

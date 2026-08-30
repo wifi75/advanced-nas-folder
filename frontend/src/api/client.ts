@@ -13,6 +13,10 @@ export class ApiError extends Error {
     public readonly status: number,
     message: string,
     public readonly detail?: unknown,
+    /** Cosa servirebbe per superare un rifiuto: `password`, `accesso`, o
+     *  `niente` quando nessuna credenziale cambierebbe l'esito. Il server lo
+     *  dice in un'intestazione, perche' e' per il programma. */
+    public readonly richiede?: string,
   ) {
     super(message)
     this.name = 'ApiError'
@@ -61,7 +65,12 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     }
     // Il server spiega spesso cosa è andato storto e cosa fare: buttare via
     // quel messaggio per mostrarne uno generico sarebbe uno spreco.
-    throw new ApiError(response.status, dettaglioLeggibile(detail) ?? messaggioPerStato(response.status), detail)
+    throw new ApiError(
+      response.status,
+      dettaglioLeggibile(detail) ?? messaggioPerStato(response.status),
+      detail,
+      response.headers.get('X-Anf-Richiede') ?? undefined,
+    )
   }
 
   if (response.status === 204) return undefined as T
