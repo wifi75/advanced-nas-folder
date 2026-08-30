@@ -15,6 +15,32 @@ const mounts = useMountsStore()
 
 const VISIBILITA: Visibilita[] = ['pubblica', 'password', 'utenti', 'utenti_scelti', 'negata']
 
+/**
+ * Indirizzo completo su cui la cartella si raggiunge.
+ *
+ * Mostrare solo lo slug (`/documenti`) lasciava indovinare il resto: il
+ * pannello vive sotto `/pannello/`, non sulla radice del sito, e chi provava a
+ * scrivere l'indirizzo a mano finiva su una pagina che non esiste.
+ */
+function indirizzo(slug: string): string {
+  return `${window.location.origin}${import.meta.env.BASE_URL}archivio/${slug}`
+}
+
+const copiato = ref<string | null>(null)
+
+async function copia(slug: string): Promise<void> {
+  try {
+    await navigator.clipboard.writeText(indirizzo(slug))
+    copiato.value = slug
+    setTimeout(() => {
+      if (copiato.value === slug) copiato.value = null
+    }, 2000)
+  } catch {
+    // Senza permesso sugli appunti (o fuori da HTTPS) resta l'indirizzo a
+    // schermo, che si seleziona a mano: meglio di un errore senza rimedio.
+  }
+}
+
 const nuovoAperto = ref(false)
 const daEliminare = ref<Share | null>(null)
 const salvataggio = ref(false)
@@ -144,9 +170,23 @@ function alterna(s: Share): void {
           <div class="titoli">
             <h2>{{ s.label }}</h2>
             <p class="origine">
-              /{{ s.slug }}<template v-if="s.subpath">
-                · {{ s.subpath }}
-              </template>
+              <a
+                class="indirizzo"
+                :href="indirizzo(s.slug)"
+                :title="t('share.indirizzoAiuto')"
+              >{{ indirizzo(s.slug) }}</a>
+              <button
+                type="button"
+                class="copia"
+                :title="t('share.copia')"
+                @click="copia(s.slug)"
+              >
+                {{ copiato === s.slug ? t('share.copiato') : t('share.copia') }}
+              </button>
+              <span
+                v-if="s.subpath"
+                class="sottopercorso"
+              >· {{ s.subpath }}</span>
             </p>
           </div>
           <span class="stato">{{ t(`visibilita.breve_${s.default_visibility}`) }}</span>
@@ -533,5 +573,30 @@ button.pericolo {
 
 .pannello .azioni {
   justify-content: flex-end;
+}
+.origine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.indirizzo {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  word-break: break-all;
+}
+
+.copia {
+  border: 1px solid var(--bordo);
+  background: none;
+  color: inherit;
+  border-radius: 0.25rem;
+  padding: 0.05rem 0.4rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.copia:hover {
+  background: var(--sfondo);
 }
 </style>

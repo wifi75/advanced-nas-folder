@@ -116,6 +116,11 @@ export default {
     nuova: 'New publication',
     vuoto: 'No folder published yet. A publication starts from an NFS share already mounted.',
     servonoMount: 'You need at least one mounted NFS share first: a publication starts from there.',
+    indirizzo: 'Address',
+    indirizzoAiuto:
+      'This is where the folder is reached from a browser. Copy it and try it: if the publication is public, it works without signing in.',
+    copia: 'Copy the address',
+    copiato: 'Copied',
     condivisione: 'NFS share',
     sottopercorso: 'Subfolder',
     sottopercorsoAiuto: 'Leave empty to publish the root of the share',

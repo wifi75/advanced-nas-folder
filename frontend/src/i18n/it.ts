@@ -119,6 +119,11 @@ export default {
       'Nessuna cartella pubblicata. Una pubblicazione parte da una condivisione NFS già montata.',
     servonoMount:
       'Prima serve almeno una condivisione NFS montata: una pubblicazione parte da lì.',
+    indirizzo: 'Indirizzo',
+    indirizzoAiuto:
+      'È qui che questa cartella si raggiunge dal browser. Copialo e provalo: se la pubblicazione è pubblica, funziona anche senza accedere.',
+    copia: 'Copia l’indirizzo',
+    copiato: 'Copiato',
     condivisione: 'Condivisione',
     sottopercorso: 'Sottocartella',
     sottopercorsoAiuto: 'Vuoto per pubblicare la radice della condivisione',

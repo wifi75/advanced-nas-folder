@@ -10,6 +10,13 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+### Aggiunto
+- **Ogni pubblicazione mostra l'indirizzo completo su cui si raggiunge**, con un
+  pulsante per copiarlo. Prima compariva solo l'identificatore (`/documenti`), e
+  il resto andava indovinato: il pannello vive sotto `/pannello/` e non sulla
+  radice del sito, quindi chi scriveva l'indirizzo a mano finiva su una pagina
+  inesistente.
+
 ## [0.6.7] - 2026-08-30
 
 Prima installazione su un server reale. Tutto quello che segue è emerso lì: sono
