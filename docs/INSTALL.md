@@ -229,6 +229,35 @@ curl -fsS http://127.0.0.1:$(grep -oP '^ANF_PORT=\K\d+' /var/www/advanced-nas-fo
 
 ---
 
+## Indirizzi corti delle cartelle pubblicate
+
+Il pannello vive sotto `/pannello/`, quindi l'indirizzo completo di una cartella
+pubblicata è `https://sito/pannello/archivio/documenti`. È corretto, ma non è un
+indirizzo che si detta al telefono.
+
+Per ogni pubblicazione attiva viene quindi generata una **scorciatoia sulla radice
+del sito**: `https://sito/documenti` porta allo stesso posto. Il file
+`anf-scorciatoie.conf` viene riscritto per intero a ogni modifica, a partire
+dall'elenco delle pubblicazioni: una scorciatoia non può sopravvivere alla
+pubblicazione che l'aveva creata.
+
+Tre cose da sapere, perché sono scelte e non limiti accidentali:
+
+- **Viene generata una regola per ogni pubblicazione, mai una che cattura tutto.**
+  Il sito ospita quasi sempre anche altro: una regola generica ne oscurerebbe i
+  contenuti, e lo farebbe in silenzio.
+- **Sono redirezioni, non riscritture interne.** Il pannello è un'applicazione a
+  pagina singola servita sotto `/pannello/`, e il suo router non riconoscerebbe un
+  indirizzo che parte dalla radice: il browser prosegue quindi sull'indirizzo lungo,
+  che resta quello visibile nella barra.
+- **Solo su Apache.** Su Nginx le `location` devono stare dentro il blocco `server`,
+  quindi un file a sé non sarebbe configurazione valida. Il pannello lo dice invece
+  di scrivere qualcosa che non funziona.
+
+I nomi `pannello`, `api`, `server-status` e `server-info` sono rifiutati: una
+scorciatoia `/pannello` renderebbe il pannello irraggiungibile, e a quel punto non
+ci sarebbe più modo di toglierla.
+
 ## Altri nomi host, dal pannello
 
 L'installer configura il primo vhost (`anf.conf`). Per pubblicare il pannello

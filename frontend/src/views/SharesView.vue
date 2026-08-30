@@ -26,6 +26,11 @@ function indirizzo(slug: string): string {
   return `${window.location.origin}${import.meta.env.BASE_URL}archivio/${slug}`
 }
 
+/** Lo stesso posto, senza il prefisso del pannello: `https://sito/documenti`. */
+function indirizzoCorto(slug: string): string {
+  return `${window.location.origin}/${slug}`
+}
+
 const copiato = ref<string | null>(null)
 
 async function copia(slug: string): Promise<void> {
@@ -187,6 +192,14 @@ function alterna(s: Share): void {
                 v-if="s.subpath"
                 class="sottopercorso"
               >· {{ s.subpath }}</span>
+            </p>
+            <p class="origine">
+              <a
+                class="indirizzo"
+                :href="indirizzoCorto(s.slug)"
+                :title="t('share.indirizzoCortoAiuto')"
+              >{{ indirizzoCorto(s.slug) }}</a>
+              <span class="etichetta">{{ t('share.indirizzoCorto') }}</span>
             </p>
           </div>
           <span class="stato">{{ t(`visibilita.breve_${s.default_visibility}`) }}</span>
@@ -579,6 +592,11 @@ button.pericolo {
   flex-wrap: wrap;
   align-items: baseline;
   gap: 0.5rem;
+}
+
+.etichetta {
+  font-size: 0.75rem;
+  opacity: 0.7;
 }
 
 .indirizzo {

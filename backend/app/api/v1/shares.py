@@ -25,7 +25,7 @@ from app.schemas.share import (
     ShareOut,
     ShareUpdate,
 )
-from app.services import acl
+from app.services import acl, scorciatoie
 from app.services import link as servizio_link
 from app.services.percorsi import PercorsoNonValido, normalizza_relativo
 
@@ -103,6 +103,7 @@ async def crea(dati: ShareCreate, sessione: Sessione, _: Amministratore) -> Shar
     sessione.add(share)
     await sessione.commit()
     await sessione.refresh(share)
+    await scorciatoie.riallinea(sessione)
     return share
 
 
@@ -132,6 +133,10 @@ async def modifica(
         share.is_enabled = dati.is_enabled
     await sessione.commit()
     await sessione.refresh(share)
+    # Anche solo spegnere una pubblicazione cambia le scorciatoie: lasciarne
+    # una attiva verso una cartella non piu pubblicata darebbe un errore
+    # inspiegabile a chi segue un vecchio collegamento.
+    await scorciatoie.riallinea(sessione)
     return share
 
 
@@ -140,6 +145,20 @@ async def elimina(share_id: int, sessione: Sessione, _: Amministratore) -> None:
     share = await _carica(sessione, share_id)
     await sessione.delete(share)
     await sessione.commit()
+    await scorciatoie.riallinea(sessione)
+
+
+
+@router.post("/scorciatoie")
+async def riapplica_scorciatoie(sessione: Sessione, _: Amministratore) -> dict[str, object]:
+    """Riscrive gli indirizzi corti nel web server.
+
+    Vengono gia riscritti a ogni cambiamento. Questo serve quando il web server
+    era irraggiungibile in quel momento, o quando la configurazione e stata
+    toccata a mano: senza, l'unico modo per rimetterli a posto sarebbe
+    modificare una pubblicazione a vuoto.
+    """
+    return await scorciatoie.riallinea(sessione)
 
 
 # --- regole di visibilità --------------------------------------------------

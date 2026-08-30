@@ -232,6 +232,33 @@ curl -fsS http://127.0.0.1:$(grep -oP '^ANF_PORT=\K\d+' /var/www/advanced-nas-fo
 
 ---
 
+## Short addresses for published folders
+
+The panel lives under `/pannello/`, so the full address of a published folder is
+`https://site/pannello/archivio/documents`. Correct, but not an address you dictate
+over the phone.
+
+Each enabled publication therefore gets a **shortcut at the site root**:
+`https://site/documents` leads to the same place. The `anf-scorciatoie.conf` file is
+rewritten in full on every change, from the list of publications: a shortcut cannot
+outlive the publication that created it.
+
+Three things worth knowing, because they are choices and not accidental limits:
+
+- **One rule per publication, never a catch-all.** The site almost always hosts other
+  things too: a generic rule would shadow their content, and would do it silently.
+- **They are redirects, not internal rewrites.** The panel is a single-page
+  application served under `/pannello/`, and its router would not recognise an address
+  starting at the root: the browser therefore continues to the long address, which is
+  what stays in the address bar.
+- **Apache only.** On Nginx `location` blocks must sit inside the `server` block, so a
+  standalone file would not be valid configuration. The panel says so instead of
+  writing something that does not work.
+
+The names `pannello`, `api`, `server-status` and `server-info` are refused: a
+`/pannello` shortcut would make the panel unreachable, and at that point there would
+be no way left to remove it.
+
 ## Extra host names, from the panel
 
 The installer sets up the first vhost (`anf.conf`). To publish the panel on

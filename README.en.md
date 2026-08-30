@@ -4,7 +4,7 @@
 
 [![Release](https://img.shields.io/github/v/release/wifi75/advanced-nas-folder?label=Release&color=2B7489&logo=github)](https://github.com/wifi75/advanced-nas-folder/releases/latest)
 [![Checks](https://img.shields.io/github/actions/workflow/status/wifi75/advanced-nas-folder/controlli.yml?branch=main&label=Checks&logo=githubactions&logoColor=white)](https://github.com/wifi75/advanced-nas-folder/actions/workflows/controlli.yml)
-[![Tests](https://img.shields.io/badge/Tests-375-6E9F18?logo=pytest&logoColor=white)](tests)
+[![Tests](https://img.shields.io/badge/Tests-388-6E9F18?logo=pytest&logoColor=white)](tests)
 [![Platform](https://img.shields.io/badge/Platform-Linux%20%2B%20systemd-FCC624?logo=linux&logoColor=black)](https://systemd.io)
 [![Backend](https://img.shields.io/badge/Backend-FastAPI%200.141-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![Python](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white)](https://www.python.org)
@@ -23,10 +23,12 @@ Self-hosted panel that **mounts NFS shares**, **publishes folders with per-subfo
 permissions** and fully replaces FileBrowser — without ever editing a server
 configuration file by hand.
 
-> **Status: working and complete in its main parts since v0.6.0.** It mounts NFS shares,
-> publishes folders with per-user permissions, downloads and uploads files with
-> resume, searches, shows previews and records transfers. It has not yet been
-> installed on a production server. See [TODO.md](TODO.md).
+> **Status: running on a real server since v0.6.9.** It mounts NFS shares, publishes
+> folders with per-user permissions, downloads and uploads files with resume,
+> searches, shows previews and records transfers. The first real installation brought
+> out a series of errors no test could have caught — permissions on directories
+> created by systemd, paths resolved from the current directory — fixed in
+> 0.6.7-0.6.9. See [TODO.md](TODO.md).
 
 ---
 

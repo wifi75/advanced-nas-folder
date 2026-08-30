@@ -10,6 +10,37 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.7.0] - 2026-08-30
+
+### Aggiunto
+- **Indirizzi corti per le cartelle pubblicate.** `https://sito/documenti` porta
+  alla stessa cartella di `https://sito/pannello/archivio/documenti`. Il file di
+  configurazione viene riscritto per intero a ogni modifica di una pubblicazione,
+  a partire dall'elenco di quelle attive: una scorciatoia non può sopravvivere
+  alla pubblicazione che l'aveva creata.
+
+  Tre scelte, non tre limiti: viene generata **una regola per ogni
+  pubblicazione** e mai una che cattura tutto, perché il sito ospita quasi sempre
+  anche altro e una regola generica ne oscurerebbe i contenuti in silenzio; sono
+  **redirezioni** e non riscritture interne, perché il router del pannello non
+  riconoscerebbe un indirizzo che parte dalla radice; funzionano **solo su
+  Apache**, perché su Nginx le `location` devono stare dentro il blocco `server`
+  e un file a sé non sarebbe valido — il pannello lo dice invece di scrivere
+  configurazione che non funziona.
+
+  I nomi `pannello`, `api`, `server-status` e `server-info` sono rifiutati: una
+  scorciatoia `/pannello` renderebbe il pannello irraggiungibile, e a quel punto
+  non ci sarebbe più modo di toglierla dal pannello stesso.
+- Nuovo endpoint `POST /api/v1/shares/scorciatoie` per riapplicarle a mano,
+  quando il web server era irraggiungibile al momento della modifica.
+
+### Modificato
+- Ogni pubblicazione mostra ora **entrambi** gli indirizzi: quello completo e
+  quello corto.
+- Badge dei test aggiornato: 388.
+- Lo stato dichiarato nel README non dice più che il progetto non è mai stato
+  installato in produzione, perché non è più vero.
+
 ## [0.6.9] - 2026-08-30
 
 ### Corretto

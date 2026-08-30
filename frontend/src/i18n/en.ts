@@ -117,6 +117,9 @@ export default {
     vuoto: 'No folder published yet. A publication starts from an NFS share already mounted.',
     servonoMount: 'You need at least one mounted NFS share first: a publication starts from there.',
     indirizzo: 'Address',
+    indirizzoCorto: 'Short address',
+    indirizzoCortoAiuto:
+      'Easier to dictate or type by hand: it leads to the same place. Apache only, and it updates itself on every change.',
     indirizzoAiuto:
       'This is where the folder is reached from a browser. Copy it and try it: if the publication is public, it works without signing in.',
     copia: 'Copy the address',

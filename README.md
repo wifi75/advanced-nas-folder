@@ -4,7 +4,7 @@
 
 [![Release](https://img.shields.io/github/v/release/wifi75/advanced-nas-folder?label=Release&color=2B7489&logo=github)](https://github.com/wifi75/advanced-nas-folder/releases/latest)
 [![Controlli](https://img.shields.io/github/actions/workflow/status/wifi75/advanced-nas-folder/controlli.yml?branch=main&label=Controlli&logo=githubactions&logoColor=white)](https://github.com/wifi75/advanced-nas-folder/actions/workflows/controlli.yml)
-[![Test](https://img.shields.io/badge/Test-375-6E9F18?logo=pytest&logoColor=white)](tests)
+[![Test](https://img.shields.io/badge/Test-388-6E9F18?logo=pytest&logoColor=white)](tests)
 [![Platform](https://img.shields.io/badge/Platform-Linux%20%2B%20systemd-FCC624?logo=linux&logoColor=black)](https://systemd.io)
 [![Backend](https://img.shields.io/badge/Backend-FastAPI%200.141-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![Python](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white)](https://www.python.org)
@@ -23,10 +23,12 @@ Pannello self-hosted che **monta condivisioni NFS**, **pubblica cartelle con per
 per sottocartella** e sostituisce integralmente FileBrowser — senza che tu debba mai
 modificare a mano un file di configurazione del server.
 
-> **Stato: funzionante e completo nelle sue parti principali dalla v0.6.0.** Monta
-> condivisioni NFS, pubblica cartelle con permessi fino al singolo utente, scarica e
-> carica file con ripresa, cerca, mostra anteprime e registra i trasferimenti. Non è
-> ancora stato installato su un server di produzione. Vedere [TODO.md](TODO.md).
+> **Stato: in esercizio su un server reale dalla v0.6.9.** Monta condivisioni NFS,
+> pubblica cartelle con permessi fino al singolo utente, scarica e carica file con
+> ripresa, cerca, mostra anteprime e registra i trasferimenti. La prima installazione
+> vera ha fatto emergere una serie di errori che nessun test poteva cogliere —
+> permessi di cartelle create da systemd, percorsi risolti dalla cartella corrente —
+> corretti nelle 0.6.7-0.6.9. Vedere [TODO.md](TODO.md).
 
 ---
 

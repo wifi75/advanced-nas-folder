@@ -73,6 +73,22 @@ class Agent:
                         hostname=valida_hostname(richiesta.dati.get("hostname")),
                     )
                 )
+            case Verbo.SCORCIATOIE_WRITE:
+                # L'elenco arriva sempre completo: il file generato resta cosi
+                # allineato al database, senza aggiunte e rimozioni da tenere
+                # in pari.
+                slug = richiesta.dati.get("slug")
+                if not isinstance(slug, list):
+                    raise ErroreAgent(
+                        CodiceErrore.VALIDAZIONE, "Elenco degli identificatori mancante."
+                    )
+                return Risposta.successo(
+                    webserver.scorciatoie(
+                        webserver=valida_webserver(richiesta.dati.get("webserver")),
+                        slug=slug,
+                        prefisso=valida_prefisso_url(richiesta.dati.get("prefisso")),
+                    )
+                )
             case Verbo.FSTAB_LIST:
                 return Risposta.successo({"montaggi": fstab.elenca()})
             case Verbo.FSTAB_DISABLE:

@@ -305,3 +305,104 @@ def elenca(webserver: str) -> list[str]:
         for f in impianto.cartella.glob(f"anf-*{impianto.estensione}")
         if _e_nostra(f)
     )
+
+
+# --- scorciatoie sulla radice del sito --------------------------------------
+
+#: Nomi che non possono diventare una scorciatoia perche il sito li usa gia.
+#: L'elenco e volutamente corto: sono i percorsi che questa applicazione stessa
+#: occupa. Tutto il resto e responsabilita di chi sceglie l'identificatore.
+RISERVATI = frozenset({"pannello", "api", "server-status", "server-info"})
+
+_SCORCIATOIE_APACHE = """{marcatore}
+# Scorciatoie: /nome porta alla cartella pubblicata con quel nome.
+#
+# Sono redirezioni, non riscritture interne: il pannello e una applicazione a
+# pagina singola servita sotto /pannello/, e il suo router non riconoscerebbe
+# un indirizzo che parte dalla radice. Con la redirezione l'indirizzo corto
+# funziona da subito — nei link, nei preferiti, scritto a mano — e il browser
+# prosegue su quello lungo.
+#
+# Viene generata una regola per ogni pubblicazione, mai una regola che cattura
+# tutto: cosi nessun altro contenuto di questo sito viene oscurato per sbaglio.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+{regole}</IfModule>
+"""
+
+
+def _regole_apache(prefisso: str, slug: str) -> str:
+    destinazione = f"{prefisso}pannello/archivio/{slug}"
+    return (
+        f"    RewriteRule ^/{slug}$ {destinazione} [R=302,L]\n"
+        f"    RewriteRule ^/{slug}/(.*)$ {destinazione}/$1 [R=302,L]\n"
+    )
+
+
+def _valida_slug(slug: object) -> str:
+    if not isinstance(slug, str) or not slug:
+        raise ErroreAgent(CodiceErrore.VALIDAZIONE, "Identificatore mancante.")
+    if not all(c.isalnum() or c in "-_" for c in slug):
+        raise ErroreAgent(
+            CodiceErrore.VALIDAZIONE,
+            f"{slug!r} contiene caratteri non ammessi in un indirizzo.",
+        )
+    if slug in RISERVATI:
+        raise ErroreAgent(
+            CodiceErrore.VALIDAZIONE,
+            f"{slug!r} e gia usato dal pannello: scegliere un altro identificatore.",
+        )
+    return slug
+
+
+def scorciatoie(*, webserver: str, slug: list[str], prefisso: str = "/") -> dict[str, str]:
+    """Riscrive per intero il file delle scorciatoie.
+
+    Riceve l'elenco completo invece di aggiunte e rimozioni: il file generato
+    e allora sempre uguale allo stato del database, e una scorciatoia rimasta
+    indietro non puo sopravvivere alla pubblicazione che l'aveva creata.
+    """
+    # Su Nginx le `location` devono stare dentro il blocco `server`: un file a
+    # se non sarebbe configurazione valida, e generarlo lo stesso vorrebbe dire
+    # far fallire il test di sintassi a ogni pubblicazione. Le scorciatoie per
+    # Nginx richiedono di rigenerare il vhost, che e lavoro diverso da questo.
+    if webserver != "apache":
+        raise ErroreAgent(
+            CodiceErrore.VALIDAZIONE,
+            "Le scorciatoie sono disponibili solo su Apache.",
+        )
+
+    impianto = _impianto(webserver)
+    if not impianto.cartella.is_dir():
+        raise ErroreAgent(
+            CodiceErrore.NON_TROVATO,
+            f"{impianto.cartella} non esiste: {webserver} non sembra installato.",
+        )
+
+    validi = [_valida_slug(s) for s in slug]
+    regole = "".join(_regole_apache(prefisso, s) for s in validi)
+    contenuto = _SCORCIATOIE_APACHE.format(marcatore=MARCATORE, regole=regole)
+
+    percorso = impianto.cartella / f"anf-scorciatoie{impianto.estensione}"
+    if percorso.exists() and not _e_nostra(percorso):
+        raise ErroreAgent(
+            CodiceErrore.VALIDAZIONE,
+            f"{percorso.name} esiste ma non e stato generato da questo pannello.",
+        )
+
+    precedente = percorso.read_text(encoding="utf-8") if percorso.exists() else None
+    percorso.write_text(contenuto, encoding="utf-8")
+    percorso.chmod(0o644)
+    _attiva(impianto, percorso)
+
+    passato, uscita = _verifica(impianto)
+    if not passato:
+        _ripristina(percorso, precedente, impianto)
+        logger.warning("scorciatoie rifiutate, ripristinate: %s", uscita)
+        raise ErroreAgent(
+            CodiceErrore.COMANDO_FALLITO,
+            f"Le scorciatoie non sono state applicate. {webserver} dice: {uscita}",
+        )
+
+    esegui(impianto.ricarica, timeout=30)
+    return {"percorso": str(percorso), "quante": str(len(validi)), "test": uscita}

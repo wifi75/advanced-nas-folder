@@ -120,6 +120,9 @@ export default {
     servonoMount:
       'Prima serve almeno una condivisione NFS montata: una pubblicazione parte da lì.',
     indirizzo: 'Indirizzo',
+    indirizzoCorto: 'Indirizzo corto',
+    indirizzoCortoAiuto:
+      'Più facile da dettare o scrivere a mano: porta allo stesso posto. Funziona solo su Apache, e viene aggiornato da solo a ogni modifica.',
     indirizzoAiuto:
       'È qui che questa cartella si raggiunge dal browser. Copialo e provalo: se la pubblicazione è pubblica, funziona anche senza accedere.',
     copia: 'Copia l’indirizzo',

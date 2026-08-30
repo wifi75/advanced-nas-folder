@@ -32,6 +32,7 @@ class Verbo(StrEnum):
     VHOST_WRITE = "vhost.write"
     VHOST_REMOVE = "vhost.remove"
     VHOST_LIST = "vhost.list"
+    SCORCIATOIE_WRITE = "scorciatoie.write"
     FSTAB_LIST = "fstab.list"
     FSTAB_DISABLE = "fstab.disable"
 
