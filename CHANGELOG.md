@@ -18,6 +18,13 @@ Vedere [TODO.md](TODO.md).
   le date sono sempre nuove, quindi tutto sembrava cambiato. Un resoconto che
   segnala tutto non segnala niente. Ora il confronto è sul contenuto.
 
+## [0.12.3] - 2026-08-30
+
+### Modificato
+- **Tema, lingua e utente stanno ora subito sotto l'ultima voce del menu**,
+  invece di essere spinti in fondo alla barra. Il vuoto in mezzo li faceva
+  sembrare scollegati dal resto.
+
 ## [0.12.2] - 2026-08-30
 
 ### Corretto

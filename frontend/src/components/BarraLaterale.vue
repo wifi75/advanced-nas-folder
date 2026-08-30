@@ -375,7 +375,9 @@ a.voce.router-link-exact-active {
 /* --- fondo: lingua e utente --- */
 
 .fondo {
-  margin-block-start: auto;
+  /* Attaccato all'ultima voce del menu, non spinto in fondo alla barra: con
+     `margin-block-start: auto` restava un vuoto in mezzo che faceva sembrare
+     questi comandi scollegati dal resto. */
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
