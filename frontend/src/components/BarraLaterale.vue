@@ -315,7 +315,7 @@ const categorie = computed<Categoria[]>(() =>
             >
               <span
                 class="pastiglia"
-                :style="{ '--tinta': 'var(--tinta-file)' }"
+                :style="{ '--tinta': 'var(--tinta-pubblicazioni)' }"
                 aria-hidden="true"
               >
                 <svg
@@ -326,7 +326,7 @@ const categorie = computed<Categoria[]>(() =>
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
-                  <path :d="ICONE.cartella" />
+                  <path :d="ICONE.globo" />
                 </svg>
               </span>
               <span class="voce__testo">{{ t('menu.tuttePubblicazioni') }}</span>

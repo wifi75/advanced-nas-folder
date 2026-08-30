@@ -10,6 +10,13 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.27.3] - 2026-08-30
+
+### Corretto
+
+- «Tutte le cartelle pubblicate» aveva perso il proprio mappamondo, cambiato
+  per sbaglio insieme alle icone del menu di chi non amministra.
+
 ## [0.27.2] - 2026-08-30
 
 ### Corretto

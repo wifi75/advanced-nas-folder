@@ -5,7 +5,7 @@ Non duplicare questi valori altrove.
 """
 
 APP_NAME = "Advanced NAS Folder"
-APP_VERSION = "0.27.2"
+APP_VERSION = "0.27.3"
 APP_AUTHOR = "Tiziano Cassone"
 APP_DESCRIPTION = (
     "Pannello self-hosted per montare condivisioni NFS, pubblicare cartelle "
