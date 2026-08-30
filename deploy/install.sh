@@ -68,6 +68,10 @@ m() {
         moduli) testo="Abilito i moduli di Apache che servono al pannello" ;;
         porta_cerco) testo="Cerco una porta libera per l'API" ;;
         porta_ok) testo="Porta %s libera" ;;
+        porta_presa) testo="La porta %s è occupata" ;;
+        porta_chi) testo="La porta %s è occupata da: %s" ;;
+        porta_libere) testo="Porte libere: %s" ;;
+        porta_chiedo) testo="Quale porta uso? [%s]" ;;
         porta_spostata) testo="La porta %s è già occupata: uso la %s" ;;
         porta_occupata) testo="La porta %s è già occupata da un altro servizio. Indicane un'altra con --porta, oppure libera quella." ;;
         porta_niente) testo="Nessuna porta libera fra %s e %s. Indicane una con --porta." ;;
@@ -95,6 +99,23 @@ m() {
         disinstallo) testo="Rimuovo Advanced NAS Folder" ;;
         disinstalla_dati) testo="I dati in %s e i mount in %s NON vengono toccati." ;;
         prova) testo="PROVA: nessuna modifica verrà applicata" ;;
+        sottotitolo) testo="Monta condivisioni NFS, pubblica cartelle, gestisce i file." ;;
+        sistema) testo="Il sistema" ;;
+        scelte) testo="Cosa verrà installato" ;;
+        conferma) testo="Procedo? [S/n]" ;;
+        annullato) testo="Annullato. Non è stato modificato nulla." ;;
+        v_sistema) testo="Sistema" ;;
+        v_python) testo="Python" ;;
+        v_web) testo="Web server" ;;
+        v_memoria) testo="Memoria libera" ;;
+        v_disco) testo="Spazio libero" ;;
+        v_porte) testo="Porte occupate" ;;
+        v_porta) testo="Porta dell'API" ;;
+        v_cartella) testo="Programma" ;;
+        v_dati) testo="Dati" ;;
+        v_mount) testo="Radice dei mount" ;;
+        v_consegna) testo="Consegna dei file" ;;
+        v_assente) testo="assente" ;;
         esiste_aggiorno) testo="Installazione esistente trovata: aggiorno" ;;
         *) testo="$chiave" ;;
         esac
@@ -113,6 +134,10 @@ m() {
         moduli) testo="Enabling the Apache modules the panel needs" ;;
         porta_cerco) testo="Looking for a free port for the API" ;;
         porta_ok) testo="Port %s is free" ;;
+        porta_presa) testo="Port %s is taken" ;;
+        porta_chi) testo="Port %s is taken by: %s" ;;
+        porta_libere) testo="Free ports: %s" ;;
+        porta_chiedo) testo="Which port should I use? [%s]" ;;
         porta_spostata) testo="Port %s is already taken: using %s instead" ;;
         porta_occupata) testo="Port %s is already taken by another service. Pick another one with --port, or free it." ;;
         porta_niente) testo="No free port between %s and %s. Pick one with --port." ;;
@@ -140,6 +165,23 @@ m() {
         disinstallo) testo="Removing Advanced NAS Folder" ;;
         disinstalla_dati) testo="Data in %s and mounts in %s are NOT touched." ;;
         prova) testo="DRY RUN: no change will be applied" ;;
+        sottotitolo) testo="Mounts NFS shares, publishes folders, manages files." ;;
+        sistema) testo="The system" ;;
+        scelte) testo="What will be installed" ;;
+        conferma) testo="Proceed? [Y/n]" ;;
+        annullato) testo="Cancelled. Nothing was changed." ;;
+        v_sistema) testo="System" ;;
+        v_python) testo="Python" ;;
+        v_web) testo="Web server" ;;
+        v_memoria) testo="Free memory" ;;
+        v_disco) testo="Free space" ;;
+        v_porte) testo="Ports in use" ;;
+        v_porta) testo="API port" ;;
+        v_cartella) testo="Program" ;;
+        v_dati) testo="Data" ;;
+        v_mount) testo="Mount root" ;;
+        v_consegna) testo="File delivery" ;;
+        v_assente) testo="missing" ;;
         esiste_aggiorno) testo="Existing installation found: upgrading" ;;
         *) testo="$chiave" ;;
         esac
@@ -152,16 +194,44 @@ m() {
 # Uscita a schermo / Output
 # ---------------------------------------------------------------------------
 
+# Colori e simboli solo se c'e' un terminale davanti: reindirizzando su file le
+# sequenze di controllo sarebbero rumore illeggibile.
 if [ -t 1 ]; then
-    C_OK=$'\033[32m'; C_INFO=$'\033[36m'; C_WARN=$'\033[33m'; C_ERR=$'\033[31m'; C_FINE=$'\033[0m'
+    C_OK=$'\033[32m'; C_INFO=$'\033[36m'; C_WARN=$'\033[33m'; C_ERR=$'\033[31m'
+    C_TIT=$'\033[1;36m'; C_DIM=$'\033[2m'; C_GRA=$'\033[1m'; C_FINE=$'\033[0m'
 else
-    C_OK=""; C_INFO=""; C_WARN=""; C_ERR=""; C_FINE=""
+    C_OK=""; C_INFO=""; C_WARN=""; C_ERR=""; C_TIT=""; C_DIM=""; C_GRA=""; C_FINE=""
 fi
 
-passo() { printf '%s==>%s %s\n' "$C_INFO" "$C_FINE" "$(m "$@")"; }
-ok()    { printf '%s  ok%s %s\n' "$C_OK" "$C_FINE" "$(m "$@")"; }
-avviso(){ printf '%s  !%s  %s\n' "$C_WARN" "$C_FINE" "$(m "$@")"; }
-errore(){ printf '%serrore:%s %s\n' "$C_ERR" "$C_FINE" "$(m "$@")" >&2; exit 1; }
+# I simboli Unicode si usano solo se il terminale dichiara UTF-8: altrove
+# comparirebbero come caratteri illeggibili, che e' peggio di un trattino.
+case "${LC_ALL:-${LC_CTYPE:-${LANG:-C}}}" in
+*[Uu][Tt][Ff]*8*) S_PASSO="▸"; S_OK="✓"; S_WARN="!"; S_ERR="✗"; S_RIGA="─"; S_PUNTO="·" ;;
+*)                S_PASSO=">"; S_OK="+"; S_WARN="!"; S_ERR="x"; S_RIGA="-"; S_PUNTO="-" ;;
+esac
+
+riga() {
+    local out=""
+    while [ "${#out}" -lt 66 ]; do out="${out}${S_RIGA}"; done
+    printf '%s%s%s
+' "$C_DIM" "$out" "$C_FINE"
+}
+
+passo()  { printf '
+%s%s%s %s%s%s
+' "$C_INFO" "$S_PASSO" "$C_FINE" "$C_GRA" "$(m "$@")" "$C_FINE"; }
+ok()     { printf '  %s%s%s %s
+' "$C_OK" "$S_OK" "$C_FINE" "$(m "$@")"; }
+avviso() { printf '  %s%s%s %s
+' "$C_WARN" "$S_WARN" "$C_FINE" "$(m "$@")"; }
+errore() { printf '
+  %s%s %s%s
+
+' "$C_ERR" "$S_ERR" "$(m "$@")" "$C_FINE" >&2; exit 1; }
+
+# Riga di una scheda riassuntiva: etichetta a sinistra, valore a destra.
+voce() { printf '  %s%-22s%s %s
+' "$C_DIM" "$1" "$C_FINE" "$2"; }
 
 esegui() {
     if [ "$DRY_RUN" = 1 ]; then
@@ -211,6 +281,57 @@ done
 rileva_lingua
 
 # ---------------------------------------------------------------------------
+# Intestazione e riepilogo / Banner and summary
+# ---------------------------------------------------------------------------
+
+intestazione() {
+    printf '\n'
+    riga
+    printf '  %sAdvanced NAS Folder%s\n' "$C_TIT" "$C_FINE"
+    printf '  %s%s%s\n' "$C_DIM" "$(m sottotitolo)" "$C_FINE"
+    riga
+}
+
+# Cosa e' stato trovato sulla macchina, prima di toccarla. Serve a decidere con
+# cognizione invece di scoprire i conflitti a meta' installazione.
+sistema() {
+    passo sistema
+    voce "$(m v_sistema)"  "$(. /etc/os-release 2>/dev/null && echo "$PRETTY_NAME" || uname -s)"
+    voce "$(m v_python)"   "$(command -v "$PYBIN" >/dev/null 2>&1 && "$PYBIN" -V 2>&1 || m v_assente)"
+    voce "$(m v_web)"      "$WEB"
+    voce "$(m v_memoria)"  "$(free -h 2>/dev/null | awk '/^Mem/{print $7" / "$2}' || echo '?')"
+    voce "$(m v_disco)"    "$(df -h "$(dirname "$RADICE")" 2>/dev/null | awk 'NR==2{print $4" / "$2}')"
+
+    # Le porte gia' in ascolto: e' l'informazione che evita il conflitto piu'
+    # comune, e non si trova da nessun'altra parte se non guardandola.
+    local occupate
+    occupate="$(ss -tln 2>/dev/null | awk 'NR>1{print $4}' | grep -oE '[0-9]+$' |
+        sort -un | awk '$1>=8000 && $1<=9000' | tr '\n' ' ')"
+    [ -n "$occupate" ] && voce "$(m v_porte)" "$occupate"
+}
+
+# Riepilogo di cosa verra' fatto, prima di farlo.
+riepilogo_scelte() {
+    passo scelte
+    voce "$(m v_porta)"       "$PORTA_API"
+    voce "$(m v_web)"         "$WEB"
+    voce "$(m v_cartella)"    "$RADICE"
+    voce "$(m v_dati)"        "$DATI"
+    voce "$(m v_mount)"       "$MOUNT_ROOT"
+    voce "$(m v_consegna)"    "$([ "$WEB" = apache ] && echo 'X-Sendfile' || echo 'X-Accel-Redirect')"
+
+    # Con un terminale davanti si chiede conferma: e' l'ultimo momento utile
+    # per fermarsi prima che qualcosa venga scritto sul sistema.
+    if [ -t 0 ] && [ "$DRY_RUN" = 0 ]; then
+        printf '\n  %s ' "$(m conferma)"
+        local r=""; read -r r || r=""
+        case "${r,,}" in
+        n | no) errore annullato ;;
+        esac
+    fi
+}
+
+# ---------------------------------------------------------------------------
 # Scelta della porta / Port selection
 # ---------------------------------------------------------------------------
 
@@ -250,24 +371,79 @@ scegli_porta() {
         return
     fi
 
-    # Nessuna indicazione: si parte dalla predefinita e si sale finche non se
-    # ne trova una libera.
+    # Nessuna indicazione: si raccolgono le prime porte libere e, se c'è
+    # qualcuno davanti al terminale, gliele si propone. Con `curl | bash` non
+    # c'è nessuno a rispondere, quindi si sceglie da soli invece di restare
+    # fermi ad aspettare un tasto che non arriverà mai.
     passo porta_cerco
+
     local candidata="$PORTA_PREDEFINITA"
     local ultima=$((PORTA_PREDEFINITA + 50))
-    while [ "$candidata" -le "$ultima" ]; do
-        if ! porta_occupata "$candidata"; then
-            if [ "$candidata" = "$PORTA_PREDEFINITA" ]; then
-                ok porta_ok "$candidata"
-            else
-                avviso porta_spostata "$PORTA_PREDEFINITA" "$candidata"
+    local libere=""
+    local quante=0
+
+    while [ "$candidata" -le "$ultima" ] && [ "$quante" -lt 5 ]; do
+        if porta_occupata "$candidata"; then
+            # Dire *chi* la occupa evita di dover andare a cercarlo a mano.
+            # Il nome del servizio systemd e' piu' utile del nome del
+            # programma: "ilmioricettario.service" dice cosa fermare,
+            # "python" no.
+            local chi pid
+            chi="$(ss -tlnp 2>/dev/null | grep -E "[:.]${candidata}[[:space:]]" |
+                grep -oE 'users:\(\("[^"]+' | head -1 | sed 's/.*"//')"
+            pid="$(ss -tlnp 2>/dev/null | grep -E "[:.]${candidata}[[:space:]]" |
+                grep -oE 'pid=[0-9]+' | head -1 | cut -d= -f2)"
+            if [ -n "$pid" ] && [ -r "/proc/$pid/cgroup" ]; then
+                local unit
+                unit="$(grep -oE '[a-zA-Z0-9@._-]+\.service' "/proc/$pid/cgroup" 2>/dev/null | head -1)"
+                [ -n "$unit" ] && chi="$unit"
             fi
-            PORTA_API="$candidata"
-            return
+            if [ -n "$chi" ]; then
+                avviso porta_chi "$candidata" "$chi"
+            else
+                avviso porta_presa "$candidata"
+            fi
+        else
+            libere="$libere $candidata"
+            quante=$((quante + 1))
         fi
         candidata=$((candidata + 1))
     done
-    errore porta_niente "$PORTA_PREDEFINITA" "$ultima"
+
+    [ "$quante" -gt 0 ] || errore porta_niente "$PORTA_PREDEFINITA" "$ultima"
+
+    # shellcheck disable=SC2086
+    set -- $libere
+    local prima="$1"
+
+    # Interattivo solo se c'è davvero un terminale da cui leggere.
+    if [ -t 0 ] && [ "$DRY_RUN" = 0 ]; then
+        printf '  %s
+' "$(m porta_libere "$(echo $libere | tr ' ' ', ')")"
+        printf '  %s ' "$(m porta_chiedo "$prima")"
+        local risposta=""
+        read -r risposta || risposta=""
+        risposta="${risposta// /}"
+
+        if [ -n "$risposta" ]; then
+            case "$risposta" in
+            '' | *[!0-9]*) errore porta_invalida "$risposta" ;;
+            esac
+            [ "$risposta" -ge 1024 ] && [ "$risposta" -le 65535 ] ||
+                errore porta_invalida "$risposta"
+            porta_occupata "$risposta" && errore porta_occupata "$risposta"
+            PORTA_API="$risposta"
+            ok porta_ok "$PORTA_API"
+            return
+        fi
+    fi
+
+    PORTA_API="$prima"
+    if [ "$prima" = "$PORTA_PREDEFINITA" ]; then
+        ok porta_ok "$prima"
+    else
+        avviso porta_spostata "$PORTA_PREDEFINITA" "$prima"
+    fi
 }
 
 # ---------------------------------------------------------------------------
@@ -298,6 +474,7 @@ fi
 [ "$(id -u)" -eq 0 ] || errore serve_root
 command -v systemctl >/dev/null 2>&1 || errore serve_systemd
 
+intestazione
 [ "$DRY_RUN" = 1 ] && avviso prova
 [ -d "$RADICE" ] && avviso esiste_aggiorno
 
@@ -343,9 +520,20 @@ if [ "$WEB" = "auto" ]; then
 fi
 ok web_rilevato "$WEB"
 
+# La cartella dei log non porta il nome del web server: Apache scrive in
+# /var/log/apache2. Ricavarla da $WEB darebbe un percorso inesistente, e il
+# monitoraggio dei trasferimenti non leggerebbe mai nulla.
+if [ "$WEB" = "apache" ]; then LOG_WEB="/var/log/apache2"; else LOG_WEB="/var/log/nginx"; fi
+
+# Cosa c'è sulla macchina, prima di toccarla.
+sistema
+
 # La porta si sceglie qui: serve al file .env, al vhost e al controllo finale,
 # e va decisa prima di tutti e tre.
 scegli_porta
+
+# Ultimo momento utile per fermarsi: da qui in poi si scrive sul sistema.
+riepilogo_scelte
 
 if [ "$WEB" = "apache" ]; then
     # Il pacchetto e il modulo sono due cose diverse: il pacchetto può essere
@@ -453,7 +641,7 @@ ANF_DB_WAL=true
 ANF_AGENT_SOCKET=${SOCKET_DIR}/agent.sock
 ANF_MOUNT_ROOT=${MOUNT_ROOT}
 ANF_DOWNLOAD_BACKEND=$([ "$WEB" = "apache" ] && echo xsendfile || echo xaccel)
-ANF_ACCESS_LOG=/var/log/${WEB}/anf_access.log
+ANF_ACCESS_LOG=${LOG_WEB}/anf_access.log
 ANF_TRUSTED_PROXIES=127.0.0.1
 FINE
         chown "$UTENTE:$GRUPPO" "$ENV_FILE"

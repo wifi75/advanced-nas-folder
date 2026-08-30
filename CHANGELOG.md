@@ -10,6 +10,32 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.6.3] - 2026-08-30
+
+L'installer diventa una cosa che si guarda mentre lavora, e chiede invece di
+decidere da solo quando c'è qualcuno davanti.
+
+### Aggiunto
+- **Intestazione, icone e colori.** Ogni passo è marcato, gli esiti hanno un simbolo,
+  e i simboli Unicode si usano solo se il terminale dichiara UTF-8: altrove
+  comparirebbero come caratteri illeggibili, che è peggio di un trattino.
+- **Riepilogo del sistema prima di toccarlo**: distribuzione, versione di Python, web
+  server, memoria e spazio liberi, e **le porte già in ascolto fra la 8000 e la 9000**.
+  È l'informazione che evita il conflitto più comune, e non si trova altrove se non
+  guardandola.
+- **Quando una porta è occupata viene detto da chi**, con il nome del servizio systemd
+  e non del programma: «ilmioricettario.service» dice cosa fermare, «python» no.
+- **Scelta interattiva della porta**: vengono proposte le prime cinque libere, con la
+  prima come valore predefinito. E un **riepilogo delle scelte con conferma** prima che
+  qualcosa venga scritto sul sistema.
+- Con `curl | bash` non viene chiesto nulla e l'installer decide da solo: lì non c'è
+  nessuno a rispondere, e restare fermi ad aspettare un tasto sarebbe peggio.
+
+### Corretto
+- **Il percorso dell'access log era sbagliato.** Veniva ricavato dal nome del web server
+  (`/var/log/apache`), ma Apache su Ubuntu scrive in `/var/log/apache2`. Il monitoraggio
+  dei trasferimenti non avrebbe mai letto un byte, e nessuno avrebbe capito perché.
+
 ## [0.6.2] - 2026-08-30
 
 Rilasciata perché l'installer della 0.6.1 non parte su una macchina dove la porta 8100
