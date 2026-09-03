@@ -10,6 +10,18 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.27.13] - 2026-09-03
+
+### Corretto
+
+- **`deploy/docker/docker-compose.yml`: nome del container ripulito dal
+  suffisso numerico di replica.** Rimosso `container_name` in v0.27.12 per
+  evitare l'ambiguità di un nome breve fisso, ma senza `container_name`
+  Compose aggiunge da solo `-1` (`advanced-nas-folder-anf-api-1`), inutile
+  per un servizio che non è pensato per scalare a più istanze. Ripristinato
+  `container_name`, questa volta con l'identità del progetto già dentro:
+  `advanced-nas-folder-anf-api`.
+
 ## [0.27.12] - 2026-09-03
 
 ### Corretto

@@ -12,7 +12,14 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.27.12
+- Versione corrente: 0.27.13
+
+## Stato alla v0.27.13 — 3 settembre 2026
+
+Rivista la v0.27.12: togliere `container_name` lasciava Compose aggiungere
+`-1` (suffisso di replica, inutile qui). Ripristinato `container_name`, ma
+con l'identità del progetto già dentro (`advanced-nas-folder-anf-api`) invece
+che un nome breve ambiguo — il meglio di entrambe le versioni precedenti.
 
 ## Stato alla v0.27.12 — 3 settembre 2026
 
@@ -158,12 +165,12 @@ prende un 404.
   Portainer — collisione garantita con qualunque altro progetto che segua
   la stessa convenzione di cartella sullo stesso host. Aggiungere sempre
   `name:` esplicito ai compose di questo tipo di progetti.
-- **`container_name` esplicito nel compose perde la disambiguazione che
-  Compose darebbe da solo.** Senza, usa `<progetto>-<servizio>-<numero>`,
-  che porta già l'identità del progetto — utile esattamente per lo stesso
-  motivo del punto sopra. Fissarlo a un nome breve (`anf-api`) lo perde.
-  Non fissare `container_name` a meno che serva davvero un nome stabile per
-  qualcos'altro che lo referenzia.
+- **`container_name` va bene fisso, ma con l'identità del progetto dentro.**
+  Un nome breve (`anf-api`) è ambiguo su un host con più applicativi;
+  lasciarlo del tutto implicito fa aggiungere a Compose un suffisso
+  numerico di replica (`-1`) inutile per un servizio a istanza singola. La
+  scelta giusta: `container_name: <progetto>-<servizio>`, esplicito e senza
+  suffisso.
 - **`deadsnakes` (Python 3.14 per `install.sh`) è specifico di Ubuntu**: su
   Debian non esiste affatto, e i repository apt di Debian stabile restano
   spesso una minor version indietro. Su Debian va compilato da sorgente con
