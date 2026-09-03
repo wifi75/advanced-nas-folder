@@ -10,6 +10,20 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.27.10] - 2026-09-03
+
+### Corretto
+
+- **`install.sh`: rieseguirlo per aggiornare non aggiornava nulla di ciò
+  che gira.** `systemctl enable --now` su un servizio già attivo non lo
+  riavvia — `start` non fa niente se è già in esecuzione. Il codice nuovo
+  arrivava sul disco, la migrazione girava, ma il processo restava quello
+  vecchio: la versione riportata da `/api/v1/health` restava quella
+  precedente nonostante l'installer dicesse «Installazione completata».
+  Ora usa `restart`, che funziona in entrambi i casi. Trovato verificando
+  la versione dopo un aggiornamento reale, non fidandosi dell'esito
+  dichiarato — la stessa disciplina già in nota per `update.sh`.
+
 ## [0.27.9] - 2026-09-03
 
 ### Corretto

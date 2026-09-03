@@ -892,8 +892,17 @@ fi
 # ---------------------------------------------------------------------------
 
 passo avvio
-esegui systemctl enable --now anf-agent
-esegui systemctl enable --now anf-api
+# "enable --now" su un servizio gia' attivo non lo riavvia: "start" e' un
+# no-op se e' gia' in esecuzione. In un aggiornamento questo lasciava in
+# piedi il processo vecchio, con il codice appena scaricato sul disco ma mai
+# caricato — trovato verificando la versione dopo un aggiornamento reale,
+# rimasta a quella precedente nonostante l'installer dicesse "completato".
+# "restart" funziona in entrambi i casi: parte se non era attivo, ricarica
+# se lo era.
+esegui systemctl enable anf-agent
+esegui systemctl restart anf-agent
+esegui systemctl enable anf-api
+esegui systemctl restart anf-api
 
 if [ "$DRY_RUN" = 0 ]; then
     passo verifica

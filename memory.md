@@ -12,7 +12,18 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.27.9
+- Versione corrente: 0.27.10
+
+## Stato alla v0.27.10 — 3 settembre 2026
+
+Quinto problema della stessa sessione, il più insidioso: `install.sh`
+diceva «Installazione completata» dopo un aggiornamento, ma il processo in
+esecuzione restava quello vecchio (`enable --now` non riavvia un servizio
+già attivo). Scoperto perché ho controllato `/api/v1/health` invece di
+fidarmi dell'esito dichiarato — esattamente la disciplina che `memory.md`
+raccomandava già per `update.sh` ("verificare sempre la versione con
+/api/v1/health"), qui applicata anche a `install.sh`. Vedere «Trappole
+trovate sul campo».
 
 ## Stato alla v0.27.9 — 3 settembre 2026
 
@@ -120,6 +131,11 @@ prende un 404.
   Nginx, disallineandolo da `.env` (lasciato intatto negli aggiornamenti).
   Corretto in v0.27.9: "occupata solo da `anf-api.service`" conta come
   libera, sia con `--porta` esplicita sia nella ricerca automatica.
+- **`systemctl enable --now` su un servizio già attivo non lo riavvia.**
+  `install.sh` lo usava per avviare agent e API: in un aggiornamento il
+  codice nuovo arrivava sul disco ma il processo restava quello vecchio,
+  e l'installer dichiarava comunque «completato». Corretto in v0.27.10 con
+  `restart`, che funziona sia a freddo sia a caldo.
 - **`deadsnakes` (Python 3.14 per `install.sh`) è specifico di Ubuntu**: su
   Debian non esiste affatto, e i repository apt di Debian stabile restano
   spesso una minor version indietro. Su Debian va compilato da sorgente con
