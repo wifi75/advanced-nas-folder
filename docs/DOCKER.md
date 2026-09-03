@@ -111,14 +111,22 @@ In alternativa al giro manuale sopra: Portainer sa gestire uno stack
 l'immagine dal codice appena scaricato quando si preme "Pull and redeploy" —
 non serve più collegarsi via SSH per aggiornare il container.
 
-Per questo il file usa un percorso **assoluto** per `env_file`
-(`/var/www/advanced-nas-folder/.env`, non `../../.env`): il repository che
-clona Portainer non è la cartella dell'installazione nativa, quindi il
-percorso relativo non troverebbe il `.env` vero. Il contesto di build
-(`../../backend`) resta invece relativo di proposito: deve costruire dal
-codice che Portainer ha appena clonato, non da quello dell'installazione
-nativa — altrimenti "Pull and redeploy" scaricherebbe il codice nuovo senza
-usarlo davvero.
+**Perché il `.env` applicativo arriva come volume e non come `env_file`.**
+`env_file` nel compose lo legge il **processo che esegue `docker compose`**,
+non il motore Docker — e quando a lanciarlo è Portainer, quel processo gira
+**dentro il container di Portainer stesso**, che ha montato solo il socket
+Docker, non il filesystem dell'host: nessun percorso host, assoluto o
+relativo, è visibile da lì. Un volume invece lo risolve sempre il **demone
+Docker sull'host**, indipendentemente da chi ha chiamato `docker compose` —
+funziona identico da riga di comando e da Portainer. Per questo il compose
+monta il `.env` reale come volume di sola lettura
+(`${ANF_ENV_FILE:-/var/www/advanced-nas-folder/.env}`) e
+`docker-entrypoint.sh` lo carica lui stesso nell'ambiente prima di partire.
+
+Il contesto di build (`../../backend`) resta invece relativo di proposito:
+deve costruire dal codice che Portainer ha appena clonato, non da quello
+dell'installazione nativa — altrimenti "Pull and redeploy" scaricherebbe il
+codice nuovo senza usarlo davvero.
 
 **Prerequisito**: l'installazione nativa resta comunque necessaria (agent,
 web server, cartelle, e soprattutto il `.env` reale con i segreti — non
@@ -128,12 +136,13 @@ Configurazione dello stack, in Portainer:
 
 1. **Stacks → Add stack → Repository**.
 2. **Repository URL**: `https://github.com/wifi75/advanced-nas-folder.git`.
-3. **Reference**: `refs/heads/main` (o un tag preciso, es. `refs/tags/v0.28.5`,
+3. **Reference**: `refs/heads/main` (o un tag preciso, es. `refs/tags/v0.28.7`,
    per non aggiornarsi da soli a ogni push).
 4. **Compose path**: `deploy/docker/docker-compose.yml`.
 5. **Environment variables**, da inserire a mano nel modulo di Portainer
    (sono le stesse di `deploy/docker/.env.example`, Portainer non legge quel
    file da un repository Git): `ANF_UID`, `ANF_GID` (da `id anf` sull'host),
+   `ANF_ENV_FILE` (di norma non va cambiato: `/var/www/advanced-nas-folder/.env`),
    `ANF_DATA_DIR`, `ANF_MOUNT_ROOT`, `ANF_SOCKET_DIR`, `ANF_PORT` — stessi
    valori usati nell'installazione nativa.
 6. Deploy the stack.

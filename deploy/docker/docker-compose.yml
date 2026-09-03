@@ -28,13 +28,6 @@ services:
     # scoprirlo con `id anf` sull'host. Senza, il container non puo' leggere
     # ne' scrivere i volumi qui sotto, che sull'host appartengono a lui.
     user: "${ANF_UID}:${ANF_GID}"
-    # Percorso assoluto, non relativo: questo file lo puo' lanciare anche
-    # Portainer da uno stack "da repository Git", che clona il progetto nella
-    # sua cartella interna, non in /var/www/advanced-nas-folder — un percorso
-    # relativo punterebbe a un .env che li' non esiste. Il file vero, coi
-    # segreti reali, resta dove l'installazione nativa lo mette sempre.
-    env_file:
-      - /var/www/advanced-nas-folder/.env
     ports:
       # Solo sul loopback dell'host: la stessa proprieta' di sicurezza
       # dell'unit systemd nativa ("ascolto solo su 127.0.0.1"), qui applicata
@@ -42,6 +35,17 @@ services:
       # nel container e' 0.0.0.0 per necessita': vedi docker-entrypoint.sh).
       - "127.0.0.1:${ANF_PORT:-8100}:${ANF_PORT:-8100}"
     volumes:
+      # NON "env_file": quello lo legge il PROCESSO che esegue `docker
+      # compose`, non il motore Docker. Se a lanciarlo e' Portainer da uno
+      # stack "da repository Git", quel processo gira dentro il container di
+      # Portainer stesso — che ha montato solo il socket Docker, non
+      # /var/www/advanced-nas-folder — quindi qualunque percorso host in
+      # "env_file" fallisce li', anche se il file esiste davvero sull'host.
+      # Un volume invece lo risolve sempre il demone Docker sull'host, non il
+      # processo che ha chiamato compose: funziona identico da riga di
+      # comando e da Portainer. docker-entrypoint.sh lo carica lui stesso
+      # nell'ambiente prima di partire.
+      - ${ANF_ENV_FILE:-/var/www/advanced-nas-folder/.env}:/run/secrets/anf.env:ro
       - ${ANF_DATA_DIR:-/var/lib/anf}:/var/lib/anf
       - ${ANF_SOCKET_DIR:-/run/anf}:/run/anf
       - type: bind

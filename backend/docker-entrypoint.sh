@@ -4,6 +4,22 @@
 # nuove), poi parte.
 set -e
 
+# Il .env applicativo arriva come volume montato (docker-compose.yml), non
+# come "env_file". "env_file" viene letto dal PROCESSO che esegue
+# `docker compose`, non dal motore Docker: se a lanciarlo e' Portainer (che
+# gira dentro un proprio container, con solo il socket Docker montato, senza
+# /var/www dell'host) quel percorso non esiste dal suo punto di vista e la
+# build fallisce, anche se il file c'e' davvero sull'host. Un volume invece
+# lo risolve sempre il demone Docker sull'host, indipendentemente da chi ha
+# invocato compose: per questo il file arriva qui come bind mount, e questo
+# script lo carica lui stesso nell'ambiente prima di partire.
+if [ -f /run/secrets/anf.env ]; then
+    set -a
+    # shellcheck disable=SC1091
+    . /run/secrets/anf.env
+    set +a
+fi
+
 alembic upgrade head
 
 # --host e' sempre 0.0.0.0 dentro il container, non ANF_HOST: quest'ultimo

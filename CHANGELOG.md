@@ -10,6 +10,25 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.28.7] - 2026-09-03
+
+### Corretto
+
+- **Il deploy da Portainer falliva sempre**: `env_file:
+  /var/www/advanced-nas-folder/.env` in `docker-compose.yml` non è mai
+  risolvibile da uno stack Portainer "da repository Git", nemmeno con un
+  percorso assoluto (correzione insufficiente della v0.28.5). Causa vera:
+  `env_file` lo legge il **processo che esegue `docker compose`**, non il
+  motore Docker — e quel processo gira dentro il container di Portainer
+  stesso, che monta solo il socket Docker, non il filesystem dell'host.
+  Sostituito con un **volume** di sola lettura verso lo stesso file (nuova
+  variabile `ANF_ENV_FILE`, stesso valore predefinito): un volume lo
+  risolve sempre il demone Docker sull'host, indipendentemente da chi ha
+  chiamato compose. `docker-entrypoint.sh` carica ora lui stesso il file
+  nell'ambiente prima di avviare l'applicazione. Trovato provando per la
+  prima volta un deploy reale da Portainer, non dalla sola lettura del
+  codice.
+
 ## [0.28.6] - 2026-09-03
 
 ### Corretto

@@ -12,7 +12,36 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.28.6
+- Versione corrente: 0.28.7
+
+## Stato alla v0.28.7 — 3 settembre 2026
+
+Primo vero tentativo di deploy da Portainer (stack "da repository Git"):
+falliva con "env file /var/www/advanced-nas-folder/.env not found",
+nonostante il percorso fosse già assoluto (fix v0.28.5). **La v0.28.5 aveva
+diagnosticato il sintomo giusto ma la causa sbagliata**: non è una
+questione di percorso relativo vs assoluto, è che `env_file` nel compose
+lo legge il *processo* che esegue `docker compose`, non il motore Docker —
+e quando quel processo è Portainer, gira dentro il **suo** container, che
+monta solo il socket Docker (verificato con `docker inspect portainer` —
+solo `portainer_data` e `docker.sock`, niente dell'host). Nessun percorso
+host, di nessun tipo, è visibile da lì.
+
+Corretto sostituendo `env_file` con un **volume** di sola lettura verso lo
+stesso file (`ANF_ENV_FILE`, stesso default): un volume lo risolve sempre
+il demone Docker sull'host, mai il processo chiamante — funziona uguale da
+CLI e da Portainer. `docker-entrypoint.sh` carica il file lui stesso
+nell'ambiente (`set -a; . /run/secrets/anf.env; set +a`) prima di avviare
+uvicorn.
+
+**Lezione per [[wifi75-deploy-linux]]**: quando uno stack Docker deve
+essere gestibile anche da un orchestratore che gira lui stesso in
+container (Portainer, ma vale in generale), qualunque riferimento a un
+file dell'host nel compose (`env_file`, bind mount di configurazione) va
+verificato pensando a *chi* esegue davvero `docker compose` — non è
+sempre l'host. I volumi sono sempre sicuri (li risolve il demone), i
+meccanismi che leggono file lato client (`env_file`, `--env-file` da CLI)
+non lo sono.
 
 ## Stato alla v0.28.6 — 3 settembre 2026
 
