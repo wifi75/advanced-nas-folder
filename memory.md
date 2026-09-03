@@ -12,7 +12,20 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.28.8
+- Versione corrente: 0.28.9
+
+## Stato alla v0.28.9 — 3 settembre 2026
+
+Le due scorciatoie sotto "Condivisioni" nel menu laterale (`BarraLaterale.vue`)
+erano link di solo testo, senza icona — l'utente le ha notate live
+sull'installazione appena aggiornata e ha chiesto perché non avessero un
+"pulsante grafico" come tutto il resto del menu. Portate allo stesso stile
+a icona (`.voce` + `.pastiglia`) delle altre voci. Nel controllarle, trovata
+anche un'etichetta sbagliata indipendente dallo stile: la chiave
+`menu.tutteCondivisioni` mostrava il testo "Nuova condivisione"/"New share"
+ma il link porta all'elenco di *tutte* le condivisioni esistenti
+(`/condivisioni`), non alla creazione di una nuova — corretta in "Tutte le
+condivisioni NFS"/"All NFS shares".
 
 ## Stato alla v0.28.8 — 3 settembre 2026
 

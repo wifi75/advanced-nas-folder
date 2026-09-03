@@ -23,7 +23,7 @@ export default {
   menu: {
     tuttePubblicazioni: 'Tutte le cartelle pubblicate',
     pubblica: 'Pubblica una cartella',
-    tutteCondivisioni: 'Nuova condivisione',
+    tutteCondivisioni: 'Tutte le condivisioni NFS',
     archivio: 'Archivio',
     sistema: 'Sistema',
     condivisioni: 'Condivisioni NFS',

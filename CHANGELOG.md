@@ -10,6 +10,21 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.28.9] - 2026-09-03
+
+### Corretto
+
+- **Le due scorciatoie sotto "Condivisioni"** ("Tutte le cartelle
+  pubblicate", "Tutte le condivisioni NFS") erano link di solo testo,
+  senza l'icona a pastiglia che ha ogni altra voce del menu — sembravano
+  pulsanti mancanti. Ora hanno lo stesso stile a icona delle altre voci.
+- **La seconda scorciatoia era etichettata "Nuova condivisione"** (en:
+  "New share") ma porta all'elenco di **tutte** le condivisioni NFS
+  esistenti (`/condivisioni`, `MountsView.vue`), non alla creazione di una
+  nuova — corretta l'etichetta in "Tutte le condivisioni NFS" (en: "All
+  NFS shares"), coerente con la sua destinazione reale e con la
+  scorciatoia gemella "Tutte le cartelle pubblicate".
+
 ## [0.28.8] - 2026-09-03
 
 ### Corretto

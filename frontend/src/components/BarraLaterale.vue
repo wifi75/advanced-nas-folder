@@ -294,25 +294,61 @@ const categorie = computed<Categoria[]>(() =>
           {{ t('menu.condivisioni') }}
         </h2>
 
-        <!-- Scorciatoie piatte, separate dall'albero sotto: prima erano le
-             ultime due voci della stessa lista dell'albero, e si leggevano
-             come se fossero anche loro condivisioni o pubblicazioni. -->
-        <div class="scorciatoie">
-          <RouterLink
-            to="/pubblicazioni"
-            class="scorciatoia"
-            @click="emit('naviga')"
-          >
-            {{ t('menu.tuttePubblicazioni') }}
-          </RouterLink>
-          <RouterLink
-            to="/condivisioni"
-            class="scorciatoia"
-            @click="emit('naviga')"
-          >
-            {{ t('menu.tutteCondivisioni') }}
-          </RouterLink>
-        </div>
+        <!-- Stesso stile a icona delle altre voci del menu: prima erano link
+             di solo testo, staccati visivamente dal resto — sembravano
+             pulsanti mancanti invece di una scelta di stile. -->
+        <ul class="voci scorciatoie">
+          <li>
+            <RouterLink
+              to="/pubblicazioni"
+              class="voce"
+              @click="emit('naviga')"
+            >
+              <span
+                class="pastiglia"
+                :style="{ '--tinta': 'var(--tinta-nfs)' }"
+                aria-hidden="true"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path :d="ICONE.documento" />
+                </svg>
+              </span>
+              <span class="voce__testo">{{ t('menu.tuttePubblicazioni') }}</span>
+            </RouterLink>
+          </li>
+          <li>
+            <RouterLink
+              to="/condivisioni"
+              class="voce"
+              @click="emit('naviga')"
+            >
+              <span
+                class="pastiglia"
+                :style="{ '--tinta': 'var(--tinta-nfs)' }"
+                aria-hidden="true"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path :d="ICONE.cartellaRete" />
+                </svg>
+              </span>
+              <span class="voce__testo">{{ t('menu.tutteCondivisioni') }}</span>
+            </RouterLink>
+          </li>
+        </ul>
 
         <ul class="voci">
           <li
@@ -559,25 +595,11 @@ const categorie = computed<Categoria[]>(() =>
   gap: 0.35rem;
 }
 
-/* --- scorciatoie: separate dall'albero, non voci del menu principale --- */
+/* --- scorciatoie: stesso stile di .voci, solo un margine per staccarle
+   dall'albero delle condivisioni vere e proprie subito sotto --- */
 
 .scorciatoie {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.15rem 0.7rem;
-  margin: 0 0 0.6rem;
-  padding-inline: 0.65rem;
-}
-
-.scorciatoia {
-  font-size: 0.75rem;
-  color: var(--testo-tenue);
-  text-decoration: none;
-}
-
-.scorciatoia:hover {
-  color: var(--accento);
-  text-decoration: underline;
+  margin-bottom: 0.5rem;
 }
 
 /* --- pulsante di vetro --- */
