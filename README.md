@@ -20,6 +20,9 @@
 [![Web server](https://img.shields.io/badge/Web%20server-Apache%20%7C%20Nginx-D22128?logo=apache&logoColor=white)](https://httpd.apache.org)
 [![Sicurezza](https://img.shields.io/badge/Privilegi-agent%20root%20isolato-4B0082)](docs/PIANO.md#nodo-1--montare-filesystem-richiede-root)
 [![License](https://img.shields.io/badge/License-MIT-3DA639?logo=opensourceinitiative&logoColor=white)](LICENSE)
+[![SemVer](https://img.shields.io/badge/SemVer-2.0.0-3F4551)](https://semver.org/lang/it/)
+[![Changelog](https://img.shields.io/badge/Changelog-Keep%20a%20Changelog-E05735)](CHANGELOG.md)
+[![Mantenuto](https://img.shields.io/badge/Mantenuto-s%C3%AC%20(2026)-2EA44F)](https://github.com/wifi75/advanced-nas-folder/commits/main)
 
 Pannello self-hosted che **monta condivisioni NFS**, **pubblica cartelle con permessi
 per sottocartella** e sostituisce integralmente FileBrowser — senza che tu debba mai

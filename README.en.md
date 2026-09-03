@@ -20,6 +20,9 @@
 [![Web server](https://img.shields.io/badge/Web%20server-Apache%20%7C%20Nginx-D22128?logo=apache&logoColor=white)](https://httpd.apache.org)
 [![Security](https://img.shields.io/badge/Privileges-isolated%20root%20agent-4B0082)](docs/PIANO.en.md)
 [![License](https://img.shields.io/badge/License-MIT-3DA639?logo=opensourceinitiative&logoColor=white)](LICENSE)
+[![SemVer](https://img.shields.io/badge/SemVer-2.0.0-3F4551)](https://semver.org)
+[![Changelog](https://img.shields.io/badge/Changelog-Keep%20a%20Changelog-E05735)](CHANGELOG.md)
+[![Maintained](https://img.shields.io/badge/Maintained-yes%20(2026)-2EA44F)](https://github.com/wifi75/advanced-nas-folder/commits/main)
 
 Self-hosted panel that **mounts NFS shares**, **publishes folders with per-subfolder
 permissions** and fully replaces FileBrowser — without ever editing a server
