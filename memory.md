@@ -12,7 +12,23 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.28.11
+- Versione corrente: 0.28.12
+
+## Stato alla v0.28.12 — 3 settembre 2026
+
+L'utente ha visto dal vivo, su `docker-2` in tema chiaro, che il fix
+della v0.28.11 alla vista File (aggiungere lo sfondo a vetro a
+`.riga-form`) non si vedeva quasi per niente — reazione diretta: "cosa
+hai migliorato? nulla!". Causa reale, più a monte del singolo elemento:
+tutte le card `.strumenti`/`.riga-form`/`.viste`/`.zona` (Caricamenti)
+avevano `box-shadow` con **solo il riflesso interno** (`inset 0 1px 0
+var(--vetro-luce-pub)`), mai l'ombra esterna `var(--vetro-ombra)` — che
+invece il pulsante di vista attiva (`.vista--scelta`) già usava da solo,
+combinata. Su un vetro bianco translucido sopra uno sfondo pagina già
+quasi bianco (`--vetro-sfondo` chiaro è bianco al 78%→42%), senza
+un'ombra esterna la card non ha alcun indizio visivo di essere "sollevata"
+dalla pagina — si mimetizza del tutto, indipendentemente da bordo o
+sfondo. Aggiunta l'ombra esterna a tutte e quattro.
 
 ## Risolto — mount NFS bloccato su LXC: creato `docker-2` come VM vera
 

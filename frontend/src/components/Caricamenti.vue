@@ -288,6 +288,7 @@ function pulisci(): void {
   background: var(--vetro-sfondo-pub);
   backdrop-filter: blur(14px) saturate(180%);
   -webkit-backdrop-filter: blur(14px) saturate(180%);
+  box-shadow: var(--vetro-ombra);
   color: var(--testo-tenue);
   font-size: 0.9rem;
   transition: border-color 0.15s ease, background 0.15s ease;

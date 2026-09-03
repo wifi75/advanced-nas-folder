@@ -1200,7 +1200,9 @@ chiudiConEsc(
   background: var(--vetro-sfondo-pub);
   backdrop-filter: blur(14px) saturate(180%);
   -webkit-backdrop-filter: blur(14px) saturate(180%);
-  box-shadow: inset 0 1px 0 var(--vetro-luce-pub);
+  box-shadow:
+    inset 0 1px 0 var(--vetro-luce-pub),
+    var(--vetro-ombra);
   align-self: flex-start;
 }
 
@@ -1617,7 +1619,9 @@ chiudiConEsc(
   background: var(--vetro-sfondo-pub);
   backdrop-filter: blur(14px) saturate(180%);
   -webkit-backdrop-filter: blur(14px) saturate(180%);
-  box-shadow: inset 0 1px 0 var(--vetro-luce-pub);
+  box-shadow:
+    inset 0 1px 0 var(--vetro-luce-pub),
+    var(--vetro-ombra);
 }
 
 .cerca {
@@ -1636,7 +1640,9 @@ chiudiConEsc(
   background: var(--vetro-sfondo-pub);
   backdrop-filter: blur(14px) saturate(180%);
   -webkit-backdrop-filter: blur(14px) saturate(180%);
-  box-shadow: inset 0 1px 0 var(--vetro-luce-pub);
+  box-shadow:
+    inset 0 1px 0 var(--vetro-luce-pub),
+    var(--vetro-ombra);
 }
 
 .velo {

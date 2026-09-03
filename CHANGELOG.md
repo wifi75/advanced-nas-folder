@@ -10,6 +10,18 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.28.12] - 2026-09-03
+
+### Corretto
+
+- **Le card di vetro della vista File erano quasi invisibili in tema
+  chiaro** (ricerca, caricamento, nuova cartella, selezione vista):
+  avevano solo il riflesso interno superiore, nessun'ombra esterna. Su
+  uno sfondo pagina già quasi bianco, un vetro bianco senza ombra non si
+  distingue affatto — sembravano elementi non ancora vestiti graficamente
+  invece di card. Aggiunta l'ombra esterna che già usava, da sola, il
+  pulsante di vista attiva.
+
 ## [0.28.11] - 2026-09-03
 
 ### Corretto
