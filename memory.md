@@ -12,7 +12,19 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.28.3
+- Versione corrente: 0.28.4
+
+## Stato alla v0.28.4 — 3 settembre 2026
+
+Corretto `update.sh`, che non sapeva che `anf-api` può girare in Docker
+(v0.28.x, `docker-vps`): avrebbe provato a riavviare il servizio nativo
+disabilitato, in conflitto di porta col container. Ora si accorge da solo
+guardando se il servizio è abilitato, gestisce solo `anf-agent` quando è
+in Docker, e ricorda il comando per ricostruire il container.
+Corretta anche `docs/DOCKER.md`: la guida "Aggiornare" indicava
+`docker compose build --pull`, che non riporta codice nuovo (aggiorna solo
+l'immagine base di Python) — bug della documentazione, non solo di chi la
+seguiva.
 
 ## Stato alla v0.28.3 — 3 settembre 2026
 
@@ -224,6 +236,12 @@ prende un 404.
 
 ### Trappole trovate sul campo, da non ripetere
 
+- **Uno script che gestisce servizi systemd per nome deve controllare se
+  sono davvero gestiti così**, non darlo per scontato. `update.sh` provava
+  a riavviare `anf-api` anche quando gira in Docker (disabilitato di
+  proposito su quell'installazione) — conflitto di porta col container.
+  Si accorge da solo con `systemctl is-enabled`, non serve un flag o una
+  configurazione separata.
 - **Due blocchi CSS con lo stesso selettore** nello stesso foglio, lontani fra
   loro, si annullano in silenzio. È già successo due volte in
   `views/ArchivioView.vue`, che ne ha ancora diversi: nessun linter lo segnala.

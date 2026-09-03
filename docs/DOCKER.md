@@ -78,13 +78,31 @@ radice del progetto usato dall'installazione nativa — nessun segreto duplicato
 
 ## Aggiornare
 
+`docker compose build` costruisce l'immagine dal codice sorgente **già
+presente sul disco**, in `/var/www/advanced-nas-folder/backend`: da solo non
+scarica una versione più recente del progetto. `--pull` aggiorna solo
+l'immagine di base di Python, non il codice — un errore facile da fare,
+capitato anche qui la prima volta che questa guida è stata scritta.
+
+Il codice si aggiorna con lo stesso `update.sh` dell'installazione nativa,
+che da questa versione riconosce da solo che `anf-api` gira in Docker (perché
+il suo servizio systemd è disabilitato) e non prova a riavviarlo — gestisce
+solo `anf-agent` e sincronizza i file:
+
 ```bash
-docker compose build --pull && docker compose up -d
+cd /var/www/advanced-nas-folder && sudo bash update.sh
 ```
 
-Le migrazioni del database girano da sole a ogni avvio del container
-(`docker-entrypoint.sh`), quindi non serve un passo separato — a differenza
-dell'installazione nativa, dove le applica l'installer.
+Alla fine stampa da sé il comando per ricostruire il container col codice
+appena arrivato:
+
+```bash
+cd deploy/docker && docker compose build --pull && docker compose up -d
+```
+
+Le migrazioni del database girano comunque da sole a ogni avvio del
+container (`docker-entrypoint.sh`), oltre a quelle già applicate da
+`update.sh`: idempotenti, non fanno danno a ripetersi.
 
 ## Perché la porta resta solo su `127.0.0.1`
 

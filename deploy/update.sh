@@ -15,7 +15,19 @@ set -Eeuo pipefail
 APP="advanced-nas-folder"
 RADICE="/var/www/${APP}"
 REPO="wifi75/advanced-nas-folder"
-SERVIZI=(anf-api anf-agent)
+
+# Se anf-api gira in Docker (docs/DOCKER.md), il servizio systemd nativo e'
+# disabilitato di proposito: fermarlo/riavviarlo qui non farebbe nulla di
+# utile, e "start" andrebbe in conflitto sulla porta con il container gia' in
+# ascolto. Si rileva da solo controllando se e' abilitato — un'installazione
+# nativa lo ha sempre abilitato, una in Docker mai.
+SERVIZI=(anf-agent)
+ANF_API_IN_DOCKER=0
+if systemctl is-enabled anf-api >/dev/null 2>&1; then
+    SERVIZI+=(anf-api)
+else
+    ANF_API_IN_DOCKER=1
+fi
 
 VERSIONE="ultima"
 DRY_RUN=0
@@ -274,6 +286,15 @@ if [ "$DRY_RUN" = 0 ]; then
 
     trap - ERR
     rm -rf "$PRECEDENTE"
+fi
+
+if [ "$ANF_API_IN_DOCKER" = 1 ]; then
+    passo "$(msg 'anf-api gira in Docker' 'anf-api runs in Docker')"
+    msg 'Il codice sorgente e stato aggiornato, ma il container usa ancora' \
+        'The source code has been updated, but the container still runs'
+    msg "l'immagine costruita dalla versione precedente. Ricostruiscilo:" \
+        'the image built from the previous version. Rebuild it:'
+    printf '\n  cd %s/deploy/docker && docker compose build --pull && docker compose up -d\n\n' "$RADICE"
 fi
 
 passo "$(msg 'Aggiornamento completato.' 'Update complete.')"

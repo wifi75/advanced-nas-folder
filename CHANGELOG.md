@@ -10,6 +10,23 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.28.4] - 2026-09-03
+
+### Corretto
+
+- **`update.sh` non sapeva che `anf-api` può girare in Docker.** Lo
+  gestiva come gli altri servizi systemd nativi: su un'installazione con
+  l'API in container, disabilitato di proposito, `systemctl start anf-api`
+  sarebbe andato in conflitto sulla porta con il container già in ascolto.
+  Ora lo rileva da solo (controllando se il servizio è abilitato) e in tal
+  caso gestisce solo `anf-agent`, stampando alla fine il comando per
+  ricostruire il container col codice appena sincronizzato.
+- **`docs/DOCKER.md`/`.en.md`, sezione "Aggiornare" corretta**: indicava
+  `docker compose build --pull`, che aggiorna solo l'immagine di base di
+  Python, non il codice sorgente — un errore della guida stessa, non solo
+  di chi la segue. Ora punta a `update.sh` (che sincronizza i file) seguito
+  dalla ricostruzione del container.
+
 ## [0.28.3] - 2026-09-03
 
 Fase 4 della revisione grafica: la vista pubblica di condivisione
