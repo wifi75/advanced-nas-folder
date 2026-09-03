@@ -33,7 +33,7 @@ async function esci(): Promise<void> {
 
 <template>
   <div
-    v-if="auth.autenticato"
+    v-if="auth.autenticato && !rotta.meta.senzaMenu"
     class="guscio"
   >
     <BarraLaterale

@@ -10,6 +10,17 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.27.14] - 2026-09-03
+
+### Corretto
+
+- **Il menu del pannello poteva comparire a chi apre un link di condivisione
+  o un link diretto, se nello stesso browser era rimasta attiva una sessione
+  di accesso.** `App.vue` mostrava la barra laterale in base alla sola
+  autenticazione, non al tipo di pagina. Le rotte `archivio` e `link` sono
+  ora marcate `senzaMenu` nel router: restano spoglie sempre, a prescindere
+  dalla sessione.
+
 ## [0.27.13] - 2026-09-03
 
 ### Corretto

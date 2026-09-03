@@ -12,7 +12,23 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.27.13
+- Versione corrente: 0.27.14
+
+## Stato alla v0.27.14 — 3 settembre 2026
+
+Corretto: il menu del pannello poteva comparire a un visitatore esterno
+(link di condivisione) se nello stesso browser era rimasta attiva una
+sessione. `App.vue` decideva solo dall'autenticazione, non dal tipo di
+rotta. Aggiunto `meta.senzaMenu` alle rotte `archivio` e `link`.
+
+**In corso**: revisione grafica della vista pubblica di condivisione
+(`ArchivioView.vue`, usata per `/archivio/:slug` e riusata anche per la
+navigazione autenticata — 1636 righe, un solo componente per pubblico
+esterno e amministrazione). Richiesta dell'utente, non ancora iniziata:
+"pagina più chiara e fatta meglio, ottimizzata per smartphone". Ha anche
+chiesto una revisione grafica dell'intero pannello di amministrazione,
+motivo generico ("non sono soddisfatto"), da chiarire con lui prima di
+scrivere codice.
 
 ## Stato alla v0.27.13 — 3 settembre 2026
 

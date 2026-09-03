@@ -47,7 +47,12 @@ const routes: RouteRecordRaw[] = [
     path: '/archivio/:slug/:percorso(.*)*',
     name: 'archivio',
     component: () => import('@/views/ArchivioView.vue'),
-    meta: { titolo: 'archivio.titolo', pubblica: true },
+    // "senzaMenu": a differenza delle altre rotte pubbliche (login, 404), chi
+    // apre un link di condivisione non deve vedere il menu del pannello
+    // nemmeno se nello stesso browser e' rimasta attiva una sessione: non e'
+    // li' per usare il pannello, e il menu confonderebbe la pagina con
+    // qualcosa che non e'.
+    meta: { titolo: 'archivio.titolo', pubblica: true, senzaMenu: true },
   },
   {
     path: '/impostazioni',
@@ -78,7 +83,7 @@ const routes: RouteRecordRaw[] = [
     path: '/l/:token/:percorso(.*)*',
     name: 'link',
     component: () => import('@/views/LinkView.vue'),
-    meta: { titolo: 'link.titolo', pubblica: true },
+    meta: { titolo: 'link.titolo', pubblica: true, senzaMenu: true },
   },
   {
     path: '/accedi',
