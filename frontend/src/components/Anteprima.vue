@@ -1083,7 +1083,7 @@ watch(
   margin: 0;
   padding: 0.6rem;
   border: 0;
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   font-size: 0.82rem;
   line-height: 1.5;
   tab-size: 2;
@@ -1133,7 +1133,7 @@ watch(
   overflow: auto;
   max-height: 60vh;
   border-radius: var(--raggio);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-mono);
   font-size: 0.85rem;
   line-height: 1.5;
   tab-size: 2;

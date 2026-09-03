@@ -412,7 +412,7 @@ chiudiConEsc(
 }
 
 .elenco-nascosti {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-mono);
   font-size: 0.82rem;
   resize: vertical;
 }

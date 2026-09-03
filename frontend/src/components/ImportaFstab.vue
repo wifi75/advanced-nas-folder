@@ -240,7 +240,7 @@ async function disattiva(voce: MontaggioPreesistente): Promise<void> {
 
 .origine,
 .punto {
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   font-size: 0.8rem;
 }
 

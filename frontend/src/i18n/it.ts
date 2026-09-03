@@ -79,7 +79,6 @@ export default {
 
   mount: {
     stato: 'Stato',
-    gestisci: 'Apri e configura',
     titolo: 'Condivisioni NFS',
     sottotitolo:
       'Passo 1. Monta le cartelle del NAS sul server. Montata non vuol dire raggiungibile: per quello serve una pubblicazione.',

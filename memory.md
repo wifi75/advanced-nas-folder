@@ -12,7 +12,30 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.28.0
+- Versione corrente: 0.28.1
+
+## Stato alla v0.28.1 — 3 settembre 2026
+
+**Fase 2 della revisione grafica, completata — più leggera del previsto.**
+Verificando da vicino `SharesView.vue`, `CondivisioneView.vue`,
+`PubblicazioneView.vue`, `DettaglioShare.vue` (i target elencati nel piano
+per il decluttering strutturale), sono risultate già ben organizzate con
+schede a tab — non serviva la riorganizzazione prevista. Lezione: la stima
+iniziale (fatta da un agente di ricerca su conteggio di righe/elementi)
+sovrastimava il disordine reale; leggere il codice prima di agire ha
+evitato lavoro non necessario. Trovato invece lavoro reale diverso: un
+bottone ridondante, CSS morto da refactor incompleti in due file, e una
+classe `.mono` usata ma mai definita in nessun posto raggiungibile (il
+percorso NFS in `CondivisioneView.vue` non aveva mai avuto davvero il font
+monospace). Font monospace unificato su `var(--font-mono)` in 9 file.
+
+**Ancora da fare** (Fasi 3-4 del piano): `Anteprima.vue` ha colori scuri
+hardcoded indipendenti dal tema, da riallineare al nuovo accento ciano; le
+sagomature bianche copiate in più componenti (BarraLaterale, GruppoCampi,
+SelettoreLingua, SelettoreTema) da portare al bagliore ciano; il bug in
+`AccessoCartella.vue` (`data-theme` invece di `data-tema`, variante scura
+mai raggiunta); poi la vista pubblica di condivisione (`ArchivioView.vue`),
+identità separata da scegliere con l'utente.
 
 ## Stato alla v0.28.0 — 3 settembre 2026
 

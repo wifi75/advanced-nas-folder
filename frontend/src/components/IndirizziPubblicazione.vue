@@ -126,7 +126,7 @@ async function copia(quale: string, testo: string): Promise<void> {
 }
 
 .valore {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-mono);
   word-break: break-all;
 }
 

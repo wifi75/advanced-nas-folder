@@ -214,12 +214,9 @@ chiudiConEsc(
         </p>
 
         <div class="azioni">
-          <RouterLink
-            class="bottone bottone--principale"
-            :to="`/condivisioni/${m.id}`"
-          >
-            {{ t('mount.gestisci') }}
-          </RouterLink>
+          <!-- "Gestisci" non c'e' piu': il titolo della scheda e' gia' un
+               link alla stessa pagina (`/condivisioni/${m.id}`), un secondo
+               pulsante identico affollava la riga senza aggiungere nulla. -->
           <button
             type="button"
             class="bottone bottone--tenue"
@@ -349,7 +346,7 @@ h1 {
 
 .origine {
   margin: 0;
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   font-size: 0.8125rem;
   color: var(--testo-tenue);
 }
@@ -393,7 +390,7 @@ h1 {
 }
 
 .mono {
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   font-size: 0.8125rem;
   overflow-wrap: anywhere;
 }

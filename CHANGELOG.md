@@ -10,6 +10,33 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.28.1] - 2026-09-03
+
+Fase 2 della revisione grafica: verificando da vicino le viste che
+sembravano più affollate (`SharesView.vue`, `CondivisioneView.vue`,
+`PubblicazioneView.vue`, `DettaglioShare.vue`), sono risultate già ben
+organizzate — usano tutte schede a tab per dividere i contenuti, la
+tecnica di decluttering che si intendeva applicare. Il lavoro reale trovato
+è stato diverso da quello preventivato.
+
+### Corretto
+
+- **`.mono` non era mai stata definita.** `CondivisioneView.vue` la usava
+  per il percorso NFS in intestazione, ma non esisteva né in quel file né
+  in `main.css`: il percorso non ha mai avuto davvero il font monospace.
+  Aggiunta una `.mono` condivisa in `main.css` (`var(--font-mono)`), così
+  nessuna vista deve più ridefinirla da sé.
+- **`MountsView.vue`: un pulsante "Gestisci" ridondante.** Il titolo della
+  scheda era già un collegamento alla stessa pagina — due modi identici di
+  fare la stessa cosa nella stessa riga.
+- **Font monospace unificato** su `var(--font-mono)` in 9 file che lo
+  scrivevano a mano (`ui-monospace, monospace` o varianti), invece del
+  token introdotto in v0.28.0.
+- Rimosso CSS morto, mai referenziato da nessun template: un blocco intero
+  in `CondivisioneView.vue` (`.dato-stato*`, avanzo di un'interfaccia
+  precedente per lo stato del mount, già sostituita da `.stato-pillola`) e
+  tre regole in `SharesView.vue`.
+
 ## [0.28.0] - 2026-09-03
 
 Prima fase della revisione grafica del pannello di amministrazione:

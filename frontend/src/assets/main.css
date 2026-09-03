@@ -510,6 +510,14 @@ a {
   padding-bottom: 0.15rem;
 }
 
+/* Condiviso: prima ogni vista ridefiniva un `.mono` locale (spesso con
+   `ui-monospace, monospace` scritto a mano invece del token), e almeno un
+   caso (`CondivisioneView.vue`) usava la classe senza definirla affatto —
+   il percorso NFS non aveva mai avuto davvero il font monospace. */
+.mono {
+  font-family: var(--font-mono);
+}
+
 /* --- stato --------------------------------------------------------------- */
 
 .stato-pillola {

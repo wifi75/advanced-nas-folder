@@ -78,7 +78,6 @@ export default {
 
   mount: {
     stato: 'State',
-    gestisci: 'Open and configure',
     titolo: 'NFS shares',
     sottotitolo:
       'Step 1. Mounts NAS folders onto the server. Mounted does not mean reachable: that takes a publication.',

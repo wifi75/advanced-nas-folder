@@ -400,7 +400,7 @@ h1 {
 
 .origine {
   margin: 0;
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   font-size: 0.8125rem;
   color: var(--testo-tenue);
 }
@@ -472,23 +472,11 @@ h1 {
   font-size: 1.15rem;
 }
 
-.conferma p {
-  margin: 0;
-  font-size: 0.9375rem;
-  color: var(--testo-tenue);
-}
-
 .campo {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
   font-size: 0.875rem;
-}
-
-.doppio {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 0.9rem;
 }
 
 .campo input,
@@ -507,12 +495,6 @@ h1 {
 
 
 
-
-.elenco-nascosti {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.82rem;
-  resize: vertical;
-}
 
 .origine-nome {
   margin-left: auto;
@@ -539,7 +521,7 @@ h1 {
 }
 
 .previsto__valore {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-mono);
   color: var(--testo);
   word-break: break-all;
 }

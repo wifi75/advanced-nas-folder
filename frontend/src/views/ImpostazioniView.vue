@@ -312,7 +312,7 @@ h2 {
 
 .disco__percorso {
   color: var(--testo-tenue);
-  font-family: ui-monospace, monospace;
+  font-family: var(--font-mono);
   font-size: 0.75rem;
 }
 

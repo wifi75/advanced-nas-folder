@@ -416,64 +416,9 @@ chiudiConEsc(
 </template>
 
 <style scoped>
-/* La scheda dello stato prende la tinta di cio' che dice: montato, in attesa,
-   errore. Prima era una pillola in alto a destra, lontana dai dati che
-   descrive e facile da non guardare. */
-.dato-stato dd {
-  font-weight: 600;
-}
-
-.dato-stato--ok {
-  border-color: color-mix(in srgb, var(--ok) 45%, var(--vetro-bordo)) !important;
-  background:
-    linear-gradient(
-      158deg,
-      color-mix(in srgb, var(--ok) 20%, transparent),
-      color-mix(in srgb, var(--ok) 8%, transparent)
-    ) !important;
-}
-
-.dato-stato--ok dd {
-  color: var(--ok);
-}
-
-.dato-stato--attesa {
-  border-color: color-mix(in srgb, var(--attenzione) 45%, var(--vetro-bordo)) !important;
-  background:
-    linear-gradient(
-      158deg,
-      color-mix(in srgb, var(--attenzione) 20%, transparent),
-      color-mix(in srgb, var(--attenzione) 8%, transparent)
-    ) !important;
-}
-
-.dato-stato--attesa dd {
-  color: var(--attenzione);
-}
-
-.dato-stato--errore {
-  border-color: color-mix(in srgb, var(--errore) 45%, var(--vetro-bordo)) !important;
-  background:
-    linear-gradient(
-      158deg,
-      color-mix(in srgb, var(--errore) 20%, transparent),
-      color-mix(in srgb, var(--errore) 8%, transparent)
-    ) !important;
-}
-
-.dato-stato--errore dd {
-  color: var(--errore);
-}
-
 .stato-pillola {
   margin-left: auto;
   background: var(--superficie);
-}
-
-.identita {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
 }
 
 .briciole {
