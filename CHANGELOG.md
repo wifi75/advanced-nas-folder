@@ -10,6 +10,28 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.28.11] - 2026-09-03
+
+### Corretto
+
+- **`install.sh --web nginx` (o `--web apache`) non installava mai il
+  pacchetto** se non era già presente: il ramo che verifica/installa il web
+  server gira solo quando la scelta è `auto`, e con `--web` esplicito
+  veniva saltato del tutto. L'installazione proseguiva convinta che il web
+  server ci fosse già, e falliva tardi e in modo poco chiaro alla
+  configurazione del vhost ("sites-available/anf.conf: No such file or
+  directory") invece di installarlo o di dirlo subito. Trovato installando
+  per la prima volta su una macchina senza nessun web server preesistente.
+- **La riga "Nuova cartella" nella vista File era priva di qualunque
+  stile**, l'unico elemento senza il trattamento a vetro fra ricerca,
+  caricamento e selezione vista — sembrava un pezzo di interfaccia
+  dimenticato. Uniformata alle altre.
+
+### Aggiunto
+
+- **Esempio pratico nella pagina Web server**, sotto il modulo di
+  pubblicazione su un nome host — promemoria di come compilare i campi.
+
 ## [0.28.10] - 2026-09-03
 
 ### Corretto

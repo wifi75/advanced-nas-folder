@@ -1630,6 +1630,13 @@ chiudiConEsc(
   display: flex;
   gap: 0.5rem;
   max-width: 26rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--vetro-bordo-pub);
+  border-radius: 12px;
+  background: var(--vetro-sfondo-pub);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  box-shadow: inset 0 1px 0 var(--vetro-luce-pub);
 }
 
 .velo {

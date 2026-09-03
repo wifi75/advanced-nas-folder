@@ -12,40 +12,53 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.28.10
+- Versione corrente: 0.28.11
 
-## In sospeso — 3 settembre 2026: mount NFS bloccato su `docker-vps`
+## Risolto — mount NFS bloccato su LXC: creato `docker-2` come VM vera
 
-**Non è un bug del codice.** `docker-vps` (192.168.1.224) è un container
-LXC **non privilegiato** su Proxmox VE (nodo `pve`, container ID 106,
-nome Proxmox "docker-serevr"), non una VM. Verificato con tre prove
-indipendenti: `systemd-detect-virt` risponde `lxc`; un `mount -t nfs`
-diretto da root, senza passare da systemd/Docker/l'app, fallisce con
-"Operation not permitted"; nessun mount NFS risulta mai riuscito su questa
-macchina. anf-agent è nativo (non Docker) e gira già come root: non serve
-altro privilegio lato applicazione, il kernel nega comunque l'operazione
-a livello del container.
+`docker-vps` (192.168.1.224) resta un container LXC non privilegiato su
+Proxmox VE — confermato che NFS/SMB-CIFS sono lì disabilitati con
+l'etichetta "privileged only", non sbloccabili senza rendere il container
+privilegiato (isolamento minore dall'host). Invece di convertirlo, creato
+un **secondo server**, `docker-2` (192.168.1.233), come **VM KVM vera**
+su Proxmox (Ubuntu 24.04, non Debian) — stesso schema Docker+Portainer,
+ma senza il limite del kernel: `systemd-detect-virt` risponde `kvm`, e un
+mount NFS reale funziona (dopo aver aggiunto l'IP alla lista permessi NFS
+del NAS — un passo lato NAS, non lato progetto). Vedi la voce "Stato alla
+v0.28.11" appena sotto per i dettagli di come è stata creata.
 
-In Proxmox (Container 106 → Options → Features), le voci **NFS e
-SMB/CIFS sono disabilitate con l'etichetta "privileged only"** — Proxmox
-non permette di abilitarle su un container non privilegiato, a differenza
-di `nesting`/`keyctl` (già attivi, servono a Docker-in-LXC e sono infatti
-già acceso). Non esiste un modo di sbloccarlo dalle opzioni del
-container: o si rende il container privilegiato (via backup + ripristino
-con "Unprivileged container" deselezionato — Proxmox non permette di
-convertire un container esistente sul posto), accettando un isolamento
-minore dall'host, oppure si ricrea `docker-vps` come VM vera (KVM),
-mantenendo l'isolamento pieno ma con più lavoro di setup.
+`docker-vps` resta comunque su, funzionante per tutto tranne il mount
+NFS — non è stato smantellato, solo affiancato da `docker-2` che ora è la
+macchina di riferimento per il lavoro che richiede NFS.
 
-**Decisione rimandata a domani**, presentata all'utente ma non ancora
-presa (l'ha chiusa con "ci pensiamo domani"). Nessuna azione su Proxmox
-eseguita finora. Rilevante anche per il prodotto in generale: l'utente ha
-detto esplicitamente che il progetto va venduto e installato da chiunque
-— vale la pena, quando si riprende, valutare se documentare questo
-limite (container LXC non privilegiati non supportano NFS) in
-`docs/INSTALL.md`/`docs/DOCKER.md` come prerequisito dell'ambiente, così
-un futuro cliente con lo stesso setup lo sappia prima di installare, non
-dopo.
+## Stato alla v0.28.11 — 3 settembre 2026
+
+Creando `docker-2` da zero (Ubuntu 24.04, non Debian) trovato un altro
+bug reale in `install.sh`: con `--web nginx` scelto esplicitamente
+(necessario quando nessun web server è già installato — l'unico caso in
+cui serve passare `--web` invece di lasciare `auto`), lo script non
+installava mai il pacchetto. Il ramo che lo fa (`apt-get install nginx`)
+gira solo quando `WEB=auto`; con `--web` esplicito quel ramo intero viene
+saltato. L'installazione proseguiva convinta che nginx ci fosse già, e
+falliva tardi — alla configurazione del vhost — con un errore poco
+chiaro ("sites-available/anf.conf: No such file or directory") invece di
+installarlo o di dirlo subito. Corretto: ora installa il web server
+scelto se manca, in entrambi i casi (`auto` ed esplicito).
+
+**Lezione confermata ancora una volta**: `docker-vps` aveva già nginx
+preinstallato quando vi si è girato `install.sh` la prima volta in questa
+sessione, per questo questo bug è rimasto invisibile fino a un'installazione
+su una macchina davvero vergine.
+
+`docker-2` è ora la seconda installazione Docker+Portainer completa e
+funzionante di questo progetto, stesso schema di `docker-vps`: agent e
+web server nativi, `anf-api` in Docker gestito da uno stack Portainer "da
+repository Git" con `refs/heads/main` (aggiornamento con un click, senza
+SSH). UID:GID identici (999:1000) fra i due server, per puro caso ma
+comodo. MOTD personalizzata su `docker-2` (script in
+`/etc/update-motd.d/99-docker2-info`, **non versionato nel progetto**:
+è specifico di questa macchina, non fa parte del pacchetto di rilascio)
+con IP, container Docker attivi e link a Portainer, colorata con icone.
 
 ## Stato alla v0.28.10 — 3 settembre 2026
 

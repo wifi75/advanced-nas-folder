@@ -365,6 +365,7 @@ export default {
     pubblica: 'Publish on a host name',
     hostname: 'Host name (e.g. files.example.com)',
     prefisso: 'Prefix (/)',
+    esempio: 'Example: files.yourdomain.com — nginx — /',
     anteprima: 'Preview',
     applica: 'Apply',
     vediConfigurazione: 'View configuration',

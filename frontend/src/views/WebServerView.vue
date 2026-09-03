@@ -203,6 +203,7 @@ chiudiConEsc(
       <h2>{{ t('webserver.pubblica') }}</h2>
       <p class="spiega">
         {{ t('webserver.nonGestiamo') }}
+        <span class="esempio">{{ t('webserver.esempio') }}</span>
       </p>
 
       <div class="riga-form">
@@ -292,6 +293,14 @@ chiudiConEsc(
   margin: 0.25rem 0 0;
   color: var(--testo-tenue);
   font-size: 0.9rem;
+}
+
+.esempio {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.82rem;
+  font-family: var(--font-mono);
+  opacity: 0.75;
 }
 
 .elenco {

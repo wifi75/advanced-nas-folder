@@ -69,6 +69,7 @@ m() {
         python_ok) testo="Python %s presente" ;;
         web_rilevato) testo="Web server rilevato: %s" ;;
         web_assente) testo="Nessun web server trovato. Installa Apache o Nginx, oppure indica quale usare con --web." ;;
+        web_installo) testo="Installo %s" ;;
         xsendfile) testo="Installo mod_xsendfile, necessario per la consegna dei download" ;;
         moduli) testo="Abilito i moduli di Apache che servono al pannello" ;;
         porta_cerco) testo="Cerco una porta libera per l'API" ;;
@@ -150,6 +151,7 @@ m() {
         python_ok) testo="Python %s found" ;;
         web_rilevato) testo="Web server detected: %s" ;;
         web_assente) testo="No web server found. Install Apache or Nginx, or pick one with --web." ;;
+        web_installo) testo="Installing %s" ;;
         xsendfile) testo="Installing mod_xsendfile, required to deliver downloads" ;;
         moduli) testo="Enabling the Apache modules the panel needs" ;;
         porta_cerco) testo="Looking for a free port for the API" ;;
@@ -670,6 +672,26 @@ if [ "$WEB" = "auto" ]; then
     # installa: indovinare significherebbe configurare quello sbagliato.
     [ "$ha_apache" = 1 ] && [ "$ha_nginx" = 1 ] && WEB_AMBIGUO=1
 fi
+
+# Con --web scelto esplicitamente, il ramo "auto" sopra non gira mai: senza
+# questo controllo lo script proseguiva convinto che il web server ci fosse
+# gia', e falliva tardi e in modo poco chiaro alla configurazione del vhost
+# (es. "sites-available/anf.conf: No such file or directory") invece di
+# installarlo o di dirlo subito.
+if [ "$WEB" = "apache" ]; then
+    if ! { command -v apache2ctl >/dev/null 2>&1 || command -v apachectl >/dev/null 2>&1; }; then
+        passo web_installo apache2
+        esegui apt-get update -qq
+        esegui apt-get install -y -qq apache2
+    fi
+elif [ "$WEB" = "nginx" ]; then
+    if ! command -v nginx >/dev/null 2>&1; then
+        passo web_installo nginx
+        esegui apt-get update -qq
+        esegui apt-get install -y -qq nginx
+    fi
+fi
+
 ok web_rilevato "$WEB"
 
 

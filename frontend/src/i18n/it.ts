@@ -368,6 +368,7 @@ export default {
     pubblica: 'Pubblica su un nome host',
     hostname: 'Nome host (es. archivio.esempio.it)',
     prefisso: 'Prefisso (/)',
+    esempio: 'Esempio: archivio.tuodominio.it — nginx — /',
     anteprima: 'Anteprima',
     applica: 'Applica',
     vediConfigurazione: 'Vedi configurazione',
