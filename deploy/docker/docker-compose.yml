@@ -19,7 +19,11 @@ services:
     build:
       context: ../../backend
     image: advanced-nas-folder-api:local
-    container_name: anf-api
+    # Nessun "container_name" esplicito di proposito: senza, Compose usa da
+    # solo lo schema "<progetto>-<servizio>-<numero>"
+    # ("advanced-nas-folder-anf-api-1"), che porta gia' l'identita' del
+    # progetto. Un nome fisso come "anf-api" la perde, ed e' proprio
+    # l'ambiguita' da evitare su un host che ospita piu' progetti.
     restart: unless-stopped
     # Deve combaciare con l'utente di sistema "anf" creato da install.sh:
     # scoprirlo con `id anf` sull'host. Senza, il container non puo' leggere
