@@ -453,6 +453,29 @@ porta_occupata() {
     fi
 }
 
+# Nome dell'unit systemd che ascolta su quella porta, se lo si riesce a
+# risalire dal cgroup del processo. Vuoto se non si sa.
+unita_in_ascolto() {
+    local porta="$1" pid
+    pid="$(ss -tlnp 2>/dev/null | grep -E "[:.]${porta}[[:space:]]" |
+        grep -oE 'pid=[0-9]+' | head -1 | cut -d= -f2)"
+    [ -n "$pid" ] && [ -r "/proc/$pid/cgroup" ] || return 0
+    grep -oE '[a-zA-Z0-9@._-]+\.service' "/proc/$pid/cgroup" 2>/dev/null | head -1
+}
+
+# Vero se la porta e' presa da qualcosa che non sia anf-api.service. In un
+# aggiornamento e' gia' lui a occuparla, in attesa del riavvio che questo
+# stesso script fara' fra poco: non e' un conflitto da segnalare o da cui
+# scappare su un'altra porta, che lascerebbe nginx (rigenerato) disallineato
+# da .env (che l'installer lascia intatto negli aggiornamenti) — trovato
+# aggiornando un'installazione gia' attiva.
+porta_occupata_da_altri() {
+    local porta="$1"
+    porta_occupata "$porta" || return 1
+    [ "$(unita_in_ascolto "$porta")" = "anf-api.service" ] && return 1
+    return 0
+}
+
 scegli_porta() {
     # Porta chiesta esplicitamente: se e occupata ci si ferma, non si cambia
     # di nascosto. Chi ha scritto --porta 8110 ha un motivo, e trovarsi il
@@ -463,7 +486,7 @@ scegli_porta() {
         esac
         [ "$PORTA_API" -ge 1024 ] && [ "$PORTA_API" -le 65535 ] ||
             errore porta_invalida "$PORTA_API"
-        if porta_occupata "$PORTA_API"; then
+        if porta_occupata_da_altri "$PORTA_API"; then
             errore porta_occupata "$PORTA_API"
         fi
         ok porta_ok "$PORTA_API"
@@ -482,21 +505,16 @@ scegli_porta() {
     local quante=0
 
     while [ "$candidata" -le "$ultima" ] && [ "$quante" -lt 5 ]; do
-        if porta_occupata "$candidata"; then
+        if porta_occupata_da_altri "$candidata"; then
             # Dire *chi* la occupa evita di dover andare a cercarlo a mano.
             # Il nome del servizio systemd e' piu' utile del nome del
             # programma: "ilmioricettario.service" dice cosa fermare,
             # "python" no.
-            local chi pid
+            local chi
             chi="$(ss -tlnp 2>/dev/null | grep -E "[:.]${candidata}[[:space:]]" |
                 grep -oE 'users:\(\("[^"]+' | head -1 | sed 's/.*"//')"
-            pid="$(ss -tlnp 2>/dev/null | grep -E "[:.]${candidata}[[:space:]]" |
-                grep -oE 'pid=[0-9]+' | head -1 | cut -d= -f2)"
-            if [ -n "$pid" ] && [ -r "/proc/$pid/cgroup" ]; then
-                local unit
-                unit="$(grep -oE '[a-zA-Z0-9@._-]+\.service' "/proc/$pid/cgroup" 2>/dev/null | head -1)"
-                [ -n "$unit" ] && chi="$unit"
-            fi
+            local unit; unit="$(unita_in_ascolto "$candidata")"
+            [ -n "$unit" ] && chi="$unit"
             if [ -n "$chi" ]; then
                 avviso porta_chi "$candidata" "$chi"
             else
@@ -545,7 +563,7 @@ scegli_porta() {
                 avviso porta_invalida "$risposta"
                 continue
             fi
-            if porta_occupata "$risposta"; then
+            if porta_occupata_da_altri "$risposta"; then
                 avviso porta_presa_ora "$risposta"
                 continue
             fi

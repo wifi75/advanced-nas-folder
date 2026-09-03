@@ -12,7 +12,18 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.27.8
+- Versione corrente: 0.27.9
+
+## Stato alla v0.27.9 — 3 settembre 2026
+
+Quarto e ultimo problema della stessa sessione di installazione: aggiornando
+un'installazione già attiva, `scegli_porta` trovava la porta occupata dal
+servizio `anf-api` che stava per riavviare lui stesso, e ne sceglieva
+un'altra per Nginx — disallineandolo da `.env` (lasciato intatto). Corretto
+trattando "occupata solo da `anf-api.service`" come libera. Con questa,
+`install.sh` è stato verificato end-to-end su un'installazione reale, non
+solo riletto: prima installazione pulita e poi aggiornamento, entrambi senza
+intervento a mano. Vedere «Trappole trovate sul campo».
 
 ## Stato alla v0.27.8 — 3 settembre 2026
 
@@ -103,6 +114,12 @@ prende un 404.
   c'è; il primo errore visibile arriva solo all'avvio di `anf-api`
   (`ModuleNotFoundError: _zstd`, da `zipstream-ng`). Aggiunta alla lista dei
   pacchetti in `docs/INSTALL.md`.
+- **Cercare una porta libera durante un aggiornamento trova se stessi.** Il
+  servizio che si sta per riavviare occupa già la porta che gli si sta per
+  riassegnare: `install.sh` la vedeva "occupata" e ne sceglieva un'altra per
+  Nginx, disallineandolo da `.env` (lasciato intatto negli aggiornamenti).
+  Corretto in v0.27.9: "occupata solo da `anf-api.service`" conta come
+  libera, sia con `--porta` esplicita sia nella ricerca automatica.
 - **`deadsnakes` (Python 3.14 per `install.sh`) è specifico di Ubuntu**: su
   Debian non esiste affatto, e i repository apt di Debian stabile restano
   spesso una minor version indietro. Su Debian va compilato da sorgente con

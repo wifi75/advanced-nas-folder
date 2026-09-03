@@ -10,6 +10,21 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.27.9] - 2026-09-03
+
+### Corretto
+
+- **`install.sh`, aggiornamento di un'installazione già attiva: la porta
+  cambiava da sola ad ogni riesecuzione.** La ricerca della porta libera
+  trovava la porta occupata dal servizio `anf-api` che stava per riavviare
+  lui stesso, e ne sceglieva un'altra per Nginx — ma `.env` (lasciato
+  intatto) continuava a dichiarare quella vecchia al processo vero:
+  Nginx e l'API restavano allineati ciascuno a una porta diversa, e il
+  pannello smetteva di rispondere. Occupata solo da `anf-api.service` ora
+  si tratta come libera, sia con `--porta` esplicita sia nella ricerca
+  automatica: è la porta che l'installer sta per restituire allo stesso
+  servizio.
+
 ## [0.27.8] - 2026-09-03
 
 ### Corretto
