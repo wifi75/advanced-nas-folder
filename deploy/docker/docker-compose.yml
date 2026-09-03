@@ -19,6 +19,12 @@ services:
     build:
       context: ../../backend
     image: advanced-nas-folder-api:local
+    # Senza, un orchestratore che fa "pull" prima di avviare lo stack (come
+    # Portainer con "Pull and redeploy") prova a scaricare questa immagine da
+    # un registry — che non esiste, l'immagine si costruisce solo in locale
+    # dal Dockerfile qui sopra. "build" dice di costruirla sempre, mai
+    # scaricarla.
+    pull_policy: build
     # Nome esplicito che porta l'identita' del progetto, senza il suffisso
     # numerico di replica che Compose aggiungerebbe da solo (".../anf-api-1"):
     # non ha senso qui, il servizio non e' pensato per scalare a piu' istanze.

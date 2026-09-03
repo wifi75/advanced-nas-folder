@@ -10,6 +10,17 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.28.8] - 2026-09-03
+
+### Corretto
+
+- **"Pull and redeploy" da Portainer falliva** con "pull access denied
+  for advanced-nas-folder-api": Portainer prova a *scaricare* l'immagine
+  da un registry prima di avviare lo stack, ma `advanced-nas-folder-api:local`
+  non esiste su nessun registry — si costruisce solo in locale dal
+  `Dockerfile`. Aggiunto `pull_policy: build` al servizio `anf-api`, che
+  dice esplicitamente di costruire sempre, mai scaricare.
+
 ## [0.28.7] - 2026-09-03
 
 ### Corretto

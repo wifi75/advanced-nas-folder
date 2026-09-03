@@ -12,7 +12,37 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.28.7
+- Versione corrente: 0.28.8
+
+## Stato alla v0.28.8 — 3 settembre 2026
+
+Secondo problema reale trovato con "Pull and redeploy" da Portainer (dopo
+il fix `env_file` → volume della v0.28.7): "pull access denied for
+advanced-nas-folder-api, repository does not exist". Portainer, prima di
+ricreare il container, esegue `docker compose pull` — che cerca di
+**scaricare** l'immagine da un registry. `advanced-nas-folder-api:local`
+non è mai stata pubblicata da nessuna parte: si costruisce solo in locale
+dal `Dockerfile` del progetto. Il tooltip nel form di Portainer indicava
+già la soluzione: `pull_policy: build` nel servizio, che dice
+esplicitamente "costruisci sempre, non scaricare mai" — aggiunto.
+
+**Lezione per [[wifi75-deploy-linux]]**: un servizio Docker Compose con
+`build:` ma senza un'immagine pubblicata su un registry va sempre marcato
+`pull_policy: build`, non solo quando gira da CLI (`docker compose up`
+senza `--pull` non ha questo problema) ma soprattutto quando un
+orchestratore esterno (Portainer, ma anche CI/CD generici) fa un pull
+esplicito prima del deploy — scenario che da riga di comando non si
+presenta mai, quindi il bug è invisibile finché non si prova davvero il
+flusso GitOps.
+
+L'utente ha reagito con frustrazione visibile al susseguirsi di versioni
+(v0.28.5 → v0.28.8 in un'ora) per completare un solo obiettivo
+("aggiornare da Portainer"): ogni problema era scopribile solo provando
+per davvero l'integrazione con Portainer, non dalla sola lettura del
+codice — ma vale la pena, per la prossima volta che si integra con uno
+strumento esterno non testabile in locale, avvisare in anticipo che
+potrebbero servire più tentativi ravvicinati, invece di lasciare che la
+sorpresa arrivi ad ogni nuovo errore.
 
 ## Stato alla v0.28.7 — 3 settembre 2026
 

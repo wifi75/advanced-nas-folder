@@ -129,6 +129,12 @@ build from the code Portainer just cloned, not from the native
 installation's copy — otherwise "Pull and redeploy" would download new code
 without actually using it.
 
+**Why `pull_policy: build`.** "Pull and redeploy" first tries to *pull* the
+image from a registry — but `advanced-nas-folder-api:local` doesn't exist
+on any registry, it's only ever built locally from the `Dockerfile`.
+Without this line the pull fails with "pull access denied". `pull_policy:
+build` explicitly says to always build, never pull.
+
 **Prerequisite**: the native installation is still required (agent, web
 server, folders, and above all the real `.env` with the actual secrets —
 it never ends up in the repository, so Portainer can't bring it along on
@@ -139,7 +145,7 @@ Stack configuration, in Portainer:
 1. **Stacks → Add stack → Repository**.
 2. **Repository URL**: `https://github.com/wifi75/advanced-nas-folder.git`.
 3. **Reference**: `refs/heads/main` (or a specific tag, e.g.
-   `refs/tags/v0.28.7`, to avoid auto-updating on every push).
+   `refs/tags/v0.28.8`, to avoid auto-updating on every push).
 4. **Compose path**: `deploy/docker/docker-compose.yml`.
 5. **Environment variables**, entered by hand in Portainer's form (the same
    ones from `deploy/docker/.env.example` — Portainer doesn't read that file
