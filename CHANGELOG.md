@@ -10,6 +10,16 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.28.6] - 2026-09-03
+
+### Corretto
+
+- **`install.sh` non installava mai `rsync`**, pur essendo richiesto da
+  `update.sh` (che si ferma subito se manca). Su un'installazione appena
+  fatta da zero, il primo `update.sh` falliva sempre con "Manca rsync" —
+  trovato eseguendolo per la prima volta su un'installazione reale.
+  Aggiunto alla lista dei pacchetti che `install.sh` verifica e installa.
+
 ## [0.28.5] - 2026-09-03
 
 ### Corretto

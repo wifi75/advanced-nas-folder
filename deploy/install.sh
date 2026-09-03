@@ -623,7 +623,11 @@ mancanti=()
 # del tipo e tutto il resto funziona lo stesso. Si installa comunque, perche'
 # scoprirlo mancante davanti a una cartella di filmati e' peggio dei pochi
 # megabyte che occupa.
-for pacchetto in curl nfs-common openssl ffmpeg; do
+# `rsync` non serve a install.sh: serve a update.sh (deploy/update.sh), che lo
+# richiede e si ferma subito se manca. Va installato qui perche' e' l'unico
+# punto che gira una volta sola con apt aggiornato — scoperto mancante sul
+# primo aggiornamento reale mai fatto su un'installazione di questo progetto.
+for pacchetto in curl nfs-common openssl ffmpeg rsync; do
     dpkg -s "$pacchetto" >/dev/null 2>&1 || mancanti+=("$pacchetto")
 done
 if [ ${#mancanti[@]} -gt 0 ]; then

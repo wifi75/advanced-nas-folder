@@ -12,7 +12,31 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.28.5
+- Versione corrente: 0.28.6
+
+## Stato alla v0.28.6 — 3 settembre 2026
+
+Applicata sul serio la v0.28.5 su `docker-vps` (192.168.1.224), primo test
+reale di tutta la catena `update.sh`: si è fermato subito con "Manca
+rsync" — `install.sh` non lo aveva mai installato, pur essendo un
+requisito rigido di `update.sh`. Stessa lezione di v0.28.5: un comando
+documentato ("cd RADICE && sudo bash update.sh") non era mai stato provato
+per davvero prima d'ora su un'installazione reale di questo progetto.
+Aggiunto `rsync` alla lista pacchetti di `install.sh`.
+
+Dopo la correzione (rsync installato a mano su `docker-vps` per sbloccare
+questo giro, poi anche nel codice per le prossime installazioni):
+`update.sh` ha portato il codice nativo a 0.28.5 (rilevando da solo
+`anf-api` in Docker, senza toccare quel servizio né la porta né nginx),
+poi `docker compose build --pull && up -d` ha ricostruito il container con
+l'`env_file` assoluto — verificato `healthy` e `"version":"0.28.5"` da
+`/api/v1/health`. **La versione del container resterà "0.28.5" finché non
+si ricostruisce di nuovo**: la v0.28.6 non tocca il backend, solo
+`install.sh`, quindi non serve un altro rebuild per questo giro.
+
+Resta da fare **dall'utente**, non da qui: configurare lo stack Portainer
+"da repository Git" (valori già in `docs/DOCKER.md`/`.en.md`) — richiede
+il login a Portainer, che non viene mai fatto da questa sessione.
 
 ## Stato alla v0.28.5 — 3 settembre 2026
 
