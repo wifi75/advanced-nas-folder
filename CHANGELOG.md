@@ -10,6 +10,15 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.27.5] - 2026-09-03
+
+Solo documentazione: il codice e' quello della 0.27.4.
+
+### Aggiunto
+
+- **Badge SemVer, Keep a Changelog e Mantenuto** nel README, nelle due lingue:
+  mancavano nonostante il progetto segua gia' entrambe le convenzioni.
+
 ## [0.27.4] - 2026-08-30
 
 Solo documentazione: il codice e' quello della 0.27.3.
