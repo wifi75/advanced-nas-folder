@@ -10,6 +10,51 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.28.3] - 2026-09-03
+
+Fase 4 della revisione grafica: la vista pubblica di condivisione
+(`ArchivioView.vue`), raggiunta da chi apre un link — identità a vetro
+(glassmorphism) separata da quella ciano del pannello.
+
+### Aggiunto
+
+- **Rinomina/sposta/elimina raggiungibili anche da touch**: il menu
+  contestuale, prima apribile solo col tasto destro del mouse, ora si apre
+  anche con una pressione prolungata (stesso gesto di Google Drive/Files).
+  Nelle viste a griglia e galleria, dove i pulsanti per esteso non ci
+  stanno apposta, era l'unico modo di raggiungere quelle azioni — e su
+  telefono non esisteva.
+
+### Corretto
+
+- **La pagina ereditava per un caso di implementazione l'identità ciano
+  del pannello** (`--vetro-*` di `main.css`, ritinti di ciano in scuro
+  dalla v0.28.0), non per scelta. Aggiunti token locali
+  (`--vetro-*-pub`) con una tinta neutra, così questa pagina ha
+  un'identità davvero separata da chi amministra.
+- **Header, barra strumenti, briciole di pane, messaggio di errore, menu
+  contestuale e finestre** (rinomina/sposta/elimina) portati allo stesso
+  vetro di righe e riquadri, che ce l'avevano già — non era la pagina
+  spoglia che sembrava, solo quelle superfici erano rimaste indietro.
+  "Pubblicazione non trovata" era testo rosso semplice, ora è un riquadro
+  vero.
+- **`Caricamenti.vue`** (zona di trascinamento upload) portato allo stesso
+  vetro: era l'unico componente della pagina rimasto senza.
+- **`AccessoCartella.vue`**: riquadro convertito in vetro ambrato, tinta
+  propria mantenuta.
+- **Vista elenco su schermo stretto**: la riga aveva tre colonne definite
+  ma cinque elementi visibili (nascosta solo la data) — la colonna delle
+  azioni finiva fuori posto. Nascosta anche la dimensione del file, visibile
+  comunque aprendolo.
+
+### Verificato, non modificato
+
+- L'overlay scuro con nome bianco sulle foto in vista galleria era
+  segnalato come valore non tokenizzato: è corretto così com'è — un testo
+  leggibile sopra una foto qualunque deve restare bianco/nero puro,
+  indipendente dal tema, stessa logica già applicata ad `Anteprima.vue`
+  in Fase 3.
+
 ## [0.28.2] - 2026-09-03
 
 Fase 3 della revisione grafica del pannello.

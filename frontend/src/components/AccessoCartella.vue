@@ -155,6 +155,11 @@ async function invia(): Promise<void> {
   --tinta-accesso: #d9a066;
 }
 
+/* Vetro ambrato, non piu' una card piena: stessa identita' a vetro del resto
+   della pagina pubblica (--vetro-*-pub, definiti su ".archivio" in
+   ArchivioView.vue — sempre l'antenato di questo componente nel DOM), tinta
+   di ambra invece che neutra, per restare la tinta propria di questa
+   schermata. */
 .riquadro {
   width: min(24rem, 100%);
   display: flex;
@@ -162,14 +167,16 @@ async function invia(): Promise<void> {
   gap: 0.8rem;
   padding: 1.6rem 1.4rem;
   border-radius: 14px;
-  border: 1px solid color-mix(in srgb, var(--tinta-accesso) 35%, var(--bordo));
+  border: 1px solid color-mix(in srgb, var(--tinta-accesso) 35%, var(--vetro-bordo-pub));
   background:
     linear-gradient(
       158deg,
-      color-mix(in srgb, var(--tinta-accesso) 12%, var(--superficie)),
-      var(--superficie)
+      color-mix(in srgb, var(--tinta-accesso) 16%, var(--vetro-sfondo-pub)),
+      var(--vetro-sfondo-pub)
     );
-  box-shadow: var(--ombra);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  box-shadow: inset 0 1px 0 var(--vetro-luce-pub), var(--vetro-ombra);
   text-align: center;
 }
 

@@ -273,6 +273,9 @@ function pulisci(): void {
   gap: 0.6rem;
 }
 
+/* Solo usato da ArchivioView.vue: puo' contare sui token --vetro-*-pub che
+   quella vista definisce su ".archivio" (le proprieta' CSS personalizzate
+   attraversano lo scoping di Vue, seguono solo l'ereditarieta' del DOM). */
 .zona {
   display: flex;
   flex-wrap: wrap;
@@ -280,16 +283,19 @@ function pulisci(): void {
   justify-content: center;
   gap: 0.75rem;
   padding: 0.9rem;
-  border: 1px dashed var(--bordo);
+  border: 1px dashed var(--vetro-bordo-pub);
   border-radius: var(--raggio);
+  background: var(--vetro-sfondo-pub);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
   color: var(--testo-tenue);
   font-size: 0.9rem;
   transition: border-color 0.15s ease, background 0.15s ease;
 }
 
 .zona--sopra {
-  border-color: var(--accento);
-  background: var(--superficie-alt);
+  border-color: var(--testo);
+  background: var(--vetro-attivo-pub);
 }
 
 .zona__testo {

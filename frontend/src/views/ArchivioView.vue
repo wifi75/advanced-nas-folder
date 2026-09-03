@@ -110,20 +110,74 @@ const voci = computed(() => risultati.value ?? contenuto.value?.voci ?? [])
 // quelle viste sarebbero di sola lettura.
 const menu = ref<{ voce: Voce; x: number; y: number } | null>(null)
 
-function apriMenu(voce: Voce, evento: MouseEvent): void {
+function apriMenuA(voce: Voce, x: number, y: number): void {
   // Si tiene il menu dentro la finestra: aperto a filo del bordo destro
   // finirebbe fuori schermo, e sui telefoni non ci sarebbe modo di tornarci.
   const larghezza = 200
   const altezza = 190
   menu.value = {
     voce,
-    x: Math.min(evento.clientX, window.innerWidth - larghezza),
-    y: Math.min(evento.clientY, window.innerHeight - altezza),
+    x: Math.min(x, window.innerWidth - larghezza),
+    y: Math.min(y, window.innerHeight - altezza),
   }
+}
+
+function apriMenu(voce: Voce, evento: MouseEvent): void {
+  apriMenuA(voce, evento.clientX, evento.clientY)
 }
 
 function chiudiMenu(): void {
   menu.value = null
+}
+
+// --- stesso menu, aperto con una pressione prolungata su touch ---
+//
+// Il tasto destro non esiste su un telefono: senza questo, rinomina/sposta/
+// elimina non erano raggiungibili nelle viste a griglia e galleria, dove i
+// pulsanti per esteso non ci stanno apposta (restano nel menu).
+const DURATA_PRESSIONE = 500
+let timerPressione: ReturnType<typeof setTimeout> | null = null
+let partenzaTocco: { x: number; y: number } | null = null
+let pressioneScattata = false
+
+function iniziaPressione(voce: Voce, evento: TouchEvent): void {
+  const tocco = evento.touches[0]
+  if (!tocco) return
+  partenzaTocco = { x: tocco.clientX, y: tocco.clientY }
+  pressioneScattata = false
+  timerPressione = setTimeout(() => {
+    timerPressione = null
+    pressioneScattata = true
+    apriMenuA(voce, tocco.clientX, tocco.clientY)
+  }, DURATA_PRESSIONE)
+}
+
+function spostaPressione(evento: TouchEvent): void {
+  // Un dito che scorre stava scorrendo la pagina, non tenendo premuto: si
+  // annulla, altrimenti il menu si aprirebbe anche durante uno scroll.
+  const tocco = evento.touches[0]
+  if (!tocco || !partenzaTocco || !timerPressione) return
+  const distanza = Math.hypot(tocco.clientX - partenzaTocco.x, tocco.clientY - partenzaTocco.y)
+  if (distanza > 10) annullaPressione()
+}
+
+function annullaPressione(): void {
+  if (timerPressione) {
+    clearTimeout(timerPressione)
+    timerPressione = null
+  }
+  partenzaTocco = null
+}
+
+function finePressione(evento: TouchEvent): void {
+  // Se il menu si e' appena aperto da questa stessa pressione, il tocco che
+  // solleva il dito non deve anche aprire il file sotto: e' lo stesso gesto
+  // di apertura, non due separati.
+  if (pressioneScattata) {
+    evento.preventDefault()
+    pressioneScattata = false
+  }
+  annullaPressione()
 }
 
 function sbloccaConPassword(valore: string): void {
@@ -692,6 +746,10 @@ chiudiConEsc(
             :key="voce.percorso"
             class="voce"
             @contextmenu.prevent="apriMenu(voce, $event)"
+            @touchstart="iniziaPressione(voce, $event)"
+            @touchmove="spostaPressione($event)"
+            @touchend="finePressione"
+            @touchcancel="annullaPressione"
           >
             <input
               type="checkbox"
@@ -998,6 +1056,33 @@ chiudiConEsc(
   margin-inline: auto;
   gap: 1.25rem;
   padding-block: 1.5rem;
+
+  /* Vetro proprio di questa pagina, non quello globale: i --vetro-* di
+     main.css sono ritinti di ciano in scuro per l'identita' del pannello
+     (v0.28.0). Senza questi, chi apre un link ereditava quel ciano per un
+     caso di implementazione, non per scelta — questa pagina ha un'identita'
+     apposta, piu' calma, separata da quella di chi amministra. In chiaro
+     restano vicini ai --vetro-* di base, gia' neutri li'. */
+  --vetro-sfondo-pub: var(--vetro-sfondo);
+  --vetro-bordo-pub: var(--vetro-bordo);
+  --vetro-luce-pub: var(--vetro-luce);
+  --vetro-attivo-pub: var(--vetro-attivo);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema='chiaro']) .archivio {
+    --vetro-sfondo-pub: linear-gradient(158deg, rgb(255 255 255 / 11%), rgb(255 255 255 / 3%));
+    --vetro-bordo-pub: rgb(255 255 255 / 16%);
+    --vetro-luce-pub: rgb(255 255 255 / 24%);
+    --vetro-attivo-pub: linear-gradient(158deg, rgb(255 255 255 / 20%), rgb(255 255 255 / 8%));
+  }
+}
+
+:root[data-tema='scuro'] .archivio {
+  --vetro-sfondo-pub: linear-gradient(158deg, rgb(255 255 255 / 11%), rgb(255 255 255 / 3%));
+  --vetro-bordo-pub: rgb(255 255 255 / 16%);
+  --vetro-luce-pub: rgb(255 255 255 / 24%);
+  --vetro-attivo-pub: linear-gradient(158deg, rgb(255 255 255 / 20%), rgb(255 255 255 / 8%));
 }
 
 .intestazione {
@@ -1056,10 +1141,14 @@ chiudiConEsc(
   display: flex;
   flex-direction: column;
   padding: 0.25rem;
-  border: 1px solid var(--bordo);
+  border: 1px solid var(--vetro-bordo-pub);
   border-radius: var(--raggio);
-  background: var(--superficie);
-  box-shadow: 0 0.5rem 1.5rem rgb(0 0 0 / 0.18);
+  background: var(--vetro-sfondo-pub);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 var(--vetro-luce-pub),
+    0 0.5rem 1.5rem rgb(0 0 0 / 0.18);
 }
 
 .menu button {
@@ -1106,12 +1195,12 @@ chiudiConEsc(
   gap: 0.2rem;
   margin-bottom: 0.6rem;
   padding: 0.25rem;
-  border: 1px solid var(--vetro-bordo);
+  border: 1px solid var(--vetro-bordo-pub);
   border-radius: 12px;
-  background: var(--vetro-sfondo);
+  background: var(--vetro-sfondo-pub);
   backdrop-filter: blur(14px) saturate(180%);
   -webkit-backdrop-filter: blur(14px) saturate(180%);
-  box-shadow: inset 0 1px 0 var(--vetro-luce);
+  box-shadow: inset 0 1px 0 var(--vetro-luce-pub);
   align-self: flex-start;
 }
 
@@ -1131,7 +1220,7 @@ chiudiConEsc(
   color: var(--testo);
   background: var(--superficie);
   box-shadow:
-    inset 0 1px 0 var(--vetro-luce),
+    inset 0 1px 0 var(--vetro-luce-pub),
     var(--vetro-ombra);
 }
 
@@ -1365,12 +1454,12 @@ chiudiConEsc(
   gap: 0.75rem;
   padding: 0.5rem 0.85rem;
   border-radius: 11px;
-  background: var(--vetro-sfondo);
-  border: 1px solid var(--vetro-bordo);
+  background: var(--vetro-sfondo-pub);
+  border: 1px solid var(--vetro-bordo-pub);
   backdrop-filter: blur(14px) saturate(180%);
   -webkit-backdrop-filter: blur(14px) saturate(180%);
   box-shadow:
-    inset 0 1px 0 var(--vetro-luce),
+    inset 0 1px 0 var(--vetro-luce-pub),
     var(--vetro-ombra);
   /* Casella, poi nome elastico, poi dimensione e data a larghezza fissa così
      le colonne restano allineate anche quando i nomi sono molto diversi. */
@@ -1378,7 +1467,9 @@ chiudiConEsc(
 }
 
 .voce:hover {
-  border-color: color-mix(in srgb, var(--accento) 32%, var(--vetro-bordo));
+  /* Non l'accento del pannello (in scuro e' ciano, identita' del pannello):
+     qui l'enfasi resta neutra, sul colore del testo stesso. */
+  border-color: color-mix(in srgb, var(--testo) 28%, var(--vetro-bordo-pub));
 }
 
 .voce__scelta {
@@ -1401,13 +1492,13 @@ chiudiConEsc(
   align-items: center;
   gap: 0.6rem;
   padding: 0.55rem 0.7rem 0.55rem 1rem;
-  border: 1px solid var(--vetro-bordo);
+  border: 1px solid var(--vetro-bordo-pub);
   border-radius: 12px;
-  background: var(--vetro-sfondo);
+  background: var(--vetro-sfondo-pub);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   box-shadow:
-    inset 0 1px 0 var(--vetro-luce),
+    inset 0 1px 0 var(--vetro-luce-pub),
     0 8px 26px -12px rgb(0 0 0 / 45%);
   font-size: 0.9rem;
   transform: translateX(-50%);
@@ -1520,6 +1611,13 @@ chiudiConEsc(
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--vetro-bordo-pub);
+  border-radius: 12px;
+  background: var(--vetro-sfondo-pub);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  box-shadow: inset 0 1px 0 var(--vetro-luce-pub);
 }
 
 .cerca {
@@ -1550,7 +1648,9 @@ chiudiConEsc(
   gap: 0.7rem;
   padding: 1.25rem;
   border-radius: var(--raggio);
+  border: 1px solid var(--vetro-bordo-pub);
   background: var(--superficie);
+  box-shadow: inset 0 1px 0 var(--vetro-luce-pub), var(--vetro-ombra);
 }
 
 .pannello h2 {
@@ -1580,7 +1680,15 @@ chiudiConEsc(
   color: var(--testo-tenue);
 }
 
+/* Prima era solo testo rosso sullo sfondo della pagina: un errore come
+   "Pubblicazione non trovata" e' il primo messaggio che vede un visitatore
+   che ha sbagliato indirizzo, e merita un riquadro vero, non una riga persa
+   nel resto del testo. */
 .avviso--errore {
+  padding: 0.65rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--tinta-link) 40%, var(--vetro-bordo-pub));
+  border-radius: var(--raggio);
+  background: color-mix(in srgb, var(--tinta-link) 10%, var(--vetro-sfondo-pub));
   color: var(--tinta-link);
 }
 
@@ -1589,7 +1697,13 @@ chiudiConEsc(
     grid-template-columns: auto minmax(0, 1fr) auto;
   }
 
-  .voce__data {
+  /* Tre colonne definite sopra, ma la riga aveva ancora cinque figli visibili
+     (casella, apri, dimensione, data, azioni): con "dimensione" nascosta solo
+     qui sotto, "azioni" restava un quarto elemento fuori posto e la riga o
+     scorreva di lato o diventava inutilmente alta. Nascosta anche
+     "dimensione", che si vede comunque aprendo il file. */
+  .voce__data,
+  .voce__dimensione {
     display: none;
   }
 

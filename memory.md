@@ -12,7 +12,27 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.28.2
+- Versione corrente: 0.28.3
+
+## Stato alla v0.28.3 — 3 settembre 2026
+
+**Fase 4 della revisione grafica, completata — e con questa, tutto il
+piano in quattro fasi è chiuso.** Vista pubblica di condivisione
+(`ArchivioView.vue`) portata a un'identità a vetro (glassmorphism) propria,
+separata dal ciano del pannello: nuovi token locali `--vetro-*-pub` su
+`.archivio`, superfici rimaste piatte (header, barra strumenti, briciole,
+errore, menu, finestre) portate allo stesso trattamento, `Caricamenti.vue`
+e `AccessoCartella.vue` allineati. Aggiunta anche la pressione prolungata
+per aprire il menu contestuale su touch (rinomina/sposta/elimina prima
+raggiungibili solo col tasto destro del mouse).
+
+**Limite dichiarato di questa sessione**: in questo ambiente di sviluppo
+Windows non è stato possibile verificare righe/griglia/galleria con file
+veri né il gesto di pressione prolungata — l'agent che monta i filesystem
+NFS gira solo su Linux, e non c'è un touchscreen. Verificato solo ciò che
+non richiede dati reali (stato di errore, barra strumenti) prima che
+l'utente chiedesse di fermare le verifiche in autonomia e occuparsene lui
+stesso.
 
 ## Stato alla v0.28.2 — 3 settembre 2026
 
