@@ -10,6 +10,41 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.28.0] - 2026-09-03
+
+Prima fase della revisione grafica del pannello di amministrazione:
+identità "Dark Tech / Console" (fondamenta) e riorganizzazione del menu.
+Bump minore: cambia in modo visibile come si presenta e si naviga il
+pannello, non solo correzioni.
+
+### Modificato
+
+- **Nuova identità visiva** in `main.css`: accento ciano (era blu
+  "Enterprise" generico), verde acido per gli stati positivi, angoli più
+  netti (`--raggio` 6px → 5px), bagliore ciano al posto del riflesso
+  bianco sulle superfici "di vetro" del menu. Vale sia per il tema chiaro
+  sia per lo scuro — il selettore di tema resta, non è stato tolto.
+- **Font monospace per i dati tecnici**: nuovo token `--font-mono`,
+  applicato ai percorsi (già lo usavano) e alla tabella dei trasferimenti
+  (data/ora, dimensioni, indirizzo IP).
+- **Menu laterale riorganizzato**: "Stato" e "Utenti" sono ora voci
+  singole in cima, non più infilate in categorie sbilanciate (una,
+  "Accessi", aveva un solo figlio). Le scorciatoie "Tutte le pubblicazioni"
+  e "Tutte le condivisioni" sono separate dall'albero delle condivisioni
+  invece di comparire come ultime voci della stessa lista.
+
+### Corretto
+
+- **Bug preesistente, trovato verificando nel browser**: il blocco
+  `:root[data-tema='scuro']` non definiva mai `--fondo-pagina`. Chi
+  sceglieva esplicitamente il tema scuro con il sistema operativo in
+  chiaro restava con lo sfondo della pagina ancora chiaro sotto testo
+  ormai chiaro — praticamente illeggibile. Non è legato alla nuova
+  identità: c'era già prima.
+- Rimossa una duplicazione accidentale di alcune righe in `main.css`
+  (`--codice-*` e `--fondo-pagina` ripetuti due volte di fila nello stesso
+  blocco).
+
 ## [0.27.14] - 2026-09-03
 
 ### Corretto

@@ -119,7 +119,7 @@ async function esci(): Promise<void> {
   color: var(--testo);
   background: var(--superficie);
   border: 1px solid var(--bordo);
-  border-radius: 10px;
+  border-radius: var(--raggio);
   cursor: pointer;
 }
 

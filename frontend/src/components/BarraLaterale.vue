@@ -113,6 +113,11 @@ const ICONE = {
     'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z M19.4 14.5a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2v.1a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-2.9-1.1l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.1-2.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 2.9-1.2V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 2.9 1.1l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0 1.2 2.9h.1a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.5 1.2Z',
 } as const
 
+// "Stato" e "Utenti" non sono piu' qui dentro: sono voci singole in cima al
+// menu (vedi template), non piu' infilate in categorie sbilanciate — "Accessi"
+// aveva un solo figlio, e "Stato" fra le voci di sistema nascondeva la pagina
+// di arrivo del pannello in mezzo a configurazione e monitoraggio.
+//
 // Tutte queste pagine sono riservate all'amministratore: l'API le rifiuta a
 // chiunque altro. Mostrarle a un utente normale non gli da' un permesso in
 // piu', gli da' solo cinque modi di sbattere contro un errore.
@@ -120,41 +125,29 @@ const categorie = computed<Categoria[]>(() =>
   !auth.utente?.is_admin
     ? []
     : [
-  {
-    titolo: t('menu.accessi'),
-    voci: [
-      {
-        etichetta: t('menu.utenti'),
-        a: '/utenti',
-        tinta: 'var(--tinta-utenti)',
-        icona: ICONE.persone,
-      },
-    ],
-  },
-  {
-    titolo: t('menu.sistema'),
-    voci: [
-      { etichetta: t('menu.stato'), a: '/', tinta: 'var(--tinta-stato)', icona: ICONE.battito },
-      {
-        etichetta: t('menu.webserver'),
-        a: '/webserver',
-        tinta: 'var(--tinta-webserver)',
-        icona: ICONE.globo,
-      },
-      {
-        etichetta: t('menu.trasferimenti'),
-        a: '/trasferimenti',
-        tinta: 'var(--tinta-trasferimenti)',
-        icona: ICONE.frecce,
-      },
-      {
-        etichetta: t('menu.impostazioni'),
-        a: '/impostazioni',
-        tinta: 'var(--tinta-impostazioni)',
-        icona: ICONE.ingranaggio,
-      },
-    ],
-  },
+        {
+          titolo: t('menu.sistema'),
+          voci: [
+            {
+              etichetta: t('menu.webserver'),
+              a: '/webserver',
+              tinta: 'var(--tinta-webserver)',
+              icona: ICONE.globo,
+            },
+            {
+              etichetta: t('menu.trasferimenti'),
+              a: '/trasferimenti',
+              tinta: 'var(--tinta-trasferimenti)',
+              icona: ICONE.frecce,
+            },
+            {
+              etichetta: t('menu.impostazioni'),
+              a: '/impostazioni',
+              tinta: 'var(--tinta-impostazioni)',
+              icona: ICONE.ingranaggio,
+            },
+          ],
+        },
       ],
 )
 </script>
@@ -234,6 +227,65 @@ const categorie = computed<Categoria[]>(() =>
         </p>
       </section>
 
+      <!-- Voci singole, non categorie: "Stato" e' la pagina di arrivo, non
+           una voce di sistema tra le altre; "Utenti" era l'unico figlio di
+           una categoria intera ("Accessi"), sezione per una voce sola. -->
+      <ul
+        v-if="auth.utente?.is_admin"
+        class="voci voci--principali"
+      >
+        <li>
+          <RouterLink
+            to="/"
+            class="voce"
+            @click="emit('naviga')"
+          >
+            <span
+              class="pastiglia"
+              :style="{ '--tinta': 'var(--tinta-stato)' }"
+              aria-hidden="true"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path :d="ICONE.battito" />
+              </svg>
+            </span>
+            <span class="voce__testo">{{ t('menu.stato') }}</span>
+          </RouterLink>
+        </li>
+        <li>
+          <RouterLink
+            to="/utenti"
+            class="voce"
+            @click="emit('naviga')"
+          >
+            <span
+              class="pastiglia"
+              :style="{ '--tinta': 'var(--tinta-utenti)' }"
+              aria-hidden="true"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path :d="ICONE.persone" />
+              </svg>
+            </span>
+            <span class="voce__testo">{{ t('menu.utenti') }}</span>
+          </RouterLink>
+        </li>
+      </ul>
+
       <section
         v-if="auth.utente?.is_admin"
         class="categoria"
@@ -241,6 +293,27 @@ const categorie = computed<Categoria[]>(() =>
         <h2 class="categoria__titolo">
           {{ t('menu.condivisioni') }}
         </h2>
+
+        <!-- Scorciatoie piatte, separate dall'albero sotto: prima erano le
+             ultime due voci della stessa lista dell'albero, e si leggevano
+             come se fossero anche loro condivisioni o pubblicazioni. -->
+        <div class="scorciatoie">
+          <RouterLink
+            to="/pubblicazioni"
+            class="scorciatoia"
+            @click="emit('naviga')"
+          >
+            {{ t('menu.tuttePubblicazioni') }}
+          </RouterLink>
+          <RouterLink
+            to="/condivisioni"
+            class="scorciatoia"
+            @click="emit('naviga')"
+          >
+            {{ t('menu.tutteCondivisioni') }}
+          </RouterLink>
+        </div>
+
         <ul class="voci">
           <li
             v-for="ramo in albero"
@@ -301,50 +374,6 @@ const categorie = computed<Categoria[]>(() =>
                 </RouterLink>
               </li>
             </ul>
-          </li>
-
-          <!-- L'elenco di tutte le cartelle pubblicate, di qualunque
-               condivisione: nell'albero si vedono solo quelle della
-               condivisione aperta, e senza questa voce la pagina non era
-               raggiungibile da nessuna parte. -->
-          <li>
-            <RouterLink
-              class="voce"
-              to="/pubblicazioni"
-              @click="emit('naviga')"
-            >
-              <span
-                class="pastiglia"
-                :style="{ '--tinta': 'var(--tinta-pubblicazioni)' }"
-                aria-hidden="true"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.7"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path :d="ICONE.globo" />
-                </svg>
-              </span>
-              <span class="voce__testo">{{ t('menu.tuttePubblicazioni') }}</span>
-            </RouterLink>
-          </li>
-
-          <li>
-            <RouterLink
-              class="voce voce--aggiungi"
-              to="/condivisioni"
-              @click="emit('naviga')"
-            >
-              <span
-                class="pastiglia pastiglia--vuota"
-                aria-hidden="true"
-              />
-              <span class="voce__testo">{{ t('menu.tutteCondivisioni') }}</span>
-            </RouterLink>
           </li>
         </ul>
       </section>
@@ -530,6 +559,27 @@ const categorie = computed<Categoria[]>(() =>
   gap: 0.35rem;
 }
 
+/* --- scorciatoie: separate dall'albero, non voci del menu principale --- */
+
+.scorciatoie {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.7rem;
+  margin: 0 0 0.6rem;
+  padding-inline: 0.65rem;
+}
+
+.scorciatoia {
+  font-size: 0.75rem;
+  color: var(--testo-tenue);
+  text-decoration: none;
+}
+
+.scorciatoia:hover {
+  color: var(--accento);
+  text-decoration: underline;
+}
+
 /* --- pulsante di vetro --- */
 
 .voce {
@@ -537,7 +587,7 @@ const categorie = computed<Categoria[]>(() =>
   align-items: center;
   gap: 0.7rem;
   padding: 0.5rem 0.7rem;
-  border-radius: 11px;
+  border-radius: var(--raggio);
   text-decoration: none;
   color: var(--testo);
   font-size: 0.875rem;
@@ -594,7 +644,7 @@ a.voce.router-link-exact-active {
   block-size: 28px;
   display: grid;
   place-items: center;
-  border-radius: 8px;
+  border-radius: var(--raggio);
   color: #fff;
   /* Non un colore piatto: sfumatura dalla tinta a una sua versione più cupa,
      più un filo di luce in alto che simula il riflesso. */
@@ -632,7 +682,7 @@ a.voce.router-link-exact-active {
   justify-content: space-between;
   gap: 0.5rem;
   padding: 0.6rem 0.7rem;
-  border-radius: 11px;
+  border-radius: var(--raggio);
   background: var(--vetro-sfondo);
   border: 1px solid var(--vetro-bordo);
   backdrop-filter: blur(14px) saturate(180%);

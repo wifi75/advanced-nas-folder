@@ -25,7 +25,6 @@ export default {
     pubblica: 'Publish a folder',
     tutteCondivisioni: 'New share',
     archivio: 'Storage',
-    accessi: 'Access',
     sistema: 'System',
     condivisioni: 'NFS shares',
     pubblicazioni: 'Published folders',

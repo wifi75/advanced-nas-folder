@@ -25,7 +25,6 @@ export default {
     pubblica: 'Pubblica una cartella',
     tutteCondivisioni: 'Nuova condivisione',
     archivio: 'Archivio',
-    accessi: 'Accessi',
     sistema: 'Sistema',
     condivisioni: 'Condivisioni NFS',
     pubblicazioni: 'Pubblicazioni',

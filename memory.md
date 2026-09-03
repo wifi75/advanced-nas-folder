@@ -12,7 +12,32 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.27.14
+- Versione corrente: 0.28.0
+
+## Stato alla v0.28.0 — 3 settembre 2026
+
+**Fase 1 della revisione grafica del pannello, completata**: identità
+"Dark Tech / Console" (accento ciano, verde acido, font mono per i dati,
+angoli più netti, bagliore ciano sul vetro) e menu laterale riorganizzato
+("Stato"/"Utenti" voci singole, scorciatoie separate dall'albero). Il
+piano completo delle quattro fasi è descritto più sotto, in questa stessa
+voce e nelle successive: non vive nel repository.
+
+Verificato nel browser, non solo col gate: login con un database vuoto di
+prova (mai toccato `dev.sqlite3`), tema chiaro e scuro. Trovato e corretto
+un bug preesistente non legato alla nuova identità: `--fondo-pagina` non
+era mai definita nel blocco `[data-tema='scuro']`, solo in quello di
+`prefers-color-scheme` — chi sceglieva "Scuro" col sistema in chiaro
+restava con la pagina illeggibile (testo chiaro su sfondo ancora chiaro).
+
+**Ancora da fare** (Fasi 2-4 dello stesso piano, non iniziate):
+decluttering strutturale di `SharesView.vue`, `CondivisioneView.vue`,
+`PubblicazioneView.vue`/`DettaglioShare.vue`, `MountsView.vue`,
+`WebServerView.vue`; poi `Anteprima.vue` (ha colori scuri hardcoded
+indipendenti dal tema) e il consolidamento delle sagomature bianche
+copiate in più componenti; poi la vista pubblica di condivisione
+(`ArchivioView.vue`), identità separata da scegliere con l'utente quando
+si arriva a quel punto.
 
 ## Stato alla v0.27.14 — 3 settembre 2026
 

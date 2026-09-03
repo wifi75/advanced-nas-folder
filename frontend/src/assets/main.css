@@ -9,17 +9,21 @@
  */
 
 :root {
-  --sfondo: #f4f6f9;
+  --sfondo: #f5f7f9;
   --superficie: #ffffff;
-  --superficie-alt: #eef1f5;
-  --bordo: #d8dee7;
-  --testo: #172433;
-  --testo-tenue: #64748b;
-  --accento: #1d5fa8;
+  --superficie-alt: #eef2f5;
+  --bordo: #d3dbe3;
+  --testo: #101820;
+  --testo-tenue: #5b6b7a;
+  --accento: #0891b2;
   --accento-testo: #ffffff;
-  --ok: #1f7a4d;
-  --attenzione: #9a6014;
-  --errore: #a5342c;
+  --ok: #16794a;
+  --attenzione: #a16207;
+  --errore: #b91c1c;
+
+  /* Font monospace per i dati tecnici (percorsi, dimensioni, IP,
+     timestamp): stack di sistema, nessuna dipendenza nuova. */
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   /* Colori dell'evidenziazione del codice. Stanno qui e non nel componente
      perche' il progetto tiene tutti i colori in variabili, definite tre volte:
@@ -30,7 +34,7 @@
   --codice-commento: #6e7781;
   --codice-nome: #953800;
 
-  --raggio: 6px;
+  --raggio: 5px;
   --ombra: 0 1px 2px rgba(23, 36, 51, 0.06), 0 8px 24px -14px rgba(23, 36, 51, 0.2);
 
   /* Vetro traslucido della barra laterale. Non è un colore piatto: è una
@@ -64,22 +68,17 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-tema='chiaro']) {
-    --sfondo: #0e151d;
-    --superficie: #16202b;
-    --superficie-alt: #1d2937;
-    --bordo: #2a3949;
-    --testo: #dde5ef;
-    --testo-tenue: #93a3b7;
-    --accento: #6aa9e8;
-    --accento-testo: #0e151d;
-    --ok: #5cb98c;
-    --attenzione: #d6a054;
-    --errore: #e0817a;
-  --codice-parola: #d2a8ff;
-  --codice-stringa: #7ee787;
-  --codice-numero: #79c0ff;
-  --codice-commento: #8b949e;
-  --codice-nome: #ffa657;
+    --sfondo: #0a0e14;
+    --superficie: #0f1620;
+    --superficie-alt: #141d29;
+    --bordo: #22303f;
+    --testo: #dbe7f2;
+    --testo-tenue: #7b8fa3;
+    --accento: #22d3ee;
+    --accento-testo: #04121a;
+    --ok: #4ade80;
+    --attenzione: #f2b854;
+    --errore: #ff6b6b;
     --codice-parola: #d2a8ff;
     --codice-stringa: #7ee787;
     --codice-numero: #79c0ff;
@@ -87,17 +86,21 @@
     --codice-nome: #ffa657;
     --ombra: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -14px rgba(0, 0, 0, 0.6);
 
-    --vetro-sfondo: linear-gradient(158deg, rgb(255 255 255 / 13%), rgb(255 255 255 / 4%));
-    --vetro-bordo: rgb(255 255 255 / 15%);
-    --vetro-luce: rgb(255 255 255 / 22%);
+    /* Bagliore ciano al posto del riflesso bianco: stessa meccanica
+       (gradiente/bordo/luce), tinta coerente con --accento. */
+    --vetro-sfondo: linear-gradient(158deg, rgb(34 211 238 / 10%), rgb(34 211 238 / 3%));
+    --vetro-bordo: rgb(34 211 238 / 18%);
+    --vetro-luce: rgb(34 211 238 / 25%);
     --vetro-ombra: 0 6px 18px -10px rgb(0 0 0 / 70%);
-    --vetro-attivo: linear-gradient(158deg, rgb(255 255 255 / 22%), rgb(255 255 255 / 9%));
+    --vetro-attivo: linear-gradient(158deg, rgb(34 211 238 / 20%), rgb(34 211 238 / 8%));
     --barra-fondo: linear-gradient(180deg, #131d28, #0d151e);
-  --fondo-pagina: radial-gradient(120% 100% at 50% 0%, #111a24 0%, #0b1119 100%);
     --fondo-pagina: radial-gradient(120% 100% at 50% 0%, #111a24 0%, #0b1119 100%);
 
-    --tinta-nfs: #4aa3ff;
-    --tinta-pubblicazioni: #45c9b8;
+    /* nfs e pubblicazioni scurite/desaturate: le tinte piu' vicine di famiglia
+       al nuovo --accento ciano, altrimenti si confondono con lui. Le altre
+       restano: hue diverse, nessun conflitto. */
+    --tinta-nfs: #5b96c9;
+    --tinta-pubblicazioni: #3ba894;
     --tinta-file: #ffb340;
     --tinta-utenti: #9c85f8;
     --tinta-link: #ff6b86;
@@ -111,28 +114,33 @@
 }
 
 :root[data-tema='scuro'] {
-  --sfondo: #0e151d;
-  --superficie: #16202b;
-  --superficie-alt: #1d2937;
-  --bordo: #2a3949;
-  --testo: #dde5ef;
-  --testo-tenue: #93a3b7;
-  --accento: #6aa9e8;
-  --accento-testo: #0e151d;
-  --ok: #5cb98c;
-  --attenzione: #d6a054;
-  --errore: #e0817a;
+  --sfondo: #0a0e14;
+  --superficie: #0f1620;
+  --superficie-alt: #141d29;
+  --bordo: #22303f;
+  --testo: #dbe7f2;
+  --testo-tenue: #7b8fa3;
+  --accento: #22d3ee;
+  --accento-testo: #04121a;
+  --ok: #4ade80;
+  --attenzione: #f2b854;
+  --errore: #ff6b6b;
   --ombra: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -14px rgba(0, 0, 0, 0.6);
 
-  --vetro-sfondo: linear-gradient(158deg, rgb(255 255 255 / 13%), rgb(255 255 255 / 4%));
-  --vetro-bordo: rgb(255 255 255 / 15%);
-  --vetro-luce: rgb(255 255 255 / 22%);
+  --vetro-sfondo: linear-gradient(158deg, rgb(34 211 238 / 10%), rgb(34 211 238 / 3%));
+  --vetro-bordo: rgb(34 211 238 / 18%);
+  --vetro-luce: rgb(34 211 238 / 25%);
   --vetro-ombra: 0 6px 18px -10px rgb(0 0 0 / 70%);
-  --vetro-attivo: linear-gradient(158deg, rgb(255 255 255 / 22%), rgb(255 255 255 / 9%));
+  --vetro-attivo: linear-gradient(158deg, rgb(34 211 238 / 20%), rgb(34 211 238 / 8%));
   --barra-fondo: linear-gradient(180deg, #131d28, #0d151e);
+  /* Mancava qui: il blocco "scelta esplicita" non la definiva mai, e chi
+     sceglieva "Scuro" col sistema in chiaro restava con lo sfondo pagina
+     ancora chiaro sotto testo ormai chiaro — bug preesistente, non di
+     questo giro, trovato verificando davvero nel browser. */
+  --fondo-pagina: radial-gradient(120% 100% at 50% 0%, #111a24 0%, #0b1119 100%);
 
-  --tinta-nfs: #4aa3ff;
-  --tinta-pubblicazioni: #45c9b8;
+  --tinta-nfs: #5b96c9;
+  --tinta-pubblicazioni: #3ba894;
   --tinta-file: #ffb340;
   --tinta-utenti: #9c85f8;
   --tinta-link: #ff6b86;
@@ -497,7 +505,7 @@ a {
   display: block;
   overflow-x: auto;
   white-space: nowrap;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-mono);
   font-size: 0.85rem;
   padding-bottom: 0.15rem;
 }
@@ -582,7 +590,7 @@ a {
 
 /* I pulsanti prendono lo stesso raggio delle voci di menu. */
 .bottone {
-  border-radius: 9px;
+  border-radius: var(--raggio);
 }
 
 /* --- campi di un modulo ---------------------------------------------------
@@ -621,7 +629,7 @@ a {
   color: var(--testo);
   background: var(--sfondo);
   border: 1px solid var(--bordo);
-  border-radius: 8px;
+  border-radius: var(--raggio);
   transition: border-color 0.12s ease, box-shadow 0.12s ease;
 }
 
