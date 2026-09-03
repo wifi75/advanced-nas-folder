@@ -10,6 +10,17 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.27.11] - 2026-09-03
+
+### Corretto
+
+- **`deploy/docker/docker-compose.yml` non aveva un nome di stack esplicito.**
+  Docker Compose lo deduceva dalla cartella da cui si lancia (`docker`, da
+  `deploy/docker/`): generico, e destinato a scontrarsi con qualunque altro
+  progetto sullo stesso host che segua la stessa convenzione di cartella —
+  visto in Portainer dopo il primo `docker compose up`. Aggiunto
+  `name: advanced-nas-folder`.
+
 ## [0.27.10] - 2026-09-03
 
 ### Corretto

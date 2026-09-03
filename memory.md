@@ -12,7 +12,17 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.27.10
+- Versione corrente: 0.27.11
+
+## Stato alla v0.27.11 — 3 settembre 2026
+
+`anf-api` è ora davvero in produzione su Docker su `docker-vps`
+(192.168.1.224), primo server a usare quella modalità: agent e Nginx
+nativi, `anf-api` in container, verificato in Portainer. Lo stack Docker
+Compose non aveva un nome esplicito e Compose lo deduceva dalla cartella
+(`deploy/docker/` → stack "docker") — generico, si scontrerebbe con
+qualunque altro progetto con la stessa convenzione sullo stesso host.
+Aggiunto `name: advanced-nas-folder` nel compose.
 
 ## Stato alla v0.27.10 — 3 settembre 2026
 
@@ -136,6 +146,11 @@ prende un 404.
   codice nuovo arrivava sul disco ma il processo restava quello vecchio,
   e l'installer dichiarava comunque «completato». Corretto in v0.27.10 con
   `restart`, che funziona sia a freddo sia a caldo.
+- **Un `docker-compose.yml` senza `name:` prende il nome dalla cartella di
+  lancio**, non dal progetto. `deploy/docker/` dava stack "docker" in
+  Portainer — collisione garantita con qualunque altro progetto che segua
+  la stessa convenzione di cartella sullo stesso host. Aggiungere sempre
+  `name:` esplicito ai compose di questo tipo di progetti.
 - **`deadsnakes` (Python 3.14 per `install.sh`) è specifico di Ubuntu**: su
   Debian non esiste affatto, e i repository apt di Debian stabile restano
   spesso una minor version indietro. Su Debian va compilato da sorgente con

@@ -8,6 +8,12 @@
 # cartelle. Questo compose sostituisce il solo servizio systemd anf-api.
 # Guida completa: docs/DOCKER.md.
 
+# Nome esplicito dello stack: senza, Docker Compose lo deduce dal nome della
+# cartella da cui si lancia ("docker", quello di "deploy/docker/") — generico
+# e destinato a scontrarsi con qualunque altro progetto che usi la stessa
+# convenzione di cartella sullo stesso host.
+name: advanced-nas-folder
+
 services:
   anf-api:
     build:
