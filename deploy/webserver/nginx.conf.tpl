@@ -3,6 +3,14 @@
 # Modello. install.sh sostituisce @@RADICE@@, @@PORTA@@ e @@MOUNT_ROOT@@.
 # Template. install.sh replaces @@RADICE@@, @@PORTA@@ and @@MOUNT_ROOT@@.
 
+# "log_format" e' valido solo nel contesto "http": qui fuori dal blocco
+# "server" funziona comunque, perche' Debian include questo file dentro il
+# proprio blocco "http" (vedi /etc/nginx/nginx.conf). Dentro "server" invece
+# nginx -t fallisce con «"log_format" directive is not allowed here» — bug
+# trovato installando su un server pulito, corretto spostandolo qui.
+log_format anf '$remote_addr $time_local "$request" $status '
+               '$body_bytes_sent $request_time "$http_user_agent"';
+
 server {
     listen 80;
     server_name _;
@@ -16,10 +24,6 @@ server {
     set_real_ip_from 127.0.0.1;
     real_ip_header X-Forwarded-For;
 
-    # Formato di log con indirizzo reale e byte inviati: da qui il pannello
-    # ricava lo stato dei download.
-    log_format anf '$remote_addr $time_local "$request" $status '
-                   '$body_bytes_sent $request_time "$http_user_agent"';
     access_log /var/log/nginx/anf_access.log anf;
 
     # --- interfaccia -------------------------------------------------------

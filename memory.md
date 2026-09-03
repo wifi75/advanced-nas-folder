@@ -12,7 +12,15 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.27.5
+- Versione corrente: 0.27.6
+
+## Stato alla v0.27.6 — 3 settembre 2026
+
+Aggiunta l'installazione Docker per `anf-api` (v. voce sotto). Trovato e
+corretto, installando su un secondo server (Debian 13, non Ubuntu) un bug
+reale in `nginx.conf.tpl`: `log_format` dentro il blocco `server` fa fallire
+sempre `nginx -t` su un'installazione pulita — vedere «Trappole trovate sul
+campo» più sotto per il dettaglio, perché è del tipo che si ripresenta.
 
 ## Stato alla v0.27.5 — 3 settembre 2026
 
@@ -56,6 +64,19 @@ prende un 404.
   `views/ArchivioView.vue`, che ne ha ancora diversi: nessun linter lo segnala.
 - **`mod_rewrite` e `CustomLog` non sono ereditati** dai VirtualHost; `mod_alias`
   (`Alias`, `RedirectMatch`) invece sì.
+- **`log_format` di Nginx dentro il blocco `server` non è valido**: solo nel
+  contesto `http`. `nginx.conf.tpl` lo aveva dentro `server` e `nginx -t`
+  falliva sempre — su qualunque server pulito, non solo quello di prova.
+  Corretto in v0.27.6 spostandolo fuori dal blocco: funziona perché Debian
+  (e le distribuzioni derivate) include i file di `sites-enabled/` dentro il
+  proprio blocco `http` in `nginx.conf`.
+- **`deadsnakes` (Python 3.14 per `install.sh`) è specifico di Ubuntu**: su
+  Debian non esiste affatto, e i repository apt di Debian stabile restano
+  spesso una minor version indietro. Su Debian va compilato da sorgente con
+  `make altinstall` (mai `make install`, che sovrascriverebbe `python3` di
+  sistema) — comandi in `docs/INSTALL.md`, sezione «Su Debian». `install.sh`
+  lo rileva comunque da solo se `python3.14` è già sul `PATH`: non serve
+  modificarlo.
 - **`pytest | tail` maschera l'esito**: usare sempre `controlla.ps1`, che si ferma
   al primo passo fallito. Due commit rotti sono arrivati su GitHub così.
 - **Uso prima della definizione in `<script setup>`**: compila, i tipi passano, la

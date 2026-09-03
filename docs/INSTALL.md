@@ -33,6 +33,29 @@ già pronto nella release.
 Sviluppato e verificato su **Ubuntu 24.04 LTS**. Su altre distribuzioni l'installer
 va adattato: usa `apt-get` e il PPA `deadsnakes`.
 
+### Su Debian (niente `deadsnakes`)
+
+`deadsnakes` è un PPA specifico di Ubuntu: su Debian non esiste, e i repository di
+Debian stabile restano spesso una minor version indietro rispetto a quella richiesta.
+Va compilato da sorgente, **accanto** all'interprete di sistema:
+
+```bash
+apt-get install -y build-essential libbz2-dev libffi-dev libgdbm-dev \
+  libgdbm-compat-dev liblzma-dev libncurses5-dev libreadline6-dev \
+  libsqlite3-dev libssl-dev tk-dev uuid-dev zlib1g-dev wget xz-utils
+
+cd /usr/local/src
+wget https://www.python.org/ftp/python/3.14.7/Python-3.14.7.tgz
+tar -xzf Python-3.14.7.tgz && cd Python-3.14.7
+./configure --prefix=/usr/local --with-ensurepip=install
+make -j"$(nproc)"
+make altinstall   # MAI "make install": sovrascriverebbe python3 di sistema
+```
+
+`make altinstall` installa `python3.14` senza toccare `python3`. Una volta sul
+`PATH`, `install.sh` lo trova da solo e salta il passo `deadsnakes`: non serve
+modificare l'installer. Pulire dopo con `rm -rf /usr/local/src/Python-3.14.7*`.
+
 ### Il NAS
 
 Prima di installare, controlla due cose sul NAS:

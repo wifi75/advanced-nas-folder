@@ -7,6 +7,11 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non rilasciato]
 
+### Da fare
+Vedere [TODO.md](TODO.md).
+
+## [0.27.6] - 2026-09-03
+
 ### Aggiunto
 
 - **Installazione Docker per `anf-api`.** L'agent privilegiato e il web
@@ -14,8 +19,14 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
   separazione dei privilegi descritto in `docs/PIANO.md`. Vedere
   [docs/DOCKER.md](docs/DOCKER.md).
 
-### Da fare
-Vedere [TODO.md](TODO.md).
+### Corretto
+
+- **`nginx.conf.tpl` non superava `nginx -t` su un'installazione pulita.**
+  `log_format` era dentro il blocco `server`, contesto in cui Nginx non lo
+  accetta («"log_format" directive is not allowed here»): l'installazione
+  falliva sempre su Nginx, con rollback automatico. Trovato installando su
+  un server Debian 13 pulito. Spostato fuori dal blocco `server` — funziona
+  perché Debian include il file dentro il proprio blocco `http`.
 
 ## [0.27.5] - 2026-09-03
 
