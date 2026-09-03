@@ -841,6 +841,17 @@ if [ "$DRY_RUN" = 0 ]; then
         fi
         systemctl reload apache2
     else
+        # Il sito "default" di Debian/Ubuntu ha "listen 80 default_server",
+        # che vince sempre su "server_name _" di anf.conf: senza toglierlo il
+        # pannello risulta irraggiungibile (404) pur con una configurazione
+        # valida — trovato installando su un server pulito. Rimosso solo se
+        # e' ancora il sito di serie della distribuzione, per non toccare un
+        # sito personalizzato con lo stesso nome.
+        if [ -L /etc/nginx/sites-enabled/default ] &&
+            [ "$(readlink -f /etc/nginx/sites-enabled/default)" = "/etc/nginx/sites-available/default" ]; then
+            esegui rm -f /etc/nginx/sites-enabled/default
+        fi
+
         DEST="/etc/nginx/sites-available/anf.conf"
         PRECEDENTE=""
         [ -f "$DEST" ] && PRECEDENTE="$(mktemp)" && cp "$DEST" "$PRECEDENTE"

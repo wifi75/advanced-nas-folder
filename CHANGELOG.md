@@ -10,6 +10,19 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.27.8] - 2026-09-03
+
+### Corretto
+
+- **`install.sh` (Nginx): il sito "default" di Debian/Ubuntu vinceva sempre
+  su `anf.conf`.** Ha `listen 80 default_server;`, che batte
+  `server_name _;` non marcato come tale: il pannello risultava
+  irraggiungibile (404 su tutto) pur con una configurazione valida.
+  L'installer ora lo rimuove, solo se è ancora quello di serie della
+  distribuzione — un sito personalizzato con lo stesso nome non viene
+  toccato. Non è un problema specifico di Debian: lo stesso pacchetto
+  Nginx di Ubuntu lo installa abilitato allo stesso modo.
+
 ## [0.27.7] - 2026-09-03
 
 ### Corretto

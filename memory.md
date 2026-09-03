@@ -12,7 +12,16 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.27.7
+- Versione corrente: 0.27.8
+
+## Stato alla v0.27.8 — 3 settembre 2026
+
+Terzo problema nella stessa sessione di installazione su un server pulito
+(Debian 13, Nginx): il sito "default" della distribuzione vinceva sempre su
+`anf.conf`, pannello irraggiungibile con configurazione altrimenti valida.
+`install.sh` ora lo rimuove da sé (solo se è ancora quello di serie). Non è
+un limite di Debian: Ubuntu spedisce lo stesso pacchetto Nginx con lo stesso
+sito abilitato — vedere «Trappole trovate sul campo».
 
 ## Stato alla v0.27.7 — 3 settembre 2026
 
@@ -85,6 +94,15 @@ prende un 404.
   release, emerso solo dopo averlo corretto (v0.27.7). Dopo un fix a un file
   di configurazione, va testato per intero, non solo sulla riga appena
   cambiata.
+- **Il sito Nginx "default" di Debian/Ubuntu ha `listen 80 default_server`**,
+  che vince sempre su `server_name _` non marcato come tale: `anf.conf`
+  restava sintatticamente valido ma irraggiungibile (404 su tutto).
+  `install.sh` lo rimuove da v0.27.8, solo se è ancora il sito di serie.
+- **`libzstd-dev` mancante fa fallire l'avvio dell'API, non la compilazione
+  di Python.** `./configure` salta `_zstd` in silenzio se la libreria non
+  c'è; il primo errore visibile arriva solo all'avvio di `anf-api`
+  (`ModuleNotFoundError: _zstd`, da `zipstream-ng`). Aggiunta alla lista dei
+  pacchetti in `docs/INSTALL.md`.
 - **`deadsnakes` (Python 3.14 per `install.sh`) è specifico di Ubuntu**: su
   Debian non esiste affatto, e i repository apt di Debian stabile restano
   spesso una minor version indietro. Su Debian va compilato da sorgente con

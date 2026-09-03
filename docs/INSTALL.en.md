@@ -37,12 +37,16 @@ needs adapting: it uses `apt-get` and the `deadsnakes` PPA.
 
 `deadsnakes` is an Ubuntu-specific PPA: it doesn't exist on Debian, and Debian
 stable's own repositories are often a minor version behind the one required.
-It has to be compiled from source, **alongside** the system interpreter:
+It has to be compiled from source, **alongside** the system interpreter.
+`libzstd-dev` is mandatory: without it, `./configure` silently skips the
+`_zstd` module, and the API then fails to start — folder ZIP downloads
+(`zipstream-ng`) require it always, not just when actually used.
 
 ```bash
 apt-get install -y build-essential libbz2-dev libffi-dev libgdbm-dev \
   libgdbm-compat-dev liblzma-dev libncurses5-dev libreadline6-dev \
-  libsqlite3-dev libssl-dev tk-dev uuid-dev zlib1g-dev wget xz-utils
+  libsqlite3-dev libssl-dev libzstd-dev tk-dev uuid-dev zlib1g-dev \
+  wget xz-utils
 
 cd /usr/local/src
 wget https://www.python.org/ftp/python/3.14.7/Python-3.14.7.tgz
