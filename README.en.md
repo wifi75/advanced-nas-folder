@@ -18,6 +18,7 @@
 [![Images](https://img.shields.io/badge/Thumbnails-Pillow%2012.3-4B8BBE?logo=python&logoColor=white)](https://python-pillow.github.io)
 [![Video](https://img.shields.io/badge/Video-ffmpeg-007808?logo=ffmpeg&logoColor=white)](https://ffmpeg.org)
 [![Web server](https://img.shields.io/badge/Web%20server-Apache%20%7C%20Nginx-D22128?logo=apache&logoColor=white)](https://httpd.apache.org)
+[![Docker](https://img.shields.io/badge/API%20also%20in-Docker-2496ED?logo=docker&logoColor=white)](docs/DOCKER.en.md)
 [![Security](https://img.shields.io/badge/Privileges-isolated%20root%20agent-4B0082)](docs/PIANO.en.md)
 [![License](https://img.shields.io/badge/License-MIT-3DA639?logo=opensourceinitiative&logoColor=white)](LICENSE)
 [![SemVer](https://img.shields.io/badge/SemVer-2.0.0-3F4551)](https://semver.org)
@@ -227,6 +228,7 @@ in `.env` and in the database.
 
 - [User guide](docs/GUIDA.en.md) — how to use it, from first sign-in to share links
 - [Installation](docs/INSTALL.en.md) — complete guide and troubleshooting
+- [Docker installation](docs/DOCKER.en.md) — anf-api in a container, agent and web server stay native
 - [NFS write access on Synology](docs/synology-nfs-scrittura.en.md)
 - [Technical plan](docs/PIANO.en.md) — architecture, data model, rationale
 - [Dependency versions](docs/VERSIONI.en.md) — current state and how to check them

@@ -343,6 +343,11 @@ Rimuove servizi, configurazione del web server e programma. **Non tocca** il dat
 in `/var/lib/anf` né i mount in `/srv/nas`: se vuoi rimuovere anche quelli, va fatto a
 mano e con cognizione.
 
+## Eseguire l'API in Docker invece che nativa
+
+Il servizio `anf-api` può girare in un container invece che nativamente — agent e web
+server restano nativi in entrambi i casi. Vedi [DOCKER.md](DOCKER.md).
+
 ---
 
 ## Se qualcosa non va

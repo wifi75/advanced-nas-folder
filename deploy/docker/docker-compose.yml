@@ -1,0 +1,40 @@
+# Esegue SOLO anf-api in un container. L'agent privilegiato e il web server
+# restano servizi nativi sull'host, esattamente come descritto in
+# docs/PIANO.md (Nodo 1): qui si containerizza solo l'applicazione senza
+# privilegi, non il pezzo che monta filesystem da root.
+#
+# Prerequisito: installazione nativa gia' fatta con install.sh — serve
+# comunque a creare l'utente di sistema "anf", l'agent, il web server e le
+# cartelle. Questo compose sostituisce il solo servizio systemd anf-api.
+# Guida completa: docs/DOCKER.md.
+
+services:
+  anf-api:
+    build:
+      context: ../../backend
+    image: advanced-nas-folder-api:local
+    container_name: anf-api
+    restart: unless-stopped
+    # Deve combaciare con l'utente di sistema "anf" creato da install.sh:
+    # scoprirlo con `id anf` sull'host. Senza, il container non puo' leggere
+    # ne' scrivere i volumi qui sotto, che sull'host appartengono a lui.
+    user: "${ANF_UID}:${ANF_GID}"
+    env_file:
+      - ../../.env
+    ports:
+      # Solo sul loopback dell'host: la stessa proprieta' di sicurezza
+      # dell'unit systemd nativa ("ascolto solo su 127.0.0.1"), qui applicata
+      # dal mapping di porta invece che dal bind interno del processo (che
+      # nel container e' 0.0.0.0 per necessita': vedi docker-entrypoint.sh).
+      - "127.0.0.1:${ANF_PORT:-8100}:${ANF_PORT:-8100}"
+    volumes:
+      - ${ANF_DATA_DIR:-/var/lib/anf}:/var/lib/anf
+      - ${ANF_SOCKET_DIR:-/run/anf}:/run/anf
+      - type: bind
+        source: ${ANF_MOUNT_ROOT:-/srv/nas}
+        target: /srv/nas
+        bind:
+          # I mount NFS li crea e li smonta systemd sull'host anche dopo che
+          # il container e' partito (automount alla prima richiesta): senza
+          # rslave il container vedrebbe la cartella per sempre vuota.
+          propagation: rslave

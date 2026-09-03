@@ -210,3 +210,6 @@ Richieste del 2026-08-29 rimaste aperte alla chiusura della v0.3.0:
 
 - **Shell integrata e comandi personalizzati.** Esecuzione di codice remoto su un
   pannello esposto a Internet. Per amministrare il server c'è SSH.
+- **Containerizzare l'agent o il web server.** Solo `anf-api` gira in Docker
+  ([docs/DOCKER.md](docs/DOCKER.md)). Motivo in `memory.md`, sezione «Fuori
+  perimetro per scelta».

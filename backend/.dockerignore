@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+dev.sqlite3
+backend-dev.log
+backend-dev.err
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/

@@ -342,6 +342,11 @@ Removes services, web server configuration and program. It does **not** touch th
 database in `/var/lib/anf` or the mounts in `/srv/nas`: removing those is a deliberate
 manual step.
 
+## Running the API in Docker instead
+
+The `anf-api` service can run in a container instead of natively — the agent and the
+web server stay native either way. See [DOCKER.en.md](DOCKER.en.md).
+
 ---
 
 ## If something goes wrong

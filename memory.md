@@ -159,6 +159,13 @@ NAS: il pannello mostra sempre stato richiesto *e* stato effettivo.
 Shell integrata e comandi personalizzati di FileBrowser: esecuzione di codice remoto
 su un pannello esposto a Internet.
 
+**Containerizzare l'agent o il web server.** Solo `anf-api` gira in Docker
+(`docs/DOCKER.md`). L'agent resta un servizio nativo root perché genera unit
+systemd sull'host: dargli accesso al systemd dell'host da dentro un container
+(`--privileged` o socket D-Bus) non protegge nulla in più di un servizio
+nativo, aggiunge solo indirezione. Il web server resta nativo perché deve
+leggere i file dal filesystem dell'host per `X-Sendfile`/`X-Accel-Redirect`.
+
 ## Vincoli noti dell'ambiente di destinazione
 
 - Dietro un reverse proxy con TLS: il proxy va elencato in `ANF_TRUSTED_PROXIES`,

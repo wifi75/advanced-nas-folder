@@ -7,6 +7,13 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 
 ## [Non rilasciato]
 
+### Aggiunto
+
+- **Installazione Docker per `anf-api`.** L'agent privilegiato e il web
+  server restano servizi nativi sull'host, per lo stesso motivo di
+  separazione dei privilegi descritto in `docs/PIANO.md`. Vedere
+  [docs/DOCKER.md](docs/DOCKER.md).
+
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
