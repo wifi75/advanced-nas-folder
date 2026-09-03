@@ -12,7 +12,24 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.28.1
+- Versione corrente: 0.28.2
+
+## Stato alla v0.28.2 — 3 settembre 2026
+
+**Fase 3 della revisione grafica, completata.** Corretto il bug
+`data-theme`/`data-tema` in `AccessoCartella.vue` (la variante scura non
+scattava mai). Consolidata la sagomatura bianca delle badge colorate in
+`BarraLaterale.vue`, `GruppoCampi.vue`, `SelettoreLingua.vue` su
+`var(--vetro-luce)` (già ritinto di ciano in v0.28.0), invece di tre copie
+dello stesso valore hardcoded. Verificato — e lasciato com'è — che
+`Anteprima.vue` non ha bisogno di riallineamento: il suo sfondo scuro
+permanente è già vicino al nuovo `--sfondo`, ed è normale che un
+visualizzatore di foto a schermo intero resti neutro.
+
+**Resta solo la Fase 4** (pianificazione separata, non ancora iniziata):
+la vista pubblica di condivisione (`ArchivioView.vue`) — identità e
+layout da scegliere con l'utente, seguendo lo stesso processo (3-4
+proposte pertinenti) usato per il pannello.
 
 ## Stato alla v0.28.1 — 3 settembre 2026
 

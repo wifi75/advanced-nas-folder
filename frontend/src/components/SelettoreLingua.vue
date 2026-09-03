@@ -111,7 +111,7 @@ const GLOBO =
     color-mix(in srgb, var(--tinta) 78%, black 22%)
   );
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 45%),
+    inset 0 1px 0 var(--vetro-luce),
     0 2px 5px -1px color-mix(in srgb, var(--tinta) 55%, transparent);
 }
 

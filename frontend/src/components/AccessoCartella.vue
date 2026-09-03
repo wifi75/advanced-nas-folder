@@ -141,13 +141,17 @@ async function invia(): Promise<void> {
   padding: 2rem 1.25rem;
 }
 
+/* Il selettore giusto e' "data-tema" (italiano), non "data-theme": con
+   quello sbagliato la variante scura non scattava mai, ne' dalla preferenza
+   di sistema ne' dalla scelta esplicita — trovato verificando davvero nel
+   browser durante la revisione grafica del pannello. */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) .accesso {
+  :root:not([data-tema='chiaro']) .accesso {
     --tinta-accesso: #d9a066;
   }
 }
 
-:root[data-theme='dark'] .accesso {
+:root[data-tema='scuro'] .accesso {
   --tinta-accesso: #d9a066;
 }
 

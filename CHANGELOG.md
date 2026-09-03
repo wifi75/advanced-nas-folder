@@ -10,6 +10,32 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.28.2] - 2026-09-03
+
+Fase 3 della revisione grafica del pannello.
+
+### Corretto
+
+- **Bug preesistente in `AccessoCartella.vue`** (schermata di accesso con
+  password alle cartelle protette): usava il selettore `data-theme`
+  (inglese) invece di `data-tema` (italiano, quello vero usato dal resto
+  del progetto). La variante scura della sua tinta non scattava mai, né
+  dalla preferenza di sistema né dalla scelta esplicita.
+- **Sagomatura bianca consolidata**: `BarraLaterale.vue`, `GruppoCampi.vue`
+  e `SelettoreLingua.vue` avevano ciascuno una propria copia dello stesso
+  riflesso (`rgb(255 255 255 / 45%)`) sulle badge colorate, sempre bianco
+  a prescindere dal tema. Ora usano `var(--vetro-luce)`, lo stesso token
+  già ritinto di ciano per il tema scuro in v0.28.0: bagliore coerente col
+  resto dell'interfaccia, niente più valore duplicato in tre file.
+
+### Verificato, non modificato
+
+- `Anteprima.vue` ha un'interfaccia scura permanente (`#0b0f14`) per la
+  visualizzazione a schermo intero, indipendente dal tema dell'app. Il
+  piano originale prevedeva di riallinearla al nuovo accento — verificato
+  che non serve: è già vicinissima al nuovo `--sfondo` scuro, ed è la
+  norma per un visualizzatore di foto restare neutro invece di colorarsi.
+
 ## [0.28.1] - 2026-09-03
 
 Fase 2 della revisione grafica: verificando da vicino le viste che
