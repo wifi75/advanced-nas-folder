@@ -28,8 +28,13 @@ services:
     # scoprirlo con `id anf` sull'host. Senza, il container non puo' leggere
     # ne' scrivere i volumi qui sotto, che sull'host appartengono a lui.
     user: "${ANF_UID}:${ANF_GID}"
+    # Percorso assoluto, non relativo: questo file lo puo' lanciare anche
+    # Portainer da uno stack "da repository Git", che clona il progetto nella
+    # sua cartella interna, non in /var/www/advanced-nas-folder — un percorso
+    # relativo punterebbe a un .env che li' non esiste. Il file vero, coi
+    # segreti reali, resta dove l'installazione nativa lo mette sempre.
     env_file:
-      - ../../.env
+      - /var/www/advanced-nas-folder/.env
     ports:
       # Solo sul loopback dell'host: la stessa proprieta' di sicurezza
       # dell'unit systemd nativa ("ascolto solo su 127.0.0.1"), qui applicata

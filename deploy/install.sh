@@ -757,9 +757,17 @@ if [ "$DRY_RUN" = 0 ]; then
         rm -rf "${RADICE:?}/$cartella"
         cp -a "$TEMP/$cartella" "$RADICE/"
     done
-    for file in README.md CHANGELOG.md LICENSE .env.example; do
+    # update.sh e uninstall.sh mancavano qui: il pacchetto li porta gia' in
+    # radice (deploy/release.yml li copia apposta, per lo scaricamento
+    # standalone), ma questo ciclo non li includeva mai nella cartella
+    # d'installazione. La guida diceva "cd RADICE && sudo bash update.sh" da
+    # sempre, e non c'era mai stato — trovato aggiornando per la prima volta
+    # un'installazione reale invece di rieseguire solo install.sh.
+    for file in README.md README.en.md CHANGELOG.md LICENSE .env.example update.sh uninstall.sh; do
         [ -f "$TEMP/$file" ] && cp -a "$TEMP/$file" "$RADICE/"
     done
+    [ -f "$RADICE/update.sh" ] && chmod +x "$RADICE/update.sh"
+    [ -f "$RADICE/uninstall.sh" ] && chmod +x "$RADICE/uninstall.sh"
     chown -R "$UTENTE:$GRUPPO" "$RADICE"
 fi
 

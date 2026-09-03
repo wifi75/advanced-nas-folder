@@ -104,6 +104,49 @@ Database migrations still run on their own at every container start
 (`docker-entrypoint.sh`), on top of the ones `update.sh` already applied:
 idempotent, running them twice does no harm.
 
+## Updating from Portainer, with one click
+
+An alternative to the manual steps above: Portainer can manage a stack
+**straight from a Git repository** — it clones the project itself and
+rebuilds the image from the freshly pulled code when you press "Pull and
+redeploy". No more SSH needed just to update the container.
+
+That's why the compose file uses an **absolute** path for `env_file`
+(`/var/www/advanced-nas-folder/.env`, not `../../.env`): the repository
+Portainer clones isn't the native installation's folder, so a relative path
+wouldn't find the real `.env`. The build context (`../../backend`) stays
+relative on purpose: it needs to build from the code Portainer just cloned,
+not from the native installation's copy — otherwise "Pull and redeploy"
+would download new code without actually using it.
+
+**Prerequisite**: the native installation is still required (agent, web
+server, folders, and above all the real `.env` with the actual secrets —
+it never ends up in the repository, so Portainer can't bring it along on
+its own).
+
+Stack configuration, in Portainer:
+
+1. **Stacks → Add stack → Repository**.
+2. **Repository URL**: `https://github.com/wifi75/advanced-nas-folder.git`.
+3. **Reference**: `refs/heads/main` (or a specific tag, e.g.
+   `refs/tags/v0.28.5`, to avoid auto-updating on every push).
+4. **Compose path**: `deploy/docker/docker-compose.yml`.
+5. **Environment variables**, entered by hand in Portainer's form (the same
+   ones from `deploy/docker/.env.example` — Portainer doesn't read that file
+   from a Git repository): `ANF_UID`, `ANF_GID` (from `id anf` on the host),
+   `ANF_DATA_DIR`, `ANF_MOUNT_ROOT`, `ANF_SOCKET_DIR`, `ANF_PORT` — same
+   values used in the native installation.
+6. Deploy the stack.
+
+From then on, updating means opening the stack in Portainer and pressing
+**"Pull and redeploy"**: Portainer downloads the latest commit on the chosen
+reference and rebuilds the container from it. The source code on the native
+installation's disk (`/var/www/advanced-nas-folder/backend`, the one
+`anf-agent` uses) is still updated **only** by `update.sh` — the two copies
+of the code (the one Portainer clones, the native installation's) are
+independent, so it's worth keeping them in sync by running both when
+updating.
+
 ## Why the port stays on `127.0.0.1` only
 
 The process inside the container has to listen on `0.0.0.0`, because in its

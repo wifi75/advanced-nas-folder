@@ -10,6 +10,33 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.28.5] - 2026-09-03
+
+### Corretto
+
+- **`install.sh` non copiava mai `update.sh`, `uninstall.sh` e
+  `README.en.md`** dal pacchetto scaricato nella cartella
+  d'installazione, pur essendo entrambi presenti nel pacchetto stesso.
+  La guida diceva "cd RADICE && sudo bash update.sh" da sempre, e quel
+  file non c'era mai stato — trovato aggiornando per la prima volta
+  un'installazione reale con `update.sh` invece di rieseguire solo
+  `install.sh`. Aggiunti al ciclo di copia, con permesso di esecuzione.
+- **`deploy/docker/docker-compose.yml`, `env_file` era un percorso
+  relativo** (`../../.env`), valido solo se lo stack viene lanciato da
+  `deploy/docker/` sull'installazione nativa. Uno stack Portainer "da
+  repository Git" clona il progetto altrove, e quel percorso non
+  troverebbe il `.env` vero. Ora è assoluto
+  (`/var/www/advanced-nas-folder/.env`); il contesto di build resta
+  relativo di proposito, per costruire dal codice appena clonato.
+
+### Aggiunto
+
+- **Documentazione per aggiornare il container `anf-api` direttamente da
+  Portainer**, senza passare da SSH: come configurare lo stack come
+  "da repository Git" (URL, riferimento, percorso del compose file,
+  variabili d'ambiente), e cosa fa e cosa non fa "Pull and redeploy"
+  rispetto al codice usato dall'agent nativo (`docs/DOCKER.md`/`.en.md`).
+
 ## [0.28.4] - 2026-09-03
 
 ### Corretto

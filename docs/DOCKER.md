@@ -104,6 +104,49 @@ Le migrazioni del database girano comunque da sole a ogni avvio del
 container (`docker-entrypoint.sh`), oltre a quelle già applicate da
 `update.sh`: idempotenti, non fanno danno a ripetersi.
 
+## Aggiornare da Portainer, con un click
+
+In alternativa al giro manuale sopra: Portainer sa gestire uno stack
+**direttamente dal repository Git**, cloni il progetto da sé e ricostruisce
+l'immagine dal codice appena scaricato quando si preme "Pull and redeploy" —
+non serve più collegarsi via SSH per aggiornare il container.
+
+Per questo il file usa un percorso **assoluto** per `env_file`
+(`/var/www/advanced-nas-folder/.env`, non `../../.env`): il repository che
+clona Portainer non è la cartella dell'installazione nativa, quindi il
+percorso relativo non troverebbe il `.env` vero. Il contesto di build
+(`../../backend`) resta invece relativo di proposito: deve costruire dal
+codice che Portainer ha appena clonato, non da quello dell'installazione
+nativa — altrimenti "Pull and redeploy" scaricherebbe il codice nuovo senza
+usarlo davvero.
+
+**Prerequisito**: l'installazione nativa resta comunque necessaria (agent,
+web server, cartelle, e soprattutto il `.env` reale con i segreti — non
+finisce mai nel repository, quindi Portainer non può portarselo da solo).
+
+Configurazione dello stack, in Portainer:
+
+1. **Stacks → Add stack → Repository**.
+2. **Repository URL**: `https://github.com/wifi75/advanced-nas-folder.git`.
+3. **Reference**: `refs/heads/main` (o un tag preciso, es. `refs/tags/v0.28.5`,
+   per non aggiornarsi da soli a ogni push).
+4. **Compose path**: `deploy/docker/docker-compose.yml`.
+5. **Environment variables**, da inserire a mano nel modulo di Portainer
+   (sono le stesse di `deploy/docker/.env.example`, Portainer non legge quel
+   file da un repository Git): `ANF_UID`, `ANF_GID` (da `id anf` sull'host),
+   `ANF_DATA_DIR`, `ANF_MOUNT_ROOT`, `ANF_SOCKET_DIR`, `ANF_PORT` — stessi
+   valori usati nell'installazione nativa.
+6. Deploy the stack.
+
+Da quel momento, aggiornare significa aprire lo stack in Portainer e premere
+**"Pull and redeploy"**: Portainer scarica l'ultimo commit del riferimento
+scelto e ricostruisce il container da lì. Il codice sorgente sul disco
+dell'installazione nativa (`/var/www/advanced-nas-folder/backend`, quello
+usato da `agent`) resta comunque aggiornato **solo** da `update.sh` — le due
+copie del codice (quella clonata da Portainer, quella dell'installazione
+nativa) sono indipendenti, e vale la pena tenerle allineate lanciando
+entrambe quando si aggiorna.
+
 ## Perché la porta resta solo su `127.0.0.1`
 
 Il processo dentro il container ascolta per forza su `0.0.0.0`, perché nel suo

@@ -12,7 +12,39 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.28.4
+- Versione corrente: 0.28.5
+
+## Stato alla v0.28.5 — 3 settembre 2026
+
+`install.sh` non aveva mai copiato `update.sh`/`uninstall.sh`/
+`README.en.md` dal pacchetto scaricato — solo `backend agent frontend
+deploy docs` e quattro file specifici. La guida promette `update.sh` da
+sempre, e su nessuna installazione reale c'era mai stato: scoperto solo
+ora, aggiornando per la prima volta con `update.sh` invece di rieseguire
+`install.sh`. Sintomo di una lezione più larga: **anche i comandi
+documentati vanno provati per davvero**, non solo riletti nel codice —
+per settimane nessuno aveva notato perché nessuno aveva mai eseguito
+`update.sh` su un'installazione reale di questo progetto.
+
+Richiesta esplicita dell'utente: l'aggiornamento del container deve poter
+partire **direttamente da Portainer**, senza SSH. Questo richiede uno
+stack "da repository Git" — Portainer clona il progetto da sé, in una
+cartella che non è `/var/www/advanced-nas-folder` — il che rompeva
+`env_file: ../../.env` in `docker-compose.yml` (percorso relativo, pensato
+per essere lanciato dall'installazione nativa). Corretto in assoluto
+(`/var/www/advanced-nas-folder/.env`, dove sta il `.env` coi segreti
+reali), lasciando `build.context` relativo apposta: deve costruire dal
+codice che Portainer ha appena clonato, non da quello dell'installazione
+nativa. Documentata in `docs/DOCKER.md`/`.en.md` la configurazione esatta
+dello stack (URL repo, riferimento, percorso compose, variabili
+d'ambiente). Le due copie del codice — quella clonata da Portainer per
+`anf-api`, quella dell'installazione nativa usata da `anf-agent` — restano
+indipendenti: "Pull and redeploy" aggiorna solo la prima, `update.sh`
+resta comunque necessario per la seconda.
+
+Vale solo per `docker-vps` (192.168.1.224): unico server su cui si lavora
+ora, per esplicita indicazione dell'utente. `folder.iu3cyv.eu` è fuori
+scope, non toccato né pianificato in questo ciclo.
 
 ## Stato alla v0.28.4 — 3 settembre 2026
 
