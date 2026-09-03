@@ -191,6 +191,13 @@ Richieste del 2026-08-29 rimaste aperte alla chiusura della v0.3.0:
 - [x] **La PWA serviva la versione vecchia a una scheda gia' aperta**, e chi
       aggiornava il server concludeva che l'aggiornamento non avesse funzionato.
       Ora il pannello controlla e si ricarica da solo. v0.26.2.
+- [ ] **Mount NFS bloccato su `docker-vps` — decisione in sospeso.** La
+      macchina è un container LXC non privilegiato su Proxmox: il kernel nega
+      qualunque mount NFS, non è un bug del progetto (dettagli e prove in
+      `memory.md`, sezione "In sospeso — 3 settembre 2026"). Da decidere:
+      rendere il container privilegiato (backup + ripristino su Proxmox) o
+      ricrearlo come VM vera. Valutare anche se documentare il limite come
+      prerequisito d'ambiente in `docs/INSTALL.md`/`docs/DOCKER.md`.
 
 ## Limiti dichiarati, non difetti
 

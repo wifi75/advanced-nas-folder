@@ -14,6 +14,39 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 - Licenza MIT
 - Versione corrente: 0.28.10
 
+## In sospeso — 3 settembre 2026: mount NFS bloccato su `docker-vps`
+
+**Non è un bug del codice.** `docker-vps` (192.168.1.224) è un container
+LXC **non privilegiato** su Proxmox VE (nodo `pve`, container ID 106,
+nome Proxmox "docker-serevr"), non una VM. Verificato con tre prove
+indipendenti: `systemd-detect-virt` risponde `lxc`; un `mount -t nfs`
+diretto da root, senza passare da systemd/Docker/l'app, fallisce con
+"Operation not permitted"; nessun mount NFS risulta mai riuscito su questa
+macchina. anf-agent è nativo (non Docker) e gira già come root: non serve
+altro privilegio lato applicazione, il kernel nega comunque l'operazione
+a livello del container.
+
+In Proxmox (Container 106 → Options → Features), le voci **NFS e
+SMB/CIFS sono disabilitate con l'etichetta "privileged only"** — Proxmox
+non permette di abilitarle su un container non privilegiato, a differenza
+di `nesting`/`keyctl` (già attivi, servono a Docker-in-LXC e sono infatti
+già acceso). Non esiste un modo di sbloccarlo dalle opzioni del
+container: o si rende il container privilegiato (via backup + ripristino
+con "Unprivileged container" deselezionato — Proxmox non permette di
+convertire un container esistente sul posto), accettando un isolamento
+minore dall'host, oppure si ricrea `docker-vps` come VM vera (KVM),
+mantenendo l'isolamento pieno ma con più lavoro di setup.
+
+**Decisione rimandata a domani**, presentata all'utente ma non ancora
+presa (l'ha chiusa con "ci pensiamo domani"). Nessuna azione su Proxmox
+eseguita finora. Rilevante anche per il prodotto in generale: l'utente ha
+detto esplicitamente che il progetto va venduto e installato da chiunque
+— vale la pena, quando si riprende, valutare se documentare questo
+limite (container LXC non privilegiati non supportano NFS) in
+`docs/INSTALL.md`/`docs/DOCKER.md` come prerequisito dell'ambiente, così
+un futuro cliente con lo stesso setup lo sappia prima di installare, non
+dopo.
+
 ## Stato alla v0.28.10 — 3 settembre 2026
 
 Trovato un bug strutturale nel deploy Docker, non un accidente locale:
