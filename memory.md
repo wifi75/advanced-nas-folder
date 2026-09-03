@@ -12,7 +12,16 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.27.6
+- Versione corrente: 0.27.7
+
+## Stato alla v0.27.7 — 3 settembre 2026
+
+Secondo bug trovato sullo stesso file installando davvero (non solo
+rileggendo) su un server Debian pulito: la regex `{8,}` nella location degli
+asset compilati non era tra virgolette, e il primo bug (`log_format`)
+nascondeva questo finché non l'ho corretto. Lezione: dopo un fix a un file di
+configurazione, testarlo per intero (`nginx -t` sul file reale), non solo
+sulla parte appena cambiata — vedere «Trappole trovate sul campo».
 
 ## Stato alla v0.27.6 — 3 settembre 2026
 
@@ -70,6 +79,12 @@ prende un 404.
   Corretto in v0.27.6 spostandolo fuori dal blocco: funziona perché Debian
   (e le distribuzioni derivate) include i file di `sites-enabled/` dentro il
   proprio blocco `http` in `nginx.conf`.
+- **Una regex di location Nginx con `{` o `}` va tra virgolette**, altrimenti
+  il parser la legge come apertura di blocco. `nginx.conf.tpl` aveva
+  `{8,}` senza virgolette: mascherato dal bug precedente nella stessa
+  release, emerso solo dopo averlo corretto (v0.27.7). Dopo un fix a un file
+  di configurazione, va testato per intero, non solo sulla riga appena
+  cambiata.
 - **`deadsnakes` (Python 3.14 per `install.sh`) è specifico di Ubuntu**: su
   Debian non esiste affatto, e i repository apt di Debian stabile restano
   spesso una minor version indietro. Su Debian va compilato da sorgente con

@@ -10,6 +10,18 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.27.7] - 2026-09-03
+
+### Corretto
+
+- **`nginx.conf.tpl`, secondo bug nella stessa configurazione della v0.27.6.**
+  La regex della location per gli asset compilati (`{8,}`) non era tra
+  virgolette: Nginx legge la `{` non quotata come apertura di un blocco,
+  non come parte del pattern, e `nginx -t` falliva con «unknown directive».
+  Il primo bug (`log_format`) nascondeva questo, che compariva solo dopo
+  averlo corretto — trovato installando davvero su un secondo server pulito
+  invece di limitarsi a una verifica parziale.
+
 ## [0.27.6] - 2026-09-03
 
 ### Aggiunto

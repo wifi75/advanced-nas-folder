@@ -35,7 +35,10 @@ server {
     }
 
     # I file compilati hanno il contenuto nel nome: si possono tenere a lungo.
-    location ~* ^/pannello/.*\.[0-9a-zA-Z]{8,}\.(js|css|woff2?)$ {
+    # La regex va tra virgolette: la "{" di "{8,}" senza, nginx la legge come
+    # apertura di un blocco invece che come parte del pattern — secondo bug
+    # trovato installando su un server pulito, dopo quello di log_format.
+    location ~* "^/pannello/.*\.[0-9a-zA-Z]{8,}\.(js|css|woff2?)$" {
         alias @@RADICE@@/frontend/dist/;
         expires 1y;
         add_header Cache-Control "public, immutable";
