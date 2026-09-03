@@ -12,7 +12,42 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.28.9
+- Versione corrente: 0.28.10
+
+## Stato alla v0.28.10 — 3 settembre 2026
+
+Trovato un bug strutturale nel deploy Docker, non un accidente locale:
+dopo che `anf-agent` si riavvia (anche solo per un `update.sh`), il
+pannello nel container smette di raggiungere l'agent — "Agent non
+raggiungibile su /run/anf/agent.sock" — pur con l'agent attivo e il socket
+presente sull'host. Causa: `RuntimeDirectory=anf` nella unit fa cancellare
+e ricreare `/run/anf` **ad ogni riavvio del servizio**, non solo al boot.
+Il bind mount Docker verso quella cartella (`deploy/docker/docker-compose.yml`)
+resta agganciato all'inode vecchio, ormai orfano — il container continua a
+vedere una cartella vuota anche se sull'host `/run/anf` ha di nuovo il
+socket. Serve ricreare il container per farlo riagganciare. Corretto con
+`RuntimeDirectoryPreserve=yes` sulla unit: la cartella non viene più
+ricreata tra un riavvio e l'altro del servizio, solo al riavvio della
+macchina (quando comunque anche Docker riparte da zero e rimonta).
+
+Nel diagnosticarlo, trovato un secondo bug indipendente ma nello stesso
+punto: **`update.sh` non ha mai reinstallato le unit systemd** in
+`/etc/systemd/system/` — sincronizzava solo la copia sorgente in
+`deploy/systemd/`, e il commento nel codice descriveva già esattamente
+questo problema ("systemd continua a usare la definizione vecchia") senza
+che il codice sotto lo risolvesse davvero: faceva solo `daemon-reload`,
+che rilegge quello che c'è già su disco, invariato. Qualunque correzione
+a una unit rilasciata con un aggiornamento non aveva mai effetto finché
+non si rieseguiva `install.sh` da capo — anche questa, come le altre
+trappole di questa sessione, invisibile finché non si prova
+l'aggiornamento per davvero.
+
+**Lezione per [[wifi75-deploy-linux]]**: `RuntimeDirectory=` in una unit
+systemd è sicuro per un servizio nativo isolato, ma **rischioso quando
+un'altra cosa (un bind mount Docker, un altro processo) dipende dalla
+persistenza di quella cartella tra un riavvio e l'altro del servizio** —
+va quasi sempre accompagnato da `RuntimeDirectoryPreserve=yes` in quel
+caso, altrimenti ogni riavvio rompe silenziosamente chi la usa dall'esterno.
 
 ## Stato alla v0.28.9 — 3 settembre 2026
 

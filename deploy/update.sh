@@ -16,6 +16,15 @@ APP="advanced-nas-folder"
 RADICE="/var/www/${APP}"
 REPO="wifi75/advanced-nas-folder"
 
+# Stessi valori fissi di install.sh (non sono scelte dell'utente: li' non
+# esiste un'opzione da riga di comando per cambiarli), servono per rigenerare
+# le unit systemd piu' sotto con la stessa sostituzione che fa l'installer.
+UTENTE="anf"
+GRUPPO="anf"
+DATI="/var/lib/anf"
+MOUNT_ROOT="/srv/nas"
+SOCKET_DIR="/run/anf"
+
 # Se anf-api gira in Docker (docs/DOCKER.md), il servizio systemd nativo e'
 # disabilitato di proposito: fermarlo/riavviarlo qui non farebbe nulla di
 # utile, e "start" andrebbe in conflitto sulla porta con il container gia' in
@@ -257,9 +266,24 @@ if [ "$DRY_RUN" = 0 ]; then
     (cd "$RADICE/backend" && "$RADICE/venv/bin/alembic" upgrade head)
 fi
 
-# Senza, systemd continua a usare la definizione caricata all'avvio e avvisa
-# che il file su disco e cambiato: i servizi ripartono con la versione vecchia
-# dell'unit, e la correzione appena installata non ha effetto.
+# Il "daemon-reload" da solo non basta: rilegge quello che c'e' gia' in
+# /etc/systemd/system, che il rsync sopra non tocca (aggiorna solo la copia
+# dentro RADICE/deploy/systemd, quella che install.sh usa come sorgente).
+# Senza rigenerarle qui, una correzione alle unit rilasciata con
+# un aggiornamento non ha mai effetto finche' non si rilancia install.sh da
+# capo — lo stesso identico problema che il commento originale di questo
+# passo descriveva senza pero' risolverlo.
+if [ "$DRY_RUN" = 0 ]; then
+    passo "$(msg 'Aggiorno le unit systemd' 'Updating systemd units')"
+    for s in "${SERVIZI[@]}"; do
+        sed -e "s|@@RADICE@@|$RADICE|g" -e "s|@@DATI@@|$DATI|g" \
+            -e "s|@@MOUNT_ROOT@@|$MOUNT_ROOT|g" -e "s|@@SOCKET@@|$SOCKET_DIR/agent.sock|g" \
+            -e "s|@@UTENTE@@|$UTENTE|g" -e "s|@@GRUPPO@@|$GRUPPO|g" \
+            "$RADICE/deploy/systemd/${s}.service" >"/etc/systemd/system/${s}.service"
+        chmod 0644 "/etc/systemd/system/${s}.service"
+    done
+fi
+
 passo "$(msg 'Ricarico le unit systemd' 'Reloading systemd units')"
 esegui systemctl daemon-reload
 

@@ -21,6 +21,15 @@ User=root
 Group=@@GRUPPO@@
 RuntimeDirectory=anf
 RuntimeDirectoryMode=0750
+# Senza, ad ogni riavvio del servizio (anche solo per un aggiornamento)
+# systemd cancella e ricrea /run/anf da zero. Se anf-api gira in un
+# container Docker con quella cartella montata come bind mount (deploy/docker/
+# docker-compose.yml), il container resta agganciato alla cartella VECCHIA —
+# ormai orfana — e non vede piu' il socket ricreato in quella nuova, finche'
+# anche il container non viene ricreato. "yes" la lascia al suo posto tra un
+# riavvio e l'altro: sparisce solo al riavvio della macchina, quando comunque
+# anche il container Docker riparte da zero e la rimonta di nuovo.
+RuntimeDirectoryPreserve=yes
 
 # L'agent non e installato nel venv di proposito: non ha dipendenze, e
 # aggiungerlo la lo legherebbe al ciclo di vita del backend. Basta dire a

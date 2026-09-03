@@ -10,6 +10,29 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.28.10] - 2026-09-03
+
+### Corretto
+
+- **"Agent non raggiungibile su /run/anf/agent.sock" nel container Docker**,
+  anche con `anf-agent` attivo e in ascolto su quel socket. Causa: la unit
+  `anf-agent.service` usa `RuntimeDirectory=anf`, che per default cancella e
+  ricrea `/run/anf` **ad ogni riavvio del servizio** — anche solo per un
+  aggiornamento. Il bind mount del container verso quella cartella resta
+  agganciato alla versione vecchia (ormai orfana) e smette di vedere il
+  socket, finché il container non viene ricreato da capo. Aggiunto
+  `RuntimeDirectoryPreserve=yes`: la cartella resta la stessa tra un riavvio
+  e l'altro, sparisce solo al riavvio della macchina (quando anche il
+  container Docker riparte comunque da zero).
+- **`update.sh` non reinstallava mai le unit systemd**: sincronizzava la
+  copia sorgente in `deploy/systemd/` ma non la copiava in
+  `/etc/systemd/system/` (lo fa solo `install.sh`). Un `systemctl
+  daemon-reload` da solo rilegge quello che c'è già su disco, invariato:
+  qualunque correzione alle unit rilasciata con un aggiornamento restava
+  senza effetto finché non si rieseguiva `install.sh` da capo. Ora
+  `update.sh` rigenera le unit dai template ad ogni esecuzione, con la
+  stessa sostituzione di `install.sh`.
+
 ## [0.28.9] - 2026-09-03
 
 ### Corretto
