@@ -10,6 +10,19 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.28.13] - 2026-09-03
+
+### Corretto
+
+- **L'ombra della v0.28.12 non bastava**: le card della vista File
+  restavano poco distinguibili in tema chiaro perché il vero problema era
+  a monte, nei token — `--vetro-sfondo-pub`/`--vetro-bordo-pub` in chiaro
+  erano un bianco traslucido su una pagina già quasi bianca, pensati per
+  un fondo scuro dove quel contrasto esiste davvero. In chiaro diventano
+  ora sfondo e bordo **solidi** (`--superficie`/`--bordo`), non più
+  traslucidi — la versione scura, dove il vetro ha senso, resta
+  invariata.
+
 ## [0.28.12] - 2026-09-03
 
 ### Corretto

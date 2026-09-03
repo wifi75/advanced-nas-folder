@@ -12,7 +12,27 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.28.12
+- Versione corrente: 0.28.13
+
+## Stato alla v0.28.13 — 3 settembre 2026
+
+Il fix v0.28.12 (aggiungere l'ombra esterna) non è bastato: l'utente ha
+visto dal vivo che restava "sempre uguale". Causa vera, più a monte:
+`--vetro-sfondo-pub`/`--vetro-bordo-pub` in chiaro erano semplicemente
+alias dei `--vetro-*` globali — bianco traslucido su bordo bianco
+traslucido — pensati per un fondo **scuro**, dove il bianco fa davvero
+contrasto. Su una pagina chiara già vicina al bianco (`--sfondo:
+#f5f7f9`), qualunque quantità di ombra non basta a salvare un vetro che
+in partenza è quasi dello stesso colore dello sfondo. Corretto rendendo
+sfondo e bordo **solidi** in chiaro (`var(--superficie)`/`var(--bordo)`,
+gli stessi token delle card "vere" del progetto, non più traslucidi) —
+il vetro resta solo dove il contrasto lo giustifica, cioè in scuro.
+
+**Lezione**: un sistema di "vetro" pensato e validato su sfondo scuro non
+si porta gratis su sfondo chiaro semplicemente riducendo l'opacità del
+bianco — a un certo punto va deciso se in chiaro conviene proprio un
+linguaggio diverso (solido, non traslucido) invece di inseguire la
+stessa estetica con aggiustamenti via via più piccoli.
 
 ## Stato alla v0.28.12 — 3 settembre 2026
 

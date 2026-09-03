@@ -1063,10 +1063,15 @@ chiudiConEsc(
      caso di implementazione, non per scelta — questa pagina ha un'identita'
      apposta, piu' calma, separata da quella di chi amministra. In chiaro
      restano vicini ai --vetro-* di base, gia' neutri li'. */
-  --vetro-sfondo-pub: var(--vetro-sfondo);
-  --vetro-bordo-pub: var(--vetro-bordo);
-  --vetro-luce-pub: var(--vetro-luce);
-  --vetro-attivo-pub: var(--vetro-attivo);
+  /* In chiaro un vetro bianco su una pagina già quasi bianca (--sfondo)
+     non si distingue, ombra o non ombra: qui bordo e sfondo diventano
+     solidi e visibili invece di restare traslucidi come gli originali
+     --vetro-*, pensati per un fondo scuro. Resta "vetro" solo in scuro,
+     dove il contrasto con lo sfondo c'è davvero (blocchi sotto). */
+  --vetro-sfondo-pub: var(--superficie);
+  --vetro-bordo-pub: var(--bordo);
+  --vetro-luce-pub: rgb(255 255 255 / 60%);
+  --vetro-attivo-pub: var(--superficie-alt);
 }
 
 @media (prefers-color-scheme: dark) {
