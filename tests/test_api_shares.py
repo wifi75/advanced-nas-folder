@@ -351,3 +351,20 @@ async def test_si_puo_svuotare_per_mostrare_tutto(admin: AsyncClient, share_id: 
     await admin.patch(f"/api/v1/shares/{share_id}", json={"hidden_patterns": ""})
 
     assert (await admin.get(f"/api/v1/shares/{share_id}")).json()["hidden_patterns"] == ""
+
+
+# --- stato degli indirizzi corti --------------------------------------------
+
+
+async def test_stato_scorciatoie_richiede_autenticazione(client: AsyncClient) -> None:
+    assert (await client.get("/api/v1/shares/scorciatoie/stato")).status_code == 401
+
+
+async def test_stato_scorciatoie_coerente_con_il_web_server(admin: AsyncClient) -> None:
+    """`attive` deve rispecchiare `webserver`, non essere una seconda fonte di
+    verita che puo' andare fuori sincrono da quella vera."""
+    risposta = await admin.get("/api/v1/shares/scorciatoie/stato")
+
+    assert risposta.status_code == 200
+    corpo = risposta.json()
+    assert corpo["attive"] == (corpo["webserver"] == "apache")

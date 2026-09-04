@@ -163,8 +163,10 @@ Richieste del 2026-08-29 rimaste aperte alla chiusura della v0.3.0:
 
 - [ ] **Indirizzi corti su Nginx.** Richiedono di rigenerare il vhost, perché le
       `location` devono stare dentro il blocco `server`: non basta un file a sé
-      come su Apache. Oggi il pannello lo dichiara invece di scrivere
-      configurazione che non funziona.
+      come su Apache. Da v0.28.14 il pannello non mostra più il blocco quando
+      non è attivo (verificato lato backend, `GET /shares/scorciatoie/stato`)
+      invece di promettere un indirizzo che risponde 404 — resta da fare
+      l'implementazione vera per Nginx, non solo nasconderne l'assenza.
 - [ ] **Indirizzo corto anche nella barra del browser.** Oggi è una redirezione:
       l'indirizzo corto funziona ovunque lo si scriva, ma il browser prosegue su
       quello lungo. Tenerlo corto richiede che il router del pannello riconosca

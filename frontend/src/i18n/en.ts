@@ -183,7 +183,7 @@ export default {
     vuoto: 'No folder published yet. A publication starts from an NFS share already mounted.',
     servonoMount: 'You need at least one mounted NFS share first: a publication starts from there.',
     daCondividere: 'Address to share',
-    cortoNota: 'Short address, easy to dictate or type by hand. Apache only.',
+    cortoNota: 'Short address, easy to dictate or type by hand.',
     completoNota: 'Full address: this is where the short one leads.',
     copia: 'Copy',
     copiato: 'Copied',

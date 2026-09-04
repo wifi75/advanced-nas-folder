@@ -91,6 +91,12 @@ export interface NuovoLink {
   max_download?: number | null
 }
 
+export interface StatoScorciatoie {
+  webserver: 'apache' | 'nginx' | null
+  /** Vero solo su Apache: su Nginx l'indirizzo breve non e' ancora disponibile. */
+  attive: boolean
+}
+
 export const sharesApi = {
   elenca: () => api.get<Share[]>('/shares'),
 
@@ -122,4 +128,6 @@ export const sharesApi = {
   creaLink: (id: number, dati: NuovoLink) => api.post<LinkCreato>(`/shares/${id}/link`, dati),
   revocaLink: (id: number, linkId: number) =>
     api.delete<LinkCondivisione>(`/shares/${id}/link/${linkId}`),
+
+  scorciatoieStato: () => api.get<StatoScorciatoie>('/shares/scorciatoie/stato'),
 }

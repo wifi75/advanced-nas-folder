@@ -10,6 +10,19 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.28.14] - 2026-09-04
+
+### Corretto
+
+- **L'indirizzo breve di una pubblicazione compariva anche su Nginx, dove
+  non funziona**: gli indirizzi corti (`/nome`) sono una limitazione nota
+  di Apache soltanto (vedere `agent/anf_agent/webserver.py`), ma il
+  pannello lo mostrava comunque, promettendo un link che rispondeva 404.
+  Il backend espone ora un endpoint di sola lettura (`GET
+  /shares/scorciatoie/stato`) con il web server realmente in uso, e il
+  pannello mostra il blocco solo quando è davvero attivo — l'indirizzo
+  completo, che funziona sempre, resta immutato.
+
 ## [0.28.13] - 2026-09-03
 
 ### Corretto

@@ -22,6 +22,8 @@ export const useSharesStore = defineStore('shares', () => {
   const aperta = ref<ShareDettaglio | null>(null)
   const caricamento = ref(false)
   const errore = ref('')
+  /** Se l'indirizzo breve funziona su questo server. `null` finche' non e' nota. */
+  const scorciatoieAttive = ref<boolean | null>(null)
 
   async function carica(): Promise<void> {
     caricamento.value = true
@@ -146,11 +148,27 @@ export const useSharesStore = defineStore('shares', () => {
     }
   }
 
+  /**
+   * Chiede una sola volta se l'indirizzo breve funziona su questo server.
+   *
+   * Se non si riesce a saperlo, meglio non mostrarlo: promettere un indirizzo
+   * che poi da' 404 e' peggio che non promettere nulla.
+   */
+  async function caricaStatoScorciatoie(): Promise<void> {
+    if (scorciatoieAttive.value !== null) return
+    try {
+      scorciatoieAttive.value = (await sharesApi.scorciatoieStato()).attive
+    } catch {
+      scorciatoieAttive.value = false
+    }
+  }
+
   return {
     elenco,
     aperta,
     caricamento,
     errore,
+    scorciatoieAttive,
     carica,
     apri,
     chiudi,
@@ -161,5 +179,6 @@ export const useSharesStore = defineStore('shares', () => {
     togliRegola,
     assegnaPermesso,
     togliPermesso,
+    caricaStatoScorciatoie,
   }
 })

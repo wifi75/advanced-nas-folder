@@ -186,7 +186,7 @@ export default {
     servonoMount:
       'Prima serve almeno una condivisione NFS montata: una pubblicazione parte da lì.',
     daCondividere: 'Indirizzo da condividere',
-    cortoNota: 'Indirizzo breve, da dettare o scrivere a mano. Funziona solo con Apache.',
+    cortoNota: 'Indirizzo breve, da dettare o scrivere a mano.',
     completoNota: 'Indirizzo completo: è qui che quello breve fa arrivare.',
     copia: 'Copia',
     copiato: 'Copiato',

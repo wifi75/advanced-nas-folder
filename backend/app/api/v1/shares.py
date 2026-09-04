@@ -211,6 +211,17 @@ async def riapplica_scorciatoie(sessione: Sessione, _: Amministratore) -> dict[s
     return await scorciatoie.riallinea(sessione)
 
 
+@router.get("/scorciatoie/stato")
+async def stato_scorciatoie(_: Amministratore) -> dict[str, object]:
+    """Se gli indirizzi corti funzionano su questo server.
+
+    Il pannello lo usa per non promettere un indirizzo breve su Nginx, dove
+    non e' ancora disponibile (vedi `agent/anf_agent/webserver.py`).
+    """
+    ws = scorciatoie.webserver_in_uso()
+    return {"webserver": ws, "attive": ws == "apache"}
+
+
 # --- regole di visibilità --------------------------------------------------
 
 

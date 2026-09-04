@@ -12,7 +12,36 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.28.13
+- Versione corrente: 0.28.14
+
+## Stato alla v0.28.14 — 4 settembre 2026
+
+L'utente ha notato dal vivo, su `Server-Docker` (Nginx), che l'indirizzo
+breve di una pubblicazione (`https://sito/nome`) veniva mostrato e
+copiabile ma non portava da nessuna parte. Causa: gli indirizzi corti sono
+una limitazione nota di Apache soltanto — su Nginx richiederebbero di
+rigenerare l'intero vhost, lavoro non ancora fatto (vedi
+`agent/anf_agent/webserver.py`, funzione `scorciatoie`). Il pannello
+però non lo sapeva: mostrava sempre il blocco, indipendentemente dal web
+server realmente in uso.
+
+Corretto esponendo `webserver_in_uso()` (gia' esistente lato backend, unica
+fonte di verita' derivata da `download_backend`) tramite un nuovo endpoint
+di sola lettura `GET /shares/scorciatoie/stato`, e nascondendo il blocco nel
+pannello quando non è attivo. Non rimosso del tutto: su Apache l'indirizzo
+breve funziona davvero e resta visibile.
+
+**Infrastruttura (non versionata in questo repo)**: sul server `Server-Docker`
+(ex `docker-2`, 192.168.1.233, VM KVM su Proxmox) rimosso il display "Serial
+terminal 0" a favore di **VirtIO-GPU** (font console `Terminus 12x24`,
+initramfs rigenerato per applicarlo da subito al boot); aggiunta la stessa
+MOTD (IP, container Docker, link Portainer) anche **prima** del login,
+via `/etc/issue` + `/etc/issue.net` rigenerati da un timer systemd
+(`banner-prelogin.service`/`.timer`) e `Banner /etc/issue.net` in
+`sshd_config.d/99-banner.conf`. Resta aperto: il testo sulla console
+compare più in basso dello schermo invece di risalire in cima — causa
+probabile un salto di risoluzione a metà boot, non ancora indagato a
+fondo su richiesta dell'utente ("lascia così").
 
 ## Stato alla v0.28.13 — 3 settembre 2026
 

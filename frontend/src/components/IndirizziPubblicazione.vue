@@ -10,12 +10,17 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { useSharesStore } from '@/stores/shares'
+
 const props = defineProps<{
   slug: string
   /** Senza riquadro proprio: sta gia' dentro la testata della pagina. */
   nudo?: boolean
 }>()
 const { t } = useI18n()
+
+const shares = useSharesStore()
+void shares.caricaStatoScorciatoie()
 
 /** Indirizzo corto, sulla radice del sito: `https://sito/documenti`. */
 function corto(): string {
@@ -52,22 +57,24 @@ async function copia(quale: string, testo: string): Promise<void> {
       {{ t('share.daCondividere') }}
     </p>
 
-    <div class="riga">
-      <a
-        class="valore"
-        :href="corto()"
-      >{{ corto() }}</a>
-      <button
-        type="button"
-        class="copia"
-        @click="copia('corto', corto())"
-      >
-        {{ copiato === 'corto' ? t('share.copiato') : t('share.copia') }}
-      </button>
-    </div>
-    <p class="nota">
-      {{ t('share.cortoNota') }}
-    </p>
+    <template v-if="shares.scorciatoieAttive">
+      <div class="riga">
+        <a
+          class="valore"
+          :href="corto()"
+        >{{ corto() }}</a>
+        <button
+          type="button"
+          class="copia"
+          @click="copia('corto', corto())"
+        >
+          {{ copiato === 'corto' ? t('share.copiato') : t('share.copia') }}
+        </button>
+      </div>
+      <p class="nota">
+        {{ t('share.cortoNota') }}
+      </p>
+    </template>
 
     <div class="riga">
       <a
