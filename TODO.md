@@ -196,6 +196,19 @@ Richieste del 2026-08-29 rimaste aperte alla chiusura della v0.3.0:
 - [x] **Mount NFS bloccato su `docker-vps` (container LXC non
       privilegiato)**: risolto creando `docker-2`, una VM KVM vera, invece
       di convertire `docker-vps`. Dettagli in `memory.md`.
+- [ ] **`uninstall.sh` non ripulisce l'`Include` manuale in un vhost
+      esistente.** Chi installa "dentro" un sito già gestito da chi
+      amministra (non un vhost dedicato — vedi `WebServerView.vue`,
+      sezione "non gestiamo") incolla a mano un blocco `CustomLog` +
+      `Include .../anf.conf` nel proprio `VirtualHost`. `uninstall.sh`
+      cancella solo `anf.conf`/`anf-*.conf`: quel blocco resta, e Apache
+      smette di partire con un errore che non nomina Advanced NAS Folder —
+      a rischio anche gli **altri siti sullo stesso Apache**, non solo
+      questo. Scoperto disinstallando su `docker-vps` (tre vhost non
+      correlati sullo stesso host). O `uninstall.sh --tutto` stampa un
+      avviso da cercare a mano in quel caso, o la documentazione
+      dell'installazione manuale va cambiata per non richiedere di toccare
+      un `VirtualHost` che non è suo.
 - [ ] **Documentare il limite LXC come prerequisito d'ambiente** in
       `docs/INSTALL.md`/`docs/DOCKER.md` — container non privilegiati non
       supportano mount NFS, utile saperlo prima di installare, non dopo
