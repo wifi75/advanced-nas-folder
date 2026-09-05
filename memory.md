@@ -12,7 +12,42 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.28.15
+- Versione corrente: 0.28.17
+
+## Stato alla v0.28.17 — 5 settembre 2026
+
+Le 5 disposizioni introdotte in v0.28.15 (vedi voce sotto) sono state
+**tolte del tutto**, dopo che provarle su dati reali (non possibile prima
+del rilascio, su questa macchina Windows senza agent NFS) ha mostrato che
+non funzionavano: prima un doppio riquadro di vetro quasi invisibile in
+tema chiaro (corretto in v0.28.16), poi — vista corretta anche quella —
+un giudizio complessivo negativo dell'utente sull'idea stessa di più
+disposizioni tra cui scegliere ("troppe cagate", confuso, non
+professionale). Rimossi store, selettore e i 5 componenti; la vista
+tornata a **una sola schermata fissa**, questa volta rivista con
+screenshot reali (mockup HTML statico, non il pannello vero) mostrati
+all'utente **prima** di toccare il codice, un pezzo alla volta
+(disposizione dei controlli → percorso a icone → conteggio → posizione
+dello switcher vista) finché non ha detto esplicitamente "procedi".
+
+Risultato: percorso a pillole con icona (casa per "Inizio", cartella per
+ogni livello, quella attuale piena del colore d'accento) invece di testo
+semplice; conteggio elementi accanto al percorso invece di un titolo H1
+ripetuto (il nome della cartella c'è già nell'ultima pillola); un'unica
+barra strumenti (ricerca, switcher vista, azioni) — **niente vetro
+annidato dentro un altro vetro**, la stessa causa del problema v0.28.16;
+caricamento e nuova cartella dietro un pulsante che li apre, non più
+sempre visibili a occupare spazio; vista predefinita **Griglia** (icone
+grandi) invece di Elenco.
+
+**Lezione per le prossime revisioni grafiche di questa pagina**: i mockup
+statici (screenshot, canvas di design) fanno approvare un'idea, ma il
+**giudizio vero arriva solo guardando la pagina reale con dati reali** —
+qui due volte di seguito (v0.28.15 e poi di nuovo dopo il fix v0.28.16).
+Quando è possibile mostrare un mockup HTML statico interattivo con
+screenshot *prima* di scrivere il codice reale, e iterare lì (come fatto
+per arrivare alla v0.28.17), si risparmiano cicli interi di
+rilascio-e-scopri-che-non-va.
 
 ## Stato alla v0.28.15 — 5 settembre 2026
 

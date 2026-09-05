@@ -10,6 +10,17 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.28.17] - 2026-09-05
+
+### Modificato
+
+- **Tolte le 5 disposizioni** introdotte in v0.28.15/v0.28.16: provate su
+  dati reali, sono risultate confuse invece che utili. Sostituite con
+  un'unica schermata fissa per la vista File — percorso a pillole con
+  icone, un'unica barra strumenti senza riquadri annidati, caricamento e
+  nuova cartella che compaiono solo quando servono, vista "Griglia"
+  (icone grandi) come predefinita.
+
 ## [0.28.16] - 2026-09-05
 
 ### Corretto
