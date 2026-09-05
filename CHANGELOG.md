@@ -10,6 +10,19 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.28.18] - 2026-09-05
+
+### Corretto
+
+- **`ANF_PANEL_DIR` aveva un default sbagliato** (`/var/www/anf/pannello`,
+  inesistente su qualunque installazione reale): chi usava "Web server →
+  Pubblica su un nome host" otteneva un vhost Nginx/Apache che punta a una
+  cartella vuota. Il vhost sbagliato, per ordine alfabetico dei file, era
+  anche finito come vhost predefinito di Nginx al posto di quello giusto,
+  rompendo pure l'accesso diretto per IP. Default corretto a
+  `/var/www/<progetto>/frontend/dist`; `install.sh` ora lo scrive
+  esplicitamente in `.env` invece di affidarsi solo al default.
+
 ## [0.28.17] - 2026-09-05
 
 ### Modificato

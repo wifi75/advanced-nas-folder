@@ -12,7 +12,36 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.28.17
+- Versione corrente: 0.28.18
+
+## Stato alla v0.28.18 — 5 settembre 2026
+
+**Bug reale trovato usando per la prima volta "Web server → Pubblica su un
+nome host" su `server-docker`** (192.168.1.233) per `file.iu3cyv.eu`:
+`ANF_PANEL_DIR` aveva sempre avuto un default sbagliato
+(`/var/www/anf/pannello`, mai esistito su nessuna installazione reale —
+il percorso vero è `/var/www/advanced-nas-folder/frontend/dist`).
+`install.sh` non l'ha mai scritto esplicitamente in `.env`, quindi ogni
+installazione ha sempre usato quel default rotto senza che nessuno se ne
+accorgesse, perché il vhost **principale** (`anf.conf`, generato da
+`install.sh` da un template proprio) non passa da questa impostazione —
+solo i vhost aggiuntivi creati dalla pagina Web server la usano.
+
+**Conseguenza inattesa, non solo un vhost rotto**: Nginx, tra `anf.conf`
+e il nuovo `anf-file.iu3cyv.eu`, ha scelto per ordine alfabetico
+quest'ultimo come vhost predefinito della porta 80 (nessuno dei due aveva
+`default_server` esplicito) — rompendo anche l'accesso diretto per IP,
+che prima funzionava. Corretto **sul server** aggiungendo `default_server`
+a `anf.conf` (fix immediato, non nel repository: è già così su ogni
+installazione via il template, il problema era solo su questo vhost
+extra). Corretto **nel codice**: default di `panel_dir` in
+`backend/app/core/config.py`, `.env.example`, e `install.sh` che ora
+scrive `ANF_PANEL_DIR` esplicitamente.
+
+**Da fare sul server** (non ancora fatto, richiede prima che l'utente
+aggiorni il container `anf-api` da Portainer): eliminare e ricreare il
+vhost `file.iu3cyv.eu` dalla pagina Web server, così si rigeneri con il
+percorso corretto.
 
 ## Stato alla v0.28.17 — 5 settembre 2026
 
