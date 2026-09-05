@@ -193,6 +193,11 @@ export default {
     condivisione: 'Condivisione',
     sottopercorso: 'Sottocartella',
     sottopercorsoAiuto: 'Vuoto per pubblicare la radice della condivisione',
+    modalitaScrivi: 'Scrivi percorso',
+    modalitaSfoglia: 'Sfoglia e seleziona',
+    pubblicaSelezionate: 'Pubblica 1 cartella selezionata | Pubblica {n} cartelle selezionate',
+    pubblicazioneBloccoErrore:
+      'Una pubblicazione non è riuscita: è rimasta selezionata, correggi il nome e riprova. | {n} pubblicazioni non sono riuscite: sono rimaste selezionate, correggi i nomi e riprova.',
     nome: 'Nome',
     descrizione: 'Descrizione',
     visibilitaPredefinita: 'Chi può accedere',
@@ -231,6 +236,7 @@ export default {
       'Ogni regola vale per una cartella e per tutto ciò che contiene. Vince sempre la regola più specifica, così una sottocartella può essere più chiusa di quella che la contiene.',
     percorso: 'Cartella',
     radice: 'tutta la pubblicazione',
+    visibilitaScelta: 'Chi può accedere',
     aggiungi: 'Aggiungi regola',
     password: 'Password',
     protetta: 'protetta da password',
@@ -242,6 +248,14 @@ export default {
     scendi: 'Entra in una sottocartella…',
     nessuna: 'Nessuna sottocartella qui',
     nonLeggibile: 'Cartella non leggibile',
+  },
+
+  sfogliaMount: {
+    titolo: 'Sfoglia e metti la spunta sulle cartelle da pubblicare',
+    apri: 'apri',
+    selezionate: '1 cartella selezionata: | {n} cartelle selezionate:',
+    aiuto:
+      'Puoi entrare in una cartella e continuare a selezionarne altre: restano tutte in elenco anche a livelli diversi.',
   },
 
   permessi: {
@@ -257,8 +271,9 @@ export default {
     assegna: 'Assegna',
     nessuno: 'Nessun permesso assegnato.',
     tutte: 'tutte le cartelle',
-    notaMultipla: 'Tieni premuto Ctrl (o Cmd) per selezionarne più di uno.',
-    nessunUtente: 'Nessun utente da scegliere: creane uno dalla voce Utenti.',
+    nessunUtente: 'Nessun utente ancora: creane uno da qui, o dalla voce Utenti.',
+    nuovoUtente: '+ Nuovo utente…',
+    creaESeleziona: 'Crea e seleziona',
   },
 
   prova: {
@@ -352,6 +367,7 @@ export default {
     can_modify: 'Modificare',
     can_delete: 'Eliminare',
     can_share: 'Creare link',
+    accessi: 'Accessi per cartella',
     confermaTitolo: 'Eliminare «{nome}»?',
     confermaTesto:
       'L’utente e i permessi che gli sono stati assegnati vengono eliminati. I file non vengono toccati.',

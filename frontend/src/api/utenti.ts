@@ -2,6 +2,20 @@
 
 import { api } from '@/api/client'
 
+/**
+ * Un permesso per cartella già assegnato altrove, di sola lettura qui.
+ *
+ * Si assegna e si toglie sempre dalla pubblicazione (`DettaglioShare.vue`):
+ * qui serve solo a rispondere "questo utente dove può andare".
+ */
+export interface Accesso {
+  share_id: number
+  share_label: string
+  share_slug: string
+  path_prefix: string
+  livello: 'lettura' | 'scrittura' | 'negato'
+}
+
 export interface Utente {
   id: number
   username: string
@@ -20,6 +34,7 @@ export interface Utente {
   can_share: boolean
   can_download: boolean
   can_upload: boolean
+  accessi: Accesso[]
 }
 
 export interface NuovoUtente {

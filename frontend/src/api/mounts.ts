@@ -60,6 +60,11 @@ export interface Scoperta {
   versioni: string[]
 }
 
+export interface CartellaMount {
+  nome: string
+  percorso: string
+}
+
 export interface MontaggioPreesistente {
   riga: number
   server: string
@@ -79,6 +84,11 @@ export const mountsApi = {
   crea: (dati: NuovoMount) => api.post<MountDettaglio>('/mounts', dati),
   modifica: (id: number, dati: Partial<NuovoMount>) =>
     api.patch<MountDettaglio>(`/mounts/${id}`, dati),
+  /** Sottocartelle di un mount, per scegliere cosa pubblicare sfogliando. */
+  cartelle: (id: number, percorso = '') => {
+    const q = new URLSearchParams({ percorso })
+    return api.get<CartellaMount[]>(`/mounts/${id}/cartelle?${q}`)
+  },
   avvia: (id: number) => api.post<MountDettaglio>(`/mounts/${id}/avvia`),
   ferma: (id: number) => api.post<MountDettaglio>(`/mounts/${id}/ferma`),
   elimina: (id: number) => api.delete<void>(`/mounts/${id}`),

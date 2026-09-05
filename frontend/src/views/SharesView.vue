@@ -9,6 +9,7 @@ import { RouterLink, useRoute, useRouter } from 'vue-router'
 import type { Visibilita } from '@/api/shares'
 import GruppoCampi from '@/components/GruppoCampi.vue'
 import IndirizziPubblicazione from '@/components/IndirizziPubblicazione.vue'
+import SfogliaMount from '@/components/SfogliaMount.vue'
 import { useMountsStore } from '@/stores/mounts'
 import { useSharesStore } from '@/stores/shares'
 
@@ -52,8 +53,20 @@ const puoCreare = computed(
   () => form.value.slug !== '' && form.value.label !== '' && form.value.mount_id > 0,
 )
 
+// --- sfoglia e pubblica in blocco ---
+//
+// Scrivere il percorso a mano resta possibile: questa e' un'alternativa per
+// chi preferisce vedere l'albero della condivisione invece di ricordarselo.
+const modalitaSottopercorso = ref<'scrivi' | 'sfoglia'>('scrivi')
+const percorsiSelezionati = ref<string[]>([])
+const pubblicandoBlocco = ref(false)
+const erroreBlocco = ref('')
+
 function apriNuovo(mountId?: number): void {
   form.value.mount_id = mountId ?? mounts.elenco[0]?.id ?? 0
+  modalitaSottopercorso.value = 'scrivi'
+  percorsiSelezionati.value = []
+  erroreBlocco.value = ''
   nuovoAperto.value = true
 }
 
@@ -82,13 +95,54 @@ const indirizzoPrevisto = computed(() =>
   form.value.slug ? `${window.location.origin}/${form.value.slug}` : '',
 )
 
-function proponiIdentificatore(): void {
-  if (form.value.slug) return
-  form.value.slug = form.value.label
+function slugifica(testo: string): string {
+  return testo
     .toLowerCase()
     .replace(/[^a-z0-9-]+/g, '-')
     .replace(/^-+|-+$/g, '')
     .slice(0, 63)
+}
+
+function proponiIdentificatore(): void {
+  if (form.value.slug) return
+  form.value.slug = slugifica(form.value.label)
+}
+
+function nomeCartella(percorso: string): string {
+  const parti = percorso.split('/').filter(Boolean)
+  return parti[parti.length - 1] ?? percorso
+}
+
+async function pubblicaSelezionate(): Promise<void> {
+  pubblicandoBlocco.value = true
+  erroreBlocco.value = ''
+  let falliti = 0
+  // Uno per volta, non in parallelo: due percorsi con lo stesso nome
+  // finale produrrebbero lo stesso slug, e il secondo deve vedere l'errore
+  // del primo restando comunque selezionato per essere rinominato a mano.
+  for (const percorso of [...percorsiSelezionati.value]) {
+    const nome = nomeCartella(percorso)
+    const fatto = await shares.crea({
+      slug: slugifica(nome),
+      label: nome,
+      mount_id: form.value.mount_id,
+      subpath: percorso,
+      description: null,
+      default_visibility: form.value.default_visibility,
+      is_enabled: true,
+    })
+    if (fatto) {
+      percorsiSelezionati.value = percorsiSelezionati.value.filter((p) => p !== percorso)
+    } else {
+      falliti += 1
+    }
+  }
+  pubblicandoBlocco.value = false
+  if (falliti > 0) {
+    erroreBlocco.value = t('share.pubblicazioneBloccoErrore', { n: falliti }, falliti)
+  } else {
+    nuovoAperto.value = false
+  }
 }
 
 async function salva(): Promise<void> {
@@ -249,17 +303,50 @@ chiudiConEsc(
               </option>
             </select>
           </label>
-          <label class="campo">
-            <span>{{ t('share.sottopercorso') }}</span>
-            <input
-              v-model="form.subpath"
-              type="text"
-              :placeholder="t('share.sottopercorsoAiuto')"
+          <div class="campo">
+            <div class="schede-modalita">
+              <button
+                type="button"
+                class="scheda-modalita"
+                :class="{ 'scheda-modalita--attiva': modalitaSottopercorso === 'scrivi' }"
+                @click="modalitaSottopercorso = 'scrivi'"
+              >
+                {{ t('share.modalitaScrivi') }}
+              </button>
+              <button
+                type="button"
+                class="scheda-modalita"
+                :class="{ 'scheda-modalita--attiva': modalitaSottopercorso === 'sfoglia' }"
+                :disabled="!form.mount_id"
+                @click="modalitaSottopercorso = 'sfoglia'"
+              >
+                {{ t('share.modalitaSfoglia') }}
+              </button>
+            </div>
+
+            <label
+              v-if="modalitaSottopercorso === 'scrivi'"
+              class="campo"
             >
-          </label>
+              <span>{{ t('share.sottopercorso') }}</span>
+              <input
+                v-model="form.subpath"
+                type="text"
+                :placeholder="t('share.sottopercorsoAiuto')"
+              >
+            </label>
+            <template v-else>
+              <span>{{ t('sfogliaMount.titolo') }}</span>
+              <SfogliaMount
+                v-model="percorsiSelezionati"
+                :mount-id="form.mount_id"
+              />
+            </template>
+          </div>
         </GruppoCampi>
 
         <GruppoCampi
+          v-if="modalitaSottopercorso === 'scrivi'"
           :titolo="t('share.gruppoNome')"
           :descrizione="t('share.gruppoNomeAiuto')"
         >
@@ -313,11 +400,11 @@ chiudiConEsc(
 
 
         <p
-          v-if="shares.errore"
+          v-if="shares.errore || erroreBlocco"
           class="errore"
           role="alert"
         >
-          {{ shares.errore }}
+          {{ erroreBlocco || shares.errore }}
         </p>
 
         <footer class="azioni">
@@ -329,12 +416,30 @@ chiudiConEsc(
             {{ t('comune.annulla') }}
           </button>
           <button
+            v-if="modalitaSottopercorso === 'scrivi'"
             class="bottone bottone--principale"
             type="button"
             :disabled="!puoCreare || salvataggio"
             @click="salva"
           >
             {{ salvataggio ? t('share.creando') : t('comune.crea') }}
+          </button>
+          <button
+            v-else
+            class="bottone bottone--principale"
+            type="button"
+            :disabled="percorsiSelezionati.length === 0 || pubblicandoBlocco"
+            @click="pubblicaSelezionate"
+          >
+            {{
+              pubblicandoBlocco
+                ? t('share.creando')
+                : t(
+                  'share.pubblicaSelezionate',
+                  { n: percorsiSelezionati.length },
+                  percorsiSelezionati.length,
+                )
+            }}
           </button>
         </footer>
       </section>
@@ -491,6 +596,35 @@ h1 {
 
 .pannello .azioni {
   justify-content: flex-end;
+}
+
+.schede-modalita {
+  display: flex;
+  gap: 0.35rem;
+  margin-bottom: 0.15rem;
+}
+
+.scheda-modalita {
+  padding: 0.35rem 0.75rem;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--testo-tenue);
+  background: transparent;
+  border: 1px solid var(--bordo);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.scheda-modalita--attiva {
+  color: var(--accento);
+  border-color: color-mix(in srgb, var(--accento) 40%, var(--bordo));
+  background: color-mix(in srgb, var(--accento) 12%, transparent);
+}
+
+.scheda-modalita:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 

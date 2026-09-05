@@ -110,3 +110,10 @@ class MontaggioPreesistente(BaseModel):
 
 class DisattivaFstab(BaseModel):
     mountpoint: str = Field(min_length=1, max_length=1024, pattern=r"^/.*")
+
+
+class CartellaMount(BaseModel):
+    """Una sottocartella del mount, per scegliere cosa pubblicare sfogliando."""
+
+    nome: str
+    percorso: str

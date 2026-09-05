@@ -11,6 +11,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { chiudiConEsc } from '@/composables/finestra'
+import { RouterLink } from 'vue-router'
 
 import { utentiApi, type NuovoUtente, type Utente } from '@/api/utenti'
 import { useAuthStore } from '@/stores/auth'
@@ -214,6 +215,23 @@ chiudiConEsc(
           >
             {{ t(`utenti.${p}`) }}
           </button>
+        </div>
+
+        <div
+          v-if="u.accessi.length"
+          class="accessi"
+        >
+          <span class="accessi__titolo">{{ t('utenti.accessi') }}</span>
+          <RouterLink
+            v-for="a in u.accessi"
+            :key="`${a.share_id}-${a.path_prefix}`"
+            :to="`/pubblicazioni/${a.share_id}`"
+            class="accesso-riga"
+          >
+            <span class="accesso-riga__share">{{ a.share_label }}</span>
+            <span class="accesso-riga__percorso">{{ a.path_prefix || t('permessi.tutte') }}</span>
+            <span class="accesso-riga__livello">{{ t(`permessi.${a.livello}`) }}</span>
+          </RouterLink>
         </div>
 
         <div class="azioni">
@@ -453,6 +471,53 @@ chiudiConEsc(
   border-color: transparent;
   background: color-mix(in srgb, var(--ok) 20%, transparent);
   color: var(--ok);
+}
+
+.accessi {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  padding-top: 0.55rem;
+  border-top: 1px dashed var(--bordo);
+}
+
+.accessi__titolo {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--testo-tenue);
+}
+
+.accesso-riga {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.55rem;
+  border: 1px solid var(--bordo);
+  border-radius: 999px;
+  font-size: 0.78rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.accesso-riga:hover {
+  border-color: var(--accento);
+}
+
+.accesso-riga__share {
+  font-weight: 600;
+  color: var(--accento);
+}
+
+.accesso-riga__percorso {
+  font-family: var(--font-mono);
+  color: var(--testo-tenue);
+}
+
+.accesso-riga__livello {
+  color: var(--testo-tenue);
 }
 
 .azioni,

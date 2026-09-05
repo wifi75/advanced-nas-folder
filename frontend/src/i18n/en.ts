@@ -190,6 +190,11 @@ export default {
     condivisione: 'NFS share',
     sottopercorso: 'Subfolder',
     sottopercorsoAiuto: 'Leave empty to publish the root of the share',
+    modalitaScrivi: 'Type a path',
+    modalitaSfoglia: 'Browse and select',
+    pubblicaSelezionate: 'Publish 1 selected folder | Publish {n} selected folders',
+    pubblicazioneBloccoErrore:
+      'One publication failed: it stayed selected, fix the name and try again. | {n} publications failed: they stayed selected, fix the names and try again.',
     nome: 'Name',
     descrizione: 'Description',
     visibilitaPredefinita: 'Who can access',
@@ -228,6 +233,7 @@ export default {
       'Each rule covers one folder and everything inside it. The most specific rule always wins, so a subfolder can be stricter than the folder containing it.',
     percorso: 'Folder',
     radice: 'the whole publication',
+    visibilitaScelta: 'Who can access',
     aggiungi: 'Add rule',
     password: 'Password',
     protetta: 'password protected',
@@ -239,6 +245,14 @@ export default {
     scendi: 'Open a subfolder…',
     nessuna: 'No subfolders here',
     nonLeggibile: 'Folder not readable',
+  },
+
+  sfogliaMount: {
+    titolo: 'Browse and tick the folders to publish',
+    apri: 'open',
+    selezionate: '1 folder selected: | {n} folders selected:',
+    aiuto:
+      'You can open a folder and keep selecting others: they all stay listed even at different depths.',
   },
 
   permessi: {
@@ -254,8 +268,9 @@ export default {
     assegna: 'Assign',
     nessuno: 'No permission assigned.',
     tutte: 'all folders',
-    notaMultipla: 'Hold Ctrl (or Cmd) to pick more than one.',
-    nessunUtente: 'No users to pick: create one from the Users page.',
+    nessunUtente: 'No users yet: create one from here, or from the Users page.',
+    nuovoUtente: '+ New user…',
+    creaESeleziona: 'Create and select',
   },
 
   prova: {
@@ -349,6 +364,7 @@ export default {
     can_modify: 'Modify',
     can_delete: 'Delete',
     can_share: 'Create links',
+    accessi: 'Folder access',
     confermaTitolo: 'Delete “{nome}”?',
     confermaTesto:
       'The user and the permissions assigned to them are removed. Files are left untouched.',

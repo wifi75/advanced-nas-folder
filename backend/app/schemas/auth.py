@@ -37,6 +37,20 @@ class TokenResponse(BaseModel):
     password_predefinita: bool = False
 
 
+class AccessoOut(BaseModel):
+    """Un permesso per cartella già assegnato altrove, di sola lettura qui.
+
+    Risponde a "questo utente dove può andare": si assegna e si toglie
+    sempre dalla pubblicazione (`PermessoUtente`), non da qui.
+    """
+
+    share_id: int
+    share_label: str
+    share_slug: str
+    path_prefix: str
+    livello: str
+
+
 class UserAdminOut(UserOut):
     """L'utente come lo vede l'amministratore.
 
@@ -46,6 +60,7 @@ class UserAdminOut(UserOut):
 
     is_active: bool
     scope: str
+    accessi: list[AccessoOut] = []
 
 
 class UserCreate(BaseModel):

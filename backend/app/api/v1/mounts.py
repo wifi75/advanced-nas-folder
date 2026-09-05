@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import re
+from pathlib import Path
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Query, status
 from sqlalchemy import select
 
 from app.api.deps import Amministratore, Sessione
@@ -13,6 +14,7 @@ from app.core.config import get_settings
 from app.models import Mount
 from app.models.enums import AccessoNFS, StatoMount
 from app.schemas.mount import (
+    CartellaMount,
     DisattivaFstab,
     MontaggioPreesistente,
     MountCreate,
@@ -23,8 +25,9 @@ from app.schemas.mount import (
     ScopertaRisposta,
     StatoEffettivo,
 )
-from app.services import agent_client
+from app.services import agent_client, archivio
 from app.services import mounts as servizio
+from app.services.percorsi import PercorsoNonValido, normalizza_relativo, risolvi
 
 router = APIRouter(prefix="/mounts", tags=["mount"])
 
@@ -166,6 +169,35 @@ async def disattiva_fstab(dati: DisattivaFstab, _: Amministratore) -> dict[str, 
         return dict(await agent_client.chiedi("fstab.disable", {"mountpoint": dati.mountpoint}))
     except (agent_client.AgentNonDisponibile, agent_client.AgentRifiuta) as exc:
         raise errore_agent(exc) from exc
+
+
+@router.get("/{mount_id}/cartelle", response_model=list[CartellaMount])
+async def cartelle(
+    mount_id: int,
+    sessione: Sessione,
+    _: Amministratore,
+    percorso: str = Query(default="", max_length=1024),
+) -> list[CartellaMount]:
+    """Sottocartelle di un mount, per scegliere cosa pubblicare sfogliando.
+
+    A differenza di `/archivio/{slug}` non serve una pubblicazione già
+    creata: qui si guarda direttamente la condivisione NFS grezza, motivo per
+    cui l'endpoint e' riservato agli amministratori invece di passare per
+    l'ACL di uno share.
+    """
+    mount = await _carica(sessione, mount_id)
+    try:
+        normalizzato = str(normalizza_relativo(percorso))
+        reale = risolvi(Path(mount.mountpoint), percorso)
+    except PercorsoNonValido as exc:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, str(exc)) from exc
+
+    try:
+        voci = await archivio.elenca(reale, normalizzato, lambda _: True)
+    except archivio.ArchivioNonDisponibile as exc:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, str(exc)) from exc
+
+    return [CartellaMount(nome=v.nome, percorso=v.percorso) for v in voci if v.cartella]
 
 
 @router.get("/{mount_id}", response_model=MountDettaglio)

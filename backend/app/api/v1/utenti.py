@@ -22,8 +22,8 @@ from sqlalchemy import func, select
 
 from app.api.deps import Amministratore, Sessione, UtenteCorrente
 from app.core.security import hash_password, verifica_password
-from app.models import User
-from app.schemas.auth import CambioPassword, UserAdminOut, UserCreate, UserUpdate
+from app.models import PermessoUtente, Share, User
+from app.schemas.auth import AccessoOut, CambioPassword, UserAdminOut, UserCreate, UserUpdate
 from app.services.percorsi import PercorsoNonValido, normalizza_relativo
 
 router = APIRouter(prefix="/utenti", tags=["utenti"])
@@ -69,10 +69,41 @@ async def _resterebbe_senza_amministratori(
     return await _quanti_amministratori(sessione) <= 1
 
 
+async def _accessi_per_utente(sessione: Sessione) -> dict[int, list[AccessoOut]]:
+    """Permessi per cartella di tutti gli utenti, raggruppati per `user_id`.
+
+    Una query sola per l'intero elenco: farne una per utente (N+1) sarebbe
+    lento gia' con poche decine di persone.
+    """
+    risultato = await sessione.execute(
+        select(PermessoUtente, Share.label, Share.slug).join(
+            Share, Share.id == PermessoUtente.share_id
+        )
+    )
+    per_utente: dict[int, list[AccessoOut]] = {}
+    for permesso, label, slug in risultato.all():
+        per_utente.setdefault(permesso.user_id, []).append(
+            AccessoOut(
+                share_id=permesso.share_id,
+                share_label=label,
+                share_slug=slug,
+                path_prefix=permesso.path_prefix,
+                livello=permesso.livello.value,
+            )
+        )
+    return per_utente
+
+
 @router.get("", response_model=list[UserAdminOut])
-async def elenca(sessione: Sessione, _: Amministratore) -> list[User]:
+async def elenca(sessione: Sessione, _: Amministratore) -> list[UserAdminOut]:
     risultato = await sessione.execute(select(User).order_by(User.username))
-    return list(risultato.scalars().all())
+    accessi = await _accessi_per_utente(sessione)
+    return [
+        UserAdminOut.model_validate(utente, from_attributes=True).model_copy(
+            update={"accessi": accessi.get(utente.id, [])}
+        )
+        for utente in risultato.scalars().all()
+    ]
 
 
 @router.post("", response_model=UserAdminOut, status_code=status.HTTP_201_CREATED)

@@ -19,7 +19,7 @@ import {
   type Livello,
   type Visibilita,
 } from '@/api/shares'
-import { utentiApi, type Utente } from '@/api/utenti'
+import { utentiApi, type NuovoUtente, type Utente } from '@/api/utenti'
 import { useSharesStore } from '@/stores/shares'
 
 const props = defineProps<{ id: number }>()
@@ -84,6 +84,58 @@ async function caricaUtenti(): Promise<void> {
     // Senza elenco resta la scheda, solo senza persone fra cui scegliere:
     // non e' un motivo per far fallire l'intera pagina.
     utenti.value = []
+  }
+}
+
+// --- creazione utente inline ---
+//
+// Assegnare un permesso presuppone che l'utente esista gia': senza questo,
+// bisognava uscire dalla pubblicazione, andare in Utenti, crearlo, e tornare
+// qui ricordandosi cosa si stava per fare.
+const creazioneUtenteAperta = ref(false)
+const nuovoUtenteNome = ref('')
+const nuovoUtentePassword = ref('')
+const creazioneUtenteErrore = ref('')
+const creazioneUtenteInCorso = ref(false)
+
+function apriCreazioneUtente(): void {
+  creazioneUtenteAperta.value = true
+  nuovoUtenteNome.value = ''
+  nuovoUtentePassword.value = ''
+  creazioneUtenteErrore.value = ''
+}
+
+async function creaUtenteInline(): Promise<void> {
+  creazioneUtenteInCorso.value = true
+  creazioneUtenteErrore.value = ''
+  // Permessi generali minimi: chi assegna l'accesso da qui sta decidendo
+  // *dove* questa persona puo' andare, non cosa puo' fare in generale — quella
+  // scelta resta in Utenti, con gli stessi valori proposti li'.
+  const dati: NuovoUtente = {
+    username: nuovoUtenteNome.value,
+    password: nuovoUtentePassword.value,
+    email: null,
+    is_admin: false,
+    scope: '',
+    can_create: false,
+    can_delete: false,
+    can_modify: false,
+    can_rename: false,
+    can_share: false,
+    can_download: true,
+    can_upload: false,
+  }
+  try {
+    const creato = await utentiApi.crea(dati)
+    await caricaUtenti()
+    if (!permessoUtenti.value.includes(creato.id)) {
+      permessoUtenti.value = [...permessoUtenti.value, creato.id]
+    }
+    creazioneUtenteAperta.value = false
+  } catch (e) {
+    creazioneUtenteErrore.value = e instanceof ApiError ? e.message : t('errori.imprevisto')
+  } finally {
+    creazioneUtenteInCorso.value = false
   }
 }
 
@@ -289,34 +341,48 @@ const chiHaDeciso = computed(() => {
             {{ t('regole.nessuna') }}
           </p>
 
-          <div class="riga-form">
-            <input
-              v-model="nuovoPercorso"
-              type="text"
-              :placeholder="t('regole.percorso')"
-            >
-            <select v-model="nuovaVisibilita">
-              <option
-                v-for="v in VISIBILITA"
-                :key="v"
-                :value="v"
+          <div class="modulo">
+            <div class="modulo__campi">
+              <label class="campo">
+                <span>{{ t('regole.percorso') }}</span>
+                <input
+                  v-model="nuovoPercorso"
+                  type="text"
+                  :placeholder="t('permessi.tutte')"
+                >
+              </label>
+              <label class="campo">
+                <span>{{ t('regole.visibilitaScelta') }}</span>
+                <select v-model="nuovaVisibilita">
+                  <option
+                    v-for="v in VISIBILITA"
+                    :key="v"
+                    :value="v"
+                  >
+                    {{ t(`visibilita.${v}`) }}
+                  </option>
+                </select>
+              </label>
+              <label
+                v-if="nuovaVisibilita === 'password'"
+                class="campo"
               >
-                {{ t(`visibilita.${v}`) }}
-              </option>
-            </select>
-            <input
-              v-if="nuovaVisibilita === 'password'"
-              v-model="nuovaPassword"
-              type="password"
-              :placeholder="t('regole.password')"
-            >
-            <button
-              class="bottone bottone--principale"
-              type="button"
-              @click="aggiungiRegola"
-            >
-              {{ t('regole.aggiungi') }}
-            </button>
+                <span>{{ t('regole.password') }}</span>
+                <input
+                  v-model="nuovaPassword"
+                  type="password"
+                >
+              </label>
+            </div>
+            <div class="modulo__azioni">
+              <button
+                class="bottone bottone--principale"
+                type="button"
+                @click="aggiungiRegola"
+              >
+                {{ t('regole.aggiungi') }}
+              </button>
+            </div>
           </div>
         </section>
       </template>
@@ -362,48 +428,119 @@ const chiHaDeciso = computed(() => {
             {{ t('permessi.nessuno') }}
           </p>
 
-          <div class="riga-form riga-form--permesso">
-            <label class="scelta-utenti">
-              <span class="scelta-utenti__titolo">{{ t('permessi.utente') }}</span>
-              <select
-                v-model="permessoUtenti"
-                multiple
-                size="4"
+          <div class="modulo">
+            <div class="campo">
+              <span>{{ t('permessi.utente') }}</span>
+              <div
+                class="utenti-box"
+                role="group"
                 :aria-label="t('permessi.utente')"
               >
-                <option
+                <button
+                  type="button"
+                  class="nuovo-utente-riga"
+                  @click="apriCreazioneUtente"
+                >
+                  {{ t('permessi.nuovoUtente') }}
+                </button>
+                <p
+                  v-if="!utenti.length"
+                  class="vuoto-box"
+                >
+                  {{ t('permessi.nessunUtente') }}
+                </p>
+                <label
                   v-for="u in utenti"
                   :key="u.id"
-                  :value="u.id"
+                  class="riga-utente"
                 >
-                  {{ u.username }}
-                </option>
-              </select>
-              <span class="scelta-utenti__nota">
-                {{ utenti.length ? t('permessi.notaMultipla') : t('permessi.nessunUtente') }}
-              </span>
-            </label>
-            <ScegliCartella
-              v-model="permessoPercorso"
-              :slug="share.slug"
-            />
-            <select v-model="permessoLivello">
-              <option
-                v-for="l in LIVELLI"
-                :key="l"
-                :value="l"
-              >
-                {{ t(`permessi.${l}`) }}
-              </option>
-            </select>
-            <button
-              class="bottone bottone--principale"
-              type="button"
-              :disabled="permessoUtenti.length === 0"
-              @click="assegnaPermesso"
+                  <input
+                    v-model="permessoUtenti"
+                    type="checkbox"
+                    :value="u.id"
+                  >
+                  <span>{{ u.username }}</span>
+                </label>
+              </div>
+            </div>
+
+            <form
+              v-if="creazioneUtenteAperta"
+              class="modulo modulo--nuovo-utente"
+              @submit.prevent="creaUtenteInline"
             >
-              {{ t('permessi.assegna') }}
-            </button>
+              <div class="modulo__campi">
+                <label class="campo">
+                  <span>{{ t('accesso.utente') }}</span>
+                  <input
+                    v-model="nuovoUtenteNome"
+                    type="text"
+                    autocomplete="off"
+                  >
+                </label>
+                <label class="campo">
+                  <span>{{ t('accesso.password') }}</span>
+                  <input
+                    v-model="nuovoUtentePassword"
+                    type="password"
+                    autocomplete="new-password"
+                  >
+                  <span class="nota-campo">{{ t('utenti.passwordMinima') }}</span>
+                </label>
+              </div>
+              <p
+                v-if="creazioneUtenteErrore"
+                class="errore-prova"
+                role="alert"
+              >
+                {{ creazioneUtenteErrore }}
+              </p>
+              <div class="modulo__azioni">
+                <button
+                  type="button"
+                  class="bottone bottone--tenue"
+                  @click="creazioneUtenteAperta = false"
+                >
+                  {{ t('comune.annulla') }}
+                </button>
+                <button
+                  type="submit"
+                  class="bottone bottone--principale"
+                  :disabled="creazioneUtenteInCorso || !nuovoUtenteNome || !nuovoUtentePassword"
+                >
+                  {{ t('permessi.creaESeleziona') }}
+                </button>
+              </div>
+            </form>
+
+            <div class="modulo__campi">
+              <ScegliCartella
+                v-model="permessoPercorso"
+                :slug="share.slug"
+              />
+              <label class="campo">
+                <span>{{ t('permessi.livello') }}</span>
+                <select v-model="permessoLivello">
+                  <option
+                    v-for="l in LIVELLI"
+                    :key="l"
+                    :value="l"
+                  >
+                    {{ t(`permessi.${l}`) }}
+                  </option>
+                </select>
+              </label>
+            </div>
+            <div class="modulo__azioni">
+              <button
+                class="bottone bottone--principale"
+                type="button"
+                :disabled="permessoUtenti.length === 0"
+                @click="assegnaPermesso"
+              >
+                {{ t('permessi.assegna') }}
+              </button>
+            </div>
           </div>
         </section>
       </template>
@@ -481,41 +618,56 @@ const chiHaDeciso = computed(() => {
             {{ t('link.nessuno') }}
           </p>
 
-          <div class="riga-form">
-            <input
-              v-model="linkPercorso"
-              type="text"
-              :placeholder="t('link.cartella')"
-            >
-            <input
-              v-model="linkEtichetta"
-              type="text"
-              :placeholder="t('link.etichetta')"
-            >
-            <input
-              v-model.number="linkGiorni"
-              type="number"
-              min="1"
-              :placeholder="t('link.giorni')"
-            >
-            <input
-              v-model.number="linkMaxDownload"
-              type="number"
-              min="1"
-              :placeholder="t('link.maxDownload')"
-            >
-            <input
-              v-model="linkPassword"
-              type="password"
-              :placeholder="t('link.password')"
-            >
-            <button
-              class="bottone bottone--principale"
-              type="button"
-              @click="creaLink"
-            >
-              {{ t('link.crea') }}
-            </button>
+          <div class="modulo">
+            <div class="modulo__campi">
+              <label class="campo">
+                <span>{{ t('link.cartella') }}</span>
+                <input
+                  v-model="linkPercorso"
+                  type="text"
+                  :placeholder="t('permessi.tutte')"
+                >
+              </label>
+              <label class="campo">
+                <span>{{ t('link.etichetta') }}</span>
+                <input
+                  v-model="linkEtichetta"
+                  type="text"
+                >
+              </label>
+              <label class="campo">
+                <span>{{ t('link.giorni') }}</span>
+                <input
+                  v-model.number="linkGiorni"
+                  type="number"
+                  min="1"
+                >
+              </label>
+              <label class="campo">
+                <span>{{ t('link.maxDownload') }}</span>
+                <input
+                  v-model.number="linkMaxDownload"
+                  type="number"
+                  min="1"
+                >
+              </label>
+              <label class="campo">
+                <span>{{ t('link.password') }}</span>
+                <input
+                  v-model="linkPassword"
+                  type="password"
+                >
+              </label>
+            </div>
+            <div class="modulo__azioni">
+              <button
+                class="bottone bottone--principale"
+                type="button"
+                @click="creaLink"
+              >
+                {{ t('link.crea') }}
+              </button>
+            </div>
           </div>
 
           <p
@@ -729,45 +881,6 @@ h3 {
   border-radius: var(--raggio);
 }
 
-/* Con l'elenco a scelta multipla la riga non e' piu' una riga: le persone
-   occupano quattro righe di altezza, e gli altri campi devono allinearsi in
-   basso invece di stirarsi accanto. */
-.riga-form--permesso {
-  align-items: flex-end;
-}
-
-.scelta-utenti {
-  flex: 2;
-  min-inline-size: 190px;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.scelta-utenti__titolo {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  color: var(--testo-tenue);
-}
-
-.scelta-utenti select {
-  /* Un elenco a scelta multipla, non una tendina: si vede subito chi c'e' e
-     chi e' gia' selezionato, senza aprire nulla. */
-  padding: 0.25rem;
-}
-
-.scelta-utenti option {
-  padding: 0.2rem 0.35rem;
-  border-radius: 5px;
-}
-
-.scelta-utenti__nota {
-  font-size: 0.75rem;
-  color: var(--testo-tenue);
-}
-
 .riga-form button {
   flex: none;
   padding: 0.4rem 0.8rem;
@@ -784,6 +897,93 @@ h3 {
 .riga-form button:disabled {
   opacity: 0.55;
   cursor: default;
+}
+
+/* --- moduli di aggiunta (regole, permessi, link) ---------------------------
+   Campi etichettati in griglia invece di una riga piatta senza testo: stesso
+   linguaggio visivo del resto del pannello (vedi GruppoCampi.vue). */
+.modulo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.modulo__campi {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.6rem 0.8rem;
+  align-items: end;
+}
+
+.modulo__azioni {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.modulo--nuovo-utente {
+  padding: 0.75rem 0.85rem;
+  background: color-mix(in srgb, var(--tinta-utenti) 6%, var(--superficie));
+  border: 1px dashed color-mix(in srgb, var(--tinta-utenti) 40%, var(--bordo));
+  border-radius: var(--raggio);
+}
+
+.nota-campo {
+  font-size: 0.75rem;
+  color: var(--testo-tenue);
+}
+
+/* Sostituisce la <select multiple>: si vede subito chi c'e' e chi e' gia'
+   selezionato, senza tenere premuto Ctrl per scegliere piu' persone. */
+.utenti-box {
+  max-height: 12rem;
+  overflow-y: auto;
+  border: 1px solid var(--bordo);
+  border-radius: var(--raggio);
+  background: var(--superficie);
+}
+
+.nuovo-utente-riga {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.65rem;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-align: start;
+  color: var(--tinta-utenti);
+  background: color-mix(in srgb, var(--tinta-utenti) 8%, var(--superficie));
+  border: none;
+  border-bottom: 1px solid var(--bordo);
+  cursor: pointer;
+}
+
+.riga-utente {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.85rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--bordo) 60%, transparent);
+  cursor: pointer;
+}
+
+.riga-utente:last-child {
+  border-bottom: none;
+}
+
+.riga-utente input {
+  inline-size: 16px;
+  block-size: 16px;
+  accent-color: var(--tinta-utenti);
+}
+
+.vuoto-box {
+  margin: 0;
+  padding: 0.5rem 0.65rem;
+  font-size: 0.8125rem;
+  font-style: italic;
+  color: var(--testo-tenue);
 }
 
 .blocco--prova {
