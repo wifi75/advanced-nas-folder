@@ -1,0 +1,137 @@
+/**
+ * Pezzi di interfaccia comuni alle 5 intestazioni della pagina "File"
+ * (frontend/src/components/archivio/Intestazione*.vue): titolo, ricerca,
+ * modulo nuova cartella, briciole di pane, selettore di vista.
+ *
+ * Erano definiti dentro lo <style scoped> di ArchivioView.vue quando
+ * quella pagina aveva una sola intestazione; spostati qui perché lo stile
+ * scoped di un componente non raggiunge il markup di un altro componente,
+ * e le 5 intestazioni li usano tutte. Importato con @import nello <style
+ * scoped> di ogni intestazione: le regole restano globali (non ri-scopate),
+ * che è quello che serve per un aspetto identico ovunque compaiano.
+ *
+ * Token --vetro-*-pub e --tinta-pubblicazioni: definiti da ArchivioView.vue
+ * sul proprio elemento radice .archivio (identità calma, separata da quella
+ * ciano del pannello — vedi il commento lì). Queste regole contano su quei
+ * token esistendo già in un antenato quando vengono usate.
+ */
+
+.rimappa-vetro {
+  display: flex;
+  align-items: center;
+}
+
+.intestazione {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.titolo {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.descrizione {
+  margin: 0;
+  color: var(--testo-tenue);
+}
+
+.strumenti {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--vetro-bordo-pub);
+  border-radius: 12px;
+  background: var(--vetro-sfondo-pub);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 var(--vetro-luce-pub),
+    var(--vetro-ombra);
+}
+
+.cerca {
+  display: flex;
+  flex: 1 1 18rem;
+  gap: 0.5rem;
+}
+
+.riga-form {
+  display: flex;
+  gap: 0.5rem;
+  max-width: 26rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--vetro-bordo-pub);
+  border-radius: 12px;
+  background: var(--vetro-sfondo-pub);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 var(--vetro-luce-pub),
+    var(--vetro-ombra);
+}
+
+.briciole {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+}
+
+.briciola {
+  padding: 0.15rem 0.35rem;
+  border: 0;
+  border-radius: var(--raggio);
+  background: none;
+  color: var(--tinta-pubblicazioni);
+  cursor: pointer;
+  font: inherit;
+}
+
+.briciola:hover {
+  background: var(--superficie-alt);
+}
+
+.briciole__separatore {
+  color: var(--testo-tenue);
+}
+
+.viste {
+  display: inline-flex;
+  gap: 0.2rem;
+  padding: 0.25rem;
+  border: 1px solid var(--vetro-bordo-pub);
+  border-radius: 12px;
+  background: var(--vetro-sfondo-pub);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  box-shadow:
+    inset 0 1px 0 var(--vetro-luce-pub),
+    var(--vetro-ombra);
+  align-self: flex-start;
+}
+
+.vista {
+  border: 0;
+  border-radius: 9px;
+  background: none;
+  color: var(--testo-tenue);
+  padding: 0.35rem 0.8rem;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.vista--scelta {
+  color: var(--testo);
+  background: var(--superficie);
+  box-shadow:
+    inset 0 1px 0 var(--vetro-luce-pub),
+    var(--vetro-ombra);
+}

@@ -504,6 +504,21 @@ export default {
     vuota: 'This folder is empty.',
     passwordRichiesta: 'This path is protected by a password.',
     sblocca: 'Open',
+    elementi: 'Items',
+    spazio: 'Space',
+    ultimoCaricamento: 'Last upload',
+    nome: 'Name',
+    modificato: 'Modified',
+    dimensione: 'Size',
+  },
+
+  disposizione: {
+    titolo: 'Layout',
+    unificata: 'Unified toolbar',
+    laterale: 'Sidebar',
+    riepilogo: 'Summary header',
+    tabella: 'Dense table',
+    card: 'Card grid',
   },
 
   errori: {
