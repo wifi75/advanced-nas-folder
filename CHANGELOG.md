@@ -10,6 +10,17 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.28.16] - 2026-09-05
+
+### Corretto
+
+- **Doppio riquadro di vetro nello switcher Elenco/Griglia/Miniature**
+  delle 5 disposizioni: finiva dentro un altro riquadro già presente
+  nella barra, e in tema chiaro i due si vedevano a malapena l'uno
+  sull'altro (quasi bianco su quasi bianco). Scoperto provando la
+  v0.28.15 su dati reali. Ogni pulsante di vista ha ora un bordo
+  proprio e un colore pieno quando selezionato.
+
 ## [0.28.15] - 2026-09-05
 
 ### Aggiunto
