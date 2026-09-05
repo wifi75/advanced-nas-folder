@@ -9,7 +9,6 @@
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import type { Component } from 'vue'
 import { chiudiConEsc } from '@/composables/finestra'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -25,28 +24,11 @@ import { ApiError, tokenCorrente } from '@/api/client'
 import Anteprima from '@/components/Anteprima.vue'
 import MiniaturaVoce from '@/components/MiniaturaVoce.vue'
 import AccessoCartella from '@/components/AccessoCartella.vue'
-import IntestazioneUnificata from '@/components/archivio/IntestazioneUnificata.vue'
-import IntestazioneLaterale from '@/components/archivio/IntestazioneLaterale.vue'
-import IntestazioneRiepilogo from '@/components/archivio/IntestazioneRiepilogo.vue'
-import IntestazioneTabella from '@/components/archivio/IntestazioneTabella.vue'
-import IntestazioneCard from '@/components/archivio/IntestazioneCard.vue'
-import { useDisposizioneStore, type Disposizione } from '@/stores/disposizione'
+import Caricamenti from '@/components/Caricamenti.vue'
 
 const route = useRoute()
 const router = useRouter()
 const { t, locale } = useI18n()
-
-// La disposizione (quale delle 5 intestazioni mostrare) è una preferenza di
-// chi guarda, non della cartella: vedi stores/disposizione.ts, stesso giro
-// di tema.ts.
-const disposizione = useDisposizioneStore()
-const COMPONENTI_INTESTAZIONE: Record<Disposizione, Component> = {
-  unificata: IntestazioneUnificata,
-  laterale: IntestazioneLaterale,
-  riepilogo: IntestazioneRiepilogo,
-  tabella: IntestazioneTabella,
-  card: IntestazioneCard,
-}
 
 const contenuto = ref<Contenuto | null>(null)
 const errore = ref<string | null>(null)
@@ -80,9 +62,9 @@ function vistaSalvata(): Vista {
     const letta = localStorage.getItem(CHIAVE_VISTA)
     if (letta && (VISTE as string[]).includes(letta)) return letta as Vista
   } catch {
-    // Finestra privata, dati del sito bloccati: si riparte dall'elenco.
+    // Finestra privata, dati del sito bloccati: si riparte dalla griglia.
   }
-  return 'elenco'
+  return 'griglia'
 }
 
 const vista = ref<Vista>(vistaSalvata())
@@ -427,6 +409,11 @@ async function scaricaCartella(): Promise<void> {
 const puoScrivere = computed(() => contenuto.value?.scrittura === true)
 
 const nuovaCartella = ref('')
+/** Il caricamento e il modulo nuova cartella occupano spazio solo quando
+ *  servono davvero: prima stavano sempre aperti, anche a cartella vuota di
+ *  cose da fare, ed erano la prima cosa segnalata come disordinata. */
+const mostraCaricamento = ref(false)
+const mostraNuovaCartella = ref(false)
 const inRinomina = ref<Voce | null>(null)
 const nomeNuovo = ref('')
 const daEliminare = ref<Voce | null>(null)
@@ -453,6 +440,7 @@ async function creaCartella(): Promise<void> {
   await conEsito(async () => {
     await archivioApi.creaCartella(slug.value, percorso.value, nome)
     nuovaCartella.value = ''
+    mostraNuovaCartella.value = false
   })
 }
 
@@ -514,53 +502,6 @@ function quando(iso: string | null): string {
   return new Date(iso).toLocaleString(locale.value, { dateStyle: 'medium', timeStyle: 'short' })
 }
 
-// --- statistiche per le intestazioni "Barra laterale" e "Riepilogo" ---
-const mostraViste = computed(() => !!contenuto.value && voci.value.length > 0)
-
-const dimensioneTotale = computed(() => {
-  const totale = voci.value.reduce((somma, v) => somma + (v.dimensione ?? 0), 0)
-  return dimensione(totale)
-})
-
-const ultimoCaricamento = computed(() => {
-  let piuRecente: string | null = null
-  for (const v of voci.value) {
-    if (v.modificato && (!piuRecente || v.modificato > piuRecente)) piuRecente = v.modificato
-  }
-  return piuRecente ? quando(piuRecente) : ''
-})
-
-// --- ordinamento, solo per la disposizione "Tabella densa" ---
-//
-// I dati sono già tutti in memoria (`voci`, non paginati): ordinarli lato
-// client costa poco e non serve toccare l'API per una sola disposizione.
-type ColonnaTabella = 'nome' | 'modificato' | 'dimensione'
-const colonnaOrdine = ref<ColonnaTabella>('nome')
-const ordineDiscendente = ref(false)
-
-function ordina(colonna: ColonnaTabella): void {
-  if (colonnaOrdine.value === colonna) ordineDiscendente.value = !ordineDiscendente.value
-  else {
-    colonnaOrdine.value = colonna
-    ordineDiscendente.value = false
-  }
-}
-
-const vociOrdinate = computed(() => {
-  const segno = ordineDiscendente.value ? -1 : 1
-  return [...voci.value].sort((a, b) => {
-    // Le cartelle restano sempre prime, come nell'elenco: mescolarle con i
-    // file solo perché si è ordinato per dimensione confonderebbe di più di
-    // quanto aiuterebbe.
-    if (a.cartella !== b.cartella) return a.cartella ? -1 : 1
-    if (colonnaOrdine.value === 'nome') return segno * a.nome.localeCompare(b.nome, locale.value)
-    if (colonnaOrdine.value === 'modificato') {
-      return segno * (a.modificato ?? '').localeCompare(b.modificato ?? '')
-    }
-    return segno * ((a.dimensione ?? 0) - (b.dimensione ?? 0))
-  })
-})
-
 // Le finestre si chiudono con Esc, non cliccando sullo sfondo: un clic di
 // troppo faceva perdere quello che si stava scrivendo.
 chiudiConEsc(
@@ -599,382 +540,380 @@ chiudiConEsc(
     v-else
     class="archivio"
   >
-    <component
-      :is="COMPONENTI_INTESTAZIONE[disposizione.disposizione]"
-      v-model:termine="termine"
-      v-model:nuova-cartella="nuovaCartella"
-      :titolo="contenuto?.label ?? slug"
-      :descrizione="contenuto?.descrizione ?? null"
-      :briciole="contenuto?.briciole ?? []"
-      :puo-scrivere="puoScrivere"
+    <nav
+      class="briciole"
+      :aria-label="t('archivio.percorso')"
+    >
+      <div class="briciole__pillole">
+        <button
+          type="button"
+          class="briciola"
+          :class="{ 'briciola--attuale': !contenuto?.briciole?.length }"
+          @click="vaiA('')"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M3 11l9-8 9 8" />
+            <path d="M5 10v10h14V10" />
+          </svg>
+          {{ t('archivio.radice') }}
+        </button>
+        <template
+          v-for="[nome, p], indice in contenuto?.briciole ?? []"
+          :key="p"
+        >
+          <svg
+            class="briciole__freccia"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+          <button
+            type="button"
+            class="briciola"
+            :class="{ 'briciola--attuale': indice === (contenuto?.briciole?.length ?? 0) - 1 }"
+            @click="vaiA(p)"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" />
+            </svg>
+            {{ nome }}
+          </button>
+        </template>
+      </div>
+      <span
+        v-if="contenuto"
+        class="meta"
+      >{{ t('archivio.elementi') }}: {{ voci.length }}</span>
+    </nav>
+
+    <p
+      v-if="contenuto?.descrizione"
+      class="descrizione"
+    >
+      {{ contenuto.descrizione }}
+    </p>
+
+    <div class="strumenti">
+      <form
+        class="cerca"
+        @submit.prevent="cerca"
+      >
+        <input
+          v-model="termine"
+          type="search"
+          class="campo"
+          :placeholder="t('ricerca.campo')"
+          @search="cerca"
+          @keyup.enter="cerca"
+        >
+        <button
+          type="submit"
+          class="bottone bottone--tenue"
+          :disabled="termine.trim().length < 2 || cercando"
+        >
+          {{ t('ricerca.cerca') }}
+        </button>
+        <button
+          v-if="risultati"
+          type="button"
+          class="bottone bottone--tenue"
+          @click="azzeraRicerca"
+        >
+          {{ t('ricerca.azzera') }}
+        </button>
+      </form>
+
+      <div
+        v-if="contenuto && voci.length"
+        class="viste"
+        role="group"
+        :aria-label="t('archivio.vista')"
+      >
+        <button
+          v-for="v in VISTE"
+          :key="v"
+          type="button"
+          class="vista"
+          :class="{ 'vista--scelta': vista === v }"
+          :aria-pressed="vista === v"
+          @click="cambiaVista(v)"
+        >
+          {{ t(`archivio.vista${v.charAt(0).toUpperCase() + v.slice(1)}`) }}
+        </button>
+      </div>
+
+      <div
+        v-if="puoScrivere"
+        class="divisore"
+      />
+
+      <template v-if="puoScrivere">
+        <button
+          type="button"
+          class="bottone bottone--principale"
+          :class="{ 'bottone--scelta': mostraCaricamento }"
+          @click="mostraCaricamento = !mostraCaricamento"
+        >
+          {{ t('caricamento.mostra') }}
+        </button>
+        <button
+          type="button"
+          class="bottone bottone--tenue"
+          :class="{ 'bottone--scelta': mostraNuovaCartella }"
+          @click="mostraNuovaCartella = !mostraNuovaCartella"
+        >
+          {{ t('operazioni.nuovaCartella') }}
+        </button>
+      </template>
+
+      <button
+        type="button"
+        class="bottone bottone--tenue"
+        @click="scaricaCartella"
+      >
+        {{ t('archivio.scaricaCartella') }}
+      </button>
+    </div>
+
+    <Caricamenti
+      v-if="puoScrivere && mostraCaricamento"
       :slug="slug"
       :percorso="percorso"
-      :operazione="operazione"
-      :cercando="cercando"
-      :has-risultati="!!risultati"
-      :vista="vista"
-      :mostra-viste="mostraViste"
-      :elementi="voci.length"
-      :dimensione-totale="dimensioneTotale"
-      :ultimo-caricamento="ultimoCaricamento"
-      @cerca="cerca"
-      @azzera-ricerca="azzeraRicerca"
-      @scarica-cartella="scaricaCartella"
-      @crea-cartella="creaCartella"
-      @vai-a="vaiA"
-      @cambia-vista="cambiaVista"
       @caricato="carica"
+    />
+
+    <form
+      v-if="puoScrivere && mostraNuovaCartella"
+      class="riga-form"
+      @submit.prevent="creaCartella"
     >
-      <p
-        v-if="errore && !carico"
-        class="avviso avviso--errore"
-        role="alert"
+      <input
+        v-model="nuovaCartella"
+        type="text"
+        class="campo"
+        :placeholder="t('operazioni.nuovaCartella')"
       >
-        {{ errore }}
-      </p>
-
-      <p
-        v-if="carico"
-        class="avviso"
+      <button
+        type="submit"
+        class="bottone bottone--tenue"
+        :disabled="operazione || nuovaCartella.trim() === ''"
       >
-        {{ t('comune.carico') }}
-      </p>
+        {{ t('operazioni.crea') }}
+      </button>
+    </form>
 
-      <p
-        v-if="risultati"
-        class="avviso"
-      >
-        {{ t('ricerca.esito', { n: risultati.length }, risultati.length) }}
-        <template v-if="troncata">
-          — {{ t('ricerca.troncata') }}
-        </template>
-      </p>
+    <p
+      v-if="errore && !carico"
+      class="avviso avviso--errore"
+      role="alert"
+    >
+      {{ errore }}
+    </p>
 
-      <p
-        v-else-if="contenuto && voci.length === 0"
-        class="avviso"
-      >
-        {{ t('archivio.vuota') }}
-      </p>
+    <p
+      v-if="carico"
+      class="avviso"
+    >
+      {{ t('comune.carico') }}
+    </p>
 
-      <div
-        v-if="scelti.size"
-        class="selezione"
-        role="status"
-      >
-        <span>{{ t('selezione.scelti', { n: scelti.size }, scelti.size) }}</span>
-        <button
-          type="button"
-          class="bottone bottone--tenue"
-          @click="scaricaScelti"
-        >
-          {{ t('selezione.scarica') }}
-        </button>
-        <button
-          type="button"
-          class="bottone bottone--tenue"
-          @click="azzeraScelta"
-        >
-          {{ t('selezione.azzera') }}
-        </button>
-      </div>
-
-      <p
-        v-if="vista !== 'elenco' && contenuto && voci.length"
-        class="suggerimento"
-      >
-        {{ t('archivio.comandiNelMenu') }}
-      </p>
-
-      <!-- La "Tabella densa" sostituisce la resa solo per la vista Elenco:
-           per Griglia e Miniature non esiste un equivalente tabellare
-           sensato, restano quelle di sempre (ramo v-else sotto). -->
-      <div
-        v-if="disposizione.disposizione === 'tabella' && vista === 'elenco' && contenuto && voci.length"
-        class="tabella"
-      >
-        <table>
-          <thead>
-            <tr>
-              <th class="cella-scelta" />
-              <th>
-                <button
-                  type="button"
-                  class="intestazione-colonna"
-                  @click="ordina('nome')"
-                >
-                  {{ t('archivio.nome') }}
-                  <svg
-                    v-if="colonnaOrdine === 'nome'"
-                    class="chevron"
-                    :class="{ 'chevron--su': !ordineDiscendente }"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2.4"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                  >
-                    <polyline points="6 9 12 15 18 9" />
-                  </svg>
-                </button>
-              </th>
-              <th>
-                <button
-                  type="button"
-                  class="intestazione-colonna"
-                  @click="ordina('modificato')"
-                >
-                  {{ t('archivio.modificato') }}
-                  <svg
-                    v-if="colonnaOrdine === 'modificato'"
-                    class="chevron"
-                    :class="{ 'chevron--su': !ordineDiscendente }"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2.4"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                  >
-                    <polyline points="6 9 12 15 18 9" />
-                  </svg>
-                </button>
-              </th>
-              <th class="destra">
-                <button
-                  type="button"
-                  class="intestazione-colonna"
-                  @click="ordina('dimensione')"
-                >
-                  {{ t('archivio.dimensione') }}
-                  <svg
-                    v-if="colonnaOrdine === 'dimensione'"
-                    class="chevron"
-                    :class="{ 'chevron--su': !ordineDiscendente }"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2.4"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    aria-hidden="true"
-                  >
-                    <polyline points="6 9 12 15 18 9" />
-                  </svg>
-                </button>
-              </th>
-              <th class="cella-azioni" />
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="voce in vociOrdinate"
-              :key="voce.percorso"
-              @contextmenu.prevent="apriMenu(voce, $event)"
-            >
-              <td class="cella-scelta">
-                <input
-                  type="checkbox"
-                  :checked="scelti.has(voce.percorso)"
-                  :aria-label="t('selezione.scegli', { nome: voce.nome })"
-                  @change="alternaScelta(voce)"
-                >
-              </td>
-              <td class="cella-nome">
-                <button
-                  type="button"
-                  class="apri-riga"
-                  @click="voce.cartella ? apri(voce) : (inAnteprima = voce)"
-                >
-                  <svg
-                    class="voce__icona"
-                    :class="`voce__icona--${famiglia(voce)}`"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path :d="TRACCIATI[famiglia(voce)]" />
-                  </svg>
-                  <span>{{ risultati ? voce.percorso : voce.nome }}</span>
-                </button>
-              </td>
-              <td class="numerica">
-                {{ quando(voce.modificato) }}
-              </td>
-              <td class="numerica destra">
-                {{ dimensione(voce.dimensione) }}
-              </td>
-              <td class="cella-azioni">
-                <button
-                  v-if="!voce.cartella"
-                  type="button"
-                  class="bottone bottone--tenue"
-                  :disabled="inPreparazione === voce.percorso"
-                  @click="scarica(voce)"
-                >
-                  {{ inPreparazione === voce.percorso ? t('comune.carico') : t('archivio.scarica') }}
-                </button>
-                <template v-if="puoScrivere">
-                  <button
-                    type="button"
-                    class="bottone bottone--tenue"
-                    @click="apriRinomina(voce)"
-                  >
-                    {{ t('operazioni.rinomina') }}
-                  </button>
-                  <button
-                    type="button"
-                    class="bottone bottone--tenue"
-                    @click="apriSposta(voce)"
-                  >
-                    {{ t('operazioni.sposta') }}
-                  </button>
-                  <button
-                    type="button"
-                    class="bottone bottone--pericolo"
-                    @click="daEliminare = voce"
-                  >
-                    {{ t('comune.elimina') }}
-                  </button>
-                </template>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- In miniature le foto sono divise per mese di scatto, come in una
-           raccolta: negli altri modi il gruppo e' uno solo e il titolo non
-           compare. -->
-      <template v-else-if="contenuto && voci.length">
-        <section
-          v-for="gruppo in gruppi"
-          :key="gruppo.titolo"
-          class="gruppo-date"
-        >
-          <h2
-            v-if="gruppo.titolo"
-            class="gruppo-date__titolo"
-          >
-            {{ gruppo.titolo }}
-          </h2>
-          <ul
-            v-if="gruppo.voci.length"
-            class="voci"
-            :class="`voci--${vista}`"
-          >
-            <li
-              v-for="voce in gruppo.voci"
-              :key="voce.percorso"
-              class="voce"
-              @contextmenu.prevent="apriMenu(voce, $event)"
-              @touchstart="iniziaPressione(voce, $event)"
-              @touchmove="spostaPressione($event)"
-              @touchend="finePressione"
-              @touchcancel="annullaPressione"
-            >
-              <input
-                type="checkbox"
-                class="voce__scelta"
-                :checked="scelti.has(voce.percorso)"
-                :aria-label="t('selezione.scegli', { nome: voce.nome })"
-                @change="alternaScelta(voce)"
-              >
-
-              <button
-                v-if="voce.cartella"
-                type="button"
-                class="voce__apri"
-                @click="apri(voce)"
-              >
-                <svg
-                  class="voce__icona"
-                  :class="`voce__icona--${famiglia(voce)}`"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path :d="TRACCIATI[famiglia(voce)]" />
-                </svg>
-                <span class="voce__nome">{{ risultati ? voce.percorso : voce.nome }}</span>
-              </button>
-
-              <button
-                v-else
-                type="button"
-                class="voce__apri"
-                @click="inAnteprima = voce"
-              >
-                <MiniaturaVoce
-                  v-if="vista !== 'elenco' && haMiniatura(voce)"
-                  :slug="slug"
-                  :percorso="voce.percorso"
-                  :nome="voce.nome"
-                >
-                  <svg
-                    class="voce__icona"
-                    :class="`voce__icona--${famiglia(voce)}`"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <path :d="TRACCIATI[famiglia(voce)]" />
-                  </svg>
-                </MiniaturaVoce>
-                <svg
-                  v-else
-                  class="voce__icona"
-                  :class="`voce__icona--${famiglia(voce)}`"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path :d="TRACCIATI[famiglia(voce)]" />
-                </svg>
-                <span class="voce__nome">{{ risultati ? voce.percorso : voce.nome }}</span>
-              </button>
-
-              <span class="voce__dimensione">{{ dimensione(voce.dimensione) }}</span>
-              <span class="voce__data">{{ quando(voce.modificato) }}</span>
-
-              <div class="voce__azioni">
-                <button
-                  v-if="!voce.cartella"
-                  type="button"
-                  class="bottone bottone--tenue"
-                  :disabled="inPreparazione === voce.percorso"
-                  @click="scarica(voce)"
-                >
-                  {{ inPreparazione === voce.percorso ? t('comune.carico') : t('archivio.scarica') }}
-                </button>
-                <template v-if="puoScrivere">
-                  <button
-                    type="button"
-                    class="bottone bottone--tenue"
-                    @click="apriRinomina(voce)"
-                  >
-                    {{ t('operazioni.rinomina') }}
-                  </button>
-                  <button
-                    type="button"
-                    class="bottone bottone--tenue"
-                    @click="apriSposta(voce)"
-                  >
-                    {{ t('operazioni.sposta') }}
-                  </button>
-                  <button
-                    type="button"
-                    class="bottone bottone--pericolo"
-                    @click="daEliminare = voce"
-                  >
-                    {{ t('comune.elimina') }}
-                  </button>
-                </template>
-              </div>
-            </li>
-          </ul>
-        </section>
+    <p
+      v-if="risultati"
+      class="avviso"
+    >
+      {{ t('ricerca.esito', { n: risultati.length }, risultati.length) }}
+      <template v-if="troncata">
+        — {{ t('ricerca.troncata') }}
       </template>
-    </component>
+    </p>
+
+    <p
+      v-else-if="contenuto && voci.length === 0"
+      class="avviso"
+    >
+      {{ t('archivio.vuota') }}
+    </p>
+
+    <div
+      v-if="scelti.size"
+      class="selezione"
+      role="status"
+    >
+      <span>{{ t('selezione.scelti', { n: scelti.size }, scelti.size) }}</span>
+      <button
+        type="button"
+        class="bottone bottone--tenue"
+        @click="scaricaScelti"
+      >
+        {{ t('selezione.scarica') }}
+      </button>
+      <button
+        type="button"
+        class="bottone bottone--tenue"
+        @click="azzeraScelta"
+      >
+        {{ t('selezione.azzera') }}
+      </button>
+    </div>
+
+    <p
+      v-if="vista !== 'elenco' && contenuto && voci.length"
+      class="suggerimento"
+    >
+      {{ t('archivio.comandiNelMenu') }}
+    </p>
+
+    <!-- In miniature le foto sono divise per mese di scatto, come in una
+         raccolta: negli altri modi il gruppo e' uno solo e il titolo non
+         compare. -->
+    <template v-if="contenuto && voci.length">
+      <section
+        v-for="gruppo in gruppi"
+        :key="gruppo.titolo"
+        class="gruppo-date"
+      >
+        <h2
+          v-if="gruppo.titolo"
+          class="gruppo-date__titolo"
+        >
+          {{ gruppo.titolo }}
+        </h2>
+        <ul
+          v-if="gruppo.voci.length"
+          class="voci"
+          :class="`voci--${vista}`"
+        >
+          <li
+            v-for="voce in gruppo.voci"
+            :key="voce.percorso"
+            class="voce"
+            @contextmenu.prevent="apriMenu(voce, $event)"
+            @touchstart="iniziaPressione(voce, $event)"
+            @touchmove="spostaPressione($event)"
+            @touchend="finePressione"
+            @touchcancel="annullaPressione"
+          >
+            <input
+              type="checkbox"
+              class="voce__scelta"
+              :checked="scelti.has(voce.percorso)"
+              :aria-label="t('selezione.scegli', { nome: voce.nome })"
+              @change="alternaScelta(voce)"
+            >
+
+            <button
+              v-if="voce.cartella"
+              type="button"
+              class="voce__apri"
+              @click="apri(voce)"
+            >
+              <svg
+                class="voce__icona"
+                :class="`voce__icona--${famiglia(voce)}`"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path :d="TRACCIATI[famiglia(voce)]" />
+              </svg>
+              <span class="voce__nome">{{ risultati ? voce.percorso : voce.nome }}</span>
+            </button>
+
+            <button
+              v-else
+              type="button"
+              class="voce__apri"
+              @click="inAnteprima = voce"
+            >
+              <MiniaturaVoce
+                v-if="vista !== 'elenco' && haMiniatura(voce)"
+                :slug="slug"
+                :percorso="voce.percorso"
+                :nome="voce.nome"
+              >
+                <svg
+                  class="voce__icona"
+                  :class="`voce__icona--${famiglia(voce)}`"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path :d="TRACCIATI[famiglia(voce)]" />
+                </svg>
+              </MiniaturaVoce>
+              <svg
+                v-else
+                class="voce__icona"
+                :class="`voce__icona--${famiglia(voce)}`"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path :d="TRACCIATI[famiglia(voce)]" />
+              </svg>
+              <span class="voce__nome">{{ risultati ? voce.percorso : voce.nome }}</span>
+            </button>
+
+            <span class="voce__dimensione">{{ dimensione(voce.dimensione) }}</span>
+            <span class="voce__data">{{ quando(voce.modificato) }}</span>
+
+            <div class="voce__azioni">
+              <button
+                v-if="!voce.cartella"
+                type="button"
+                class="bottone bottone--tenue"
+                :disabled="inPreparazione === voce.percorso"
+                @click="scarica(voce)"
+              >
+                {{ inPreparazione === voce.percorso ? t('comune.carico') : t('archivio.scarica') }}
+              </button>
+              <template v-if="puoScrivere">
+                <button
+                  type="button"
+                  class="bottone bottone--tenue"
+                  @click="apriRinomina(voce)"
+                >
+                  {{ t('operazioni.rinomina') }}
+                </button>
+                <button
+                  type="button"
+                  class="bottone bottone--tenue"
+                  @click="apriSposta(voce)"
+                >
+                  {{ t('operazioni.sposta') }}
+                </button>
+                <button
+                  type="button"
+                  class="bottone bottone--pericolo"
+                  @click="daEliminare = voce"
+                >
+                  {{ t('comune.elimina') }}
+                </button>
+              </template>
+            </div>
+          </li>
+        </ul>
+      </section>
+    </template>
 
     <div
       v-if="menu"
@@ -1663,100 +1602,143 @@ chiudiConEsc(
 }
 
 
-/* .strumenti, .cerca, .riga-form: vedi la nota più sopra, ora in
-   assets/archivio-comune.css. */
-
-/* Tabella densa (disposizione "tabella", solo vista Elenco). */
-.tabella {
-  overflow-x: auto;
-  border: 1px solid var(--vetro-bordo-pub);
-  border-radius: var(--raggio);
+/* Percorso a pillole, con icona: una fila di testo sottile si perdeva
+   nella pagina e non dava un punto di riferimento chiaro su dove ci si
+   trova. La pillola piena segna la cartella attuale. */
+.briciole {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.9rem;
 }
 
-.tabella table {
-  width: 100%;
-  border-collapse: collapse;
+.briciole__pillole {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.briciola {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--bordo);
+  border-radius: 999px;
+  background: var(--superficie);
+  color: var(--testo-tenue);
   font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
 }
 
-.tabella th,
-.tabella td {
-  padding: 0.4rem 0.6rem;
-  text-align: left;
+.briciola svg {
+  flex: none;
+  inline-size: 14px;
+  block-size: 14px;
+}
+
+.briciola:hover {
+  border-color: var(--accento);
+  color: var(--accento);
+}
+
+.briciola--attuale {
+  background: var(--accento);
+  border-color: var(--accento);
+  color: var(--accento-testo);
+  font-weight: 600;
+}
+
+.briciole__freccia {
+  flex: none;
+  inline-size: 14px;
+  block-size: 14px;
+  color: var(--bordo);
+}
+
+.meta {
+  font-size: 0.8rem;
+  color: var(--testo-tenue);
+  font-family: var(--font-mono);
   white-space: nowrap;
 }
 
-.tabella th {
-  background: var(--vetro-attivo-pub);
-  color: var(--testo-tenue);
-  font-weight: 500;
-}
-
-.tabella tbody tr:hover {
-  background: var(--vetro-attivo-pub);
-}
-
-.tabella .destra {
-  text-align: right;
-}
-
-.tabella .numerica {
-  font-variant-numeric: tabular-nums;
-  font-family: var(--font-mono);
+.descrizione {
+  margin: 0 0 0.9rem;
   color: var(--testo-tenue);
 }
 
-.tabella .cella-scelta {
-  width: 2rem;
-}
-
-.tabella .cella-azioni {
-  text-align: right;
-}
-
-.tabella .cella-azioni .bottone {
-  padding: 0.2rem 0.5rem;
-  font-size: 0.78rem;
-}
-
-.intestazione-colonna {
-  display: inline-flex;
+/* Un solo riquadro per tutti i comandi della barra: niente vetro
+   annidato dentro un altro riquadro, che in tema chiaro si vede a
+   malapena (trovato provando la v0.28.15 su dati reali). */
+.strumenti {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.2rem;
-  border: 0;
-  background: none;
-  color: inherit;
-  font: inherit;
-  font-weight: 500;
-  padding: 0;
-  cursor: pointer;
+  gap: 0.6rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--bordo);
+  border-radius: var(--raggio);
+  background: var(--superficie);
+  box-shadow: 0 1px 2px rgb(16 24 32 / 4%);
+  margin-bottom: 0.9rem;
 }
 
-.chevron {
-  inline-size: 12px;
-  block-size: 12px;
-  transform: rotate(180deg);
-}
-
-.chevron--su {
-  transform: none;
-}
-
-.apri-riga {
-  display: inline-flex;
-  align-items: center;
+.cerca {
+  display: flex;
+  flex: 1 1 14rem;
   gap: 0.5rem;
-  border: 0;
-  background: none;
-  color: inherit;
+}
+
+.strumenti .divisore {
+  inline-size: 1px;
+  align-self: stretch;
+  background: var(--bordo);
+}
+
+.viste {
+  display: inline-flex;
+  gap: 0.3rem;
+}
+
+.vista {
+  border: 1px solid var(--bordo);
+  border-radius: 6px;
+  background: var(--superficie);
+  color: var(--testo-tenue);
+  padding: 0.4rem 0.75rem;
   font: inherit;
-  padding: 0;
+  font-size: 0.82rem;
+  font-weight: 500;
   cursor: pointer;
 }
 
-.apri-riga .voce__icona {
-  inline-size: 18px;
-  block-size: 18px;
+.vista:hover {
+  border-color: var(--accento);
+  color: var(--accento);
+}
+
+.vista--scelta {
+  color: var(--accento-testo);
+  background: var(--accento);
+  border-color: var(--accento);
+}
+
+.bottone--scelta {
+  background: var(--superficie-alt);
+  border-color: var(--accento);
+  color: var(--accento);
+}
+
+.riga-form {
+  display: flex;
+  gap: 0.5rem;
+  max-width: 26rem;
+  margin-bottom: 0.9rem;
 }
 
 .velo {

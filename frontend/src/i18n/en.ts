@@ -438,6 +438,7 @@ export default {
   },
 
   caricamento: {
+    mostra: 'Upload files',
     trascina: 'Drop files here to upload',
     scegli: 'Choose from device',
     scegliCartella: 'Choose a folder',
@@ -505,20 +506,6 @@ export default {
     passwordRichiesta: 'This path is protected by a password.',
     sblocca: 'Open',
     elementi: 'Items',
-    spazio: 'Space',
-    ultimoCaricamento: 'Last upload',
-    nome: 'Name',
-    modificato: 'Modified',
-    dimensione: 'Size',
-  },
-
-  disposizione: {
-    titolo: 'Layout',
-    unificata: 'Unified toolbar',
-    laterale: 'Sidebar',
-    riepilogo: 'Summary header',
-    tabella: 'Dense table',
-    card: 'Card grid',
   },
 
   errori: {

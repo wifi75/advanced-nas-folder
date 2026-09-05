@@ -442,6 +442,7 @@ export default {
   },
 
   caricamento: {
+    mostra: 'Carica file',
     trascina: 'Trascina qui i file da caricare',
     scegli: 'Scegli dal dispositivo',
     scegliCartella: 'Scegli una cartella',
@@ -511,20 +512,6 @@ export default {
     passwordRichiesta: 'Questo percorso è protetto da una password.',
     sblocca: 'Apri',
     elementi: 'Elementi',
-    spazio: 'Spazio',
-    ultimoCaricamento: 'Ultimo caricamento',
-    nome: 'Nome',
-    modificato: 'Modificato',
-    dimensione: 'Dimensione',
-  },
-
-  disposizione: {
-    titolo: 'Disposizione',
-    unificata: 'Barra unica',
-    laterale: 'Barra laterale',
-    riepilogo: 'Intestazione con riepilogo',
-    tabella: 'Tabella densa',
-    card: 'Griglia a card',
   },
 
   errori: {
