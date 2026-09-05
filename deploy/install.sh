@@ -827,6 +827,7 @@ ANF_DB_PATH=${DATI}/anf.sqlite3
 ANF_DB_WAL=true
 ANF_AGENT_SOCKET=${SOCKET_DIR}/agent.sock
 ANF_MOUNT_ROOT=${MOUNT_ROOT}
+ANF_PANEL_DIR=${RADICE}/frontend/dist
 ANF_DOWNLOAD_BACKEND=$([ "$WEB" = "apache" ] && echo xsendfile || echo xaccel)
 ANF_ACCESS_LOG=${LOG_WEB}/anf_access.log
 ANF_TRUSTED_PROXIES=127.0.0.1

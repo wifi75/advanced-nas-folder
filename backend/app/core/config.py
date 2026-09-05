@@ -54,7 +54,7 @@ class Settings(BaseSettings):
 
     #: Cartella in cui l'installer mette i file compilati del pannello. Serve
     #: alla configurazione del web server, che deve sapere cosa servire.
-    panel_dir: Path = Path("/var/www/anf/pannello")
+    panel_dir: Path = Path("/var/www/advanced-nas-folder/frontend/dist")
 
     # --- Consegna dei download ---
     #: In sviluppo diventa "stream" da solo: senza un web server davanti,
