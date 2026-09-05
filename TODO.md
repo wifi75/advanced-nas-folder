@@ -85,6 +85,9 @@ nessuna dipende da quelle successive.
 - [x] **Caricamento con trascinamento e avanzamento**, a blocchi e riprendibile
 - [x] **Caricamento di cartelle intere**, ricostruendo l'albero
 - [x] **Cartella come archivio ZIP**, prodotto mentre lo si invia
+- [x] **5 disposizioni della pagina scelte dall'utente** (barra unica,
+      laterale, riepilogo, tabella densa, griglia a card), preferenza
+      personale salvata nel browser come tema e lingua — v0.28.15
 
 - [x] **Ricerca** nei nomi, ricorsiva e filtrata dai permessi
 - [x] **Gestione utenti**: creazione, permessi generali, ambito per utente,
@@ -180,6 +183,14 @@ Richieste del 2026-08-29 rimaste aperte alla chiusura della v0.3.0:
       provato a mano contro un NAS reale, ma **vhost e fstab non sono mai stati
       eseguiti su Linux**, perché sulla macchina di sviluppo Windows i socket Unix
       non esistono. È la prima cosa da verificare al momento della pubblicazione.
+- [ ] **Le 5 disposizioni della vista File (v0.28.15) non sono mai state
+      viste con file veri.** Verificate solo strutturalmente (cambio di
+      disposizione, tema chiaro/scuro, nessun errore in console) su una
+      pubblicazione inesistente: questa macchina Windows non ha l'agent
+      NFS, quindi nessuna cartella reale da aprire. Da controllare su un
+      server Linux con un mount reale: elenco popolato, caricamento,
+      rinomina/sposta/elimina in almeno due disposizioni diverse, e la
+      combinazione Tabella densa + ordinamento.
 - [x] Riferimenti a strumenti di terze parti nei piè di firma dei commit: rimossi
       riscrivendo la cronologia. Verificato che l'API di GitHub riporti un solo
       contributore.

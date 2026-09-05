@@ -10,6 +10,18 @@ e il versionamento segue [Semantic Versioning](https://semver.org/lang/it/).
 ### Da fare
 Vedere [TODO.md](TODO.md).
 
+## [0.28.15] - 2026-09-05
+
+### Aggiunto
+
+- **5 disposizioni scelte dall'utente per la vista File**: "Barra unica",
+  "Barra laterale", "Intestazione con riepilogo", "Tabella densa" e
+  "Griglia a card" — una preferenza personale salvata nel browser, stesso
+  schema di tema e lingua, non un'impostazione di sistema. La "Tabella
+  densa" sostituisce la resa della vista Elenco con una vera tabella
+  ordinabile per nome, data o dimensione; le viste Griglia e Miniature
+  restano quelle di sempre in tutte e 5 le disposizioni.
+
 ## [0.28.14] - 2026-09-04
 
 ### Corretto

@@ -12,7 +12,45 @@ per sottocartella e gestire file. Sostituisce FileBrowser e `mod_autoindex`.
 
 - Repository pubblico: `wifi75/advanced-nas-folder`
 - Licenza MIT
-- Versione corrente: 0.28.14
+- Versione corrente: 0.28.15
+
+## Stato alla v0.28.15 — 5 settembre 2026
+
+L'utente ha trovato la vista File disordinata sia graficamente che
+strutturalmente. Proposte e approvate (via canvas di design pubblicata
+come Artifact, poi screenshot a piena pagina) 5 disposizioni alternative
+per intestazione/toolbar di quella pagina; l'utente ha poi chiesto che
+tutte e 5 esistano davvero nel pannello, scelte da ciascuno come
+preferenza personale — stesso schema di `stores/tema.ts` (localStorage,
+non un'impostazione di sistema).
+
+Nuovo store `stores/disposizione.ts` + selettore `SelettoreDisposizione.vue`
+(5 icone, stesso stile di tema/lingua) + 5 componenti in
+`components/archivio/` (`IntestazioneUnificata`, `IntestazioneLaterale`,
+`IntestazioneRiepilogo`, `IntestazioneTabella`, `IntestazioneCard`).
+`ArchivioView.vue` sceglie dinamicamente quale montare; la logica (ricerca,
+caricamento, CRUD, selezione, menu contestuale, anteprima) resta tutta lì,
+condivisa — le 5 intestazioni sono presentazione pura. Estratti in
+`assets/archivio-comune.css` i pezzi di stile davvero comuni a tutte e 5
+(titolo, briciole, switcher di vista): erano scoped dentro `ArchivioView.vue`
+e non avrebbero raggiunto i nuovi componenti figli.
+
+**Scelta deliberata**: caricamento file e "nuova cartella" restano quelli
+di sempre (stessa `<Caricamenti>`, stesso modulo), solo riposizionati —
+non ridotti a pulsanti a sola icona come nei mockup statici, per non
+toccare il caricamento a blocchi ripristinabile già indurito sul campo.
+`vista` (Elenco/Griglia/Miniature) e `disposizione` restano assi
+indipendenti tranne che per "Tabella densa": sostituisce la resa solo
+quando `vista === 'elenco'` con una vera tabella (pattern ripreso da
+`TrasferimentiView.vue`), con un piccolo ordinamento client-side aggiunto
+per l'occasione (i dati sono già tutti in memoria, non paginati).
+
+**Limite dichiarato di questa sessione**: verificato solo strutturalmente
+nel browser (cambio disposizione, tema chiaro/scuro, nessun errore in
+console) su una pubblicazione inesistente — questa macchina Windows non
+ha l'agent NFS, quindi nessuna cartella reale da aprire, stesso limite già
+noto per la revisione grafica della v0.28.3. Da verificare su un server
+Linux con dati veri: vedere `TODO.md`, sezione «Emerso durante i rilasci».
 
 ## Stato alla v0.28.14 — 4 settembre 2026
 
